@@ -1,0 +1,65 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_ancillary_data": true,
+      "cleaning_dynamic_ancillary_data": true
+    },
+    "ancillary": {
+      "domain" : "Barbados"
+    }
+  },
+  "data": {
+    "static": {
+      "grid_ref": {
+        "filename": "grid_wrf_barbados.workspace",
+        "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/static/wrf_barbados/ancillary/"
+      },
+      "land": {
+        "land_ref": {
+          "filename": "barbados.dem.txt",
+          "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/static/wrf_barbados/gridded/"
+        },
+        "land_ancillary": {
+          "filename": "geo_wrf_barbados.workspace",
+          "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/static/wrf_barbados/ancillary/"
+        }
+      }
+    },
+    "dynamic": {
+      "source": {
+        "data_source": {
+          "filename": "WRF_$DOMAIN_$yyyy$mm$dd$HH00.nc.gz",
+          "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/dynamic/outcome/wrf_barbados/$yyyy/$mm/$dd/"
+        },
+        "data_ancillary": {
+          "filename": "WRF_$DOMAIN_$yyyy$mm$dd$HH$MM.workspace",
+          "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/dynamic/ancillary/wrf_barbados/$yyyy/$mm/$dd/"
+        }
+      },
+      "outcome": {
+        "data_product": {
+          "filename": "WRF_1H_$DOMAIN_$yyyy$mm$dd$HH$MM.nc.gz",
+          "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/dynamic/outcome/wrf_barbados_1h/$yyyy/$mm/$dd/"
+        }
+      }
+    },
+    "log": {
+        "filename": "fp_tools_datasplitter_local_log.txt",
+        "folder": "/home/fabio/Documents/Working_Area/Code_Development/Workspace/PyCharm_Workspace_Python3/fp-ws/log/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": "201810090900",
+    "time_step": "4",
+    "time_delta": "43200",
+    "time_refHH": ["00", "12"]
+  }
+}

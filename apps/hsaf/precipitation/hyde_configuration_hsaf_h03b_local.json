@@ -1,0 +1,144 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_ancillary_data": true,
+      "cleaning_dynamic_ancillary_data": true,
+      "cleaning_dynamic_ancillary_archive": true,
+      "cleaning_dynamic_product_data": true
+    },
+    "ancillary": {
+      "domain" : "europe"
+    },
+    "general": {
+      "title": "HSAF - H03B precipitation product",
+      "web-site": "http://hsaf.meteoam.it/",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "4.0.5 [20191004]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "land_ref": {
+          "filename": "Mask_Europe_LatLon_0.066.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/precipitation/gridded"
+        },
+        "land_ancillary": {
+          "filename": "geo_h03b.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/precipitation/ancillary/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": "HTML.Colormap.H03B_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/precipitation/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_forecast_step": 0,
+        "time_forecast_delta": 0,
+        "time_observed_step": 1,
+        "time_observed_delta": 900,
+        "time_reference_type": {"units": "minutes",
+                                "rounding": -15,
+                                "steps": ["00", "15", "30", "45"]
+        }
+      },
+      "input": {
+        "__comment": "original grib file name --> h03B_$yyyy$mm$dd_$HH$MM_fdk.grb.gz",
+        "rain_data": {
+          "filename": "h03B_$yyyy$mm$dd_$HH$MM_europe.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/h03b/$yyyy/$mm/$dd/"
+        },
+        "rain_ancillary": {
+          "filename": "h03b_$yyyy$mm$dd_$HH$MM_$DOMAIN.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/h03b/$yyyy/$mm/$dd/"
+        }
+      },
+      "outcome": {
+        "rain_product": {
+          "filename": "hsaf_h03b_$yyyy$mm$dd$HH$MM_$DOMAIN.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/h03b/$yyyy/$mm/$dd/"
+        }
+      }
+    },
+    "log": {
+        "filename": "hyde_dynamicdata_hsaf_precipitation_h03b_local.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/"
+      },
+    "temp": {
+        "filename": null,
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/tmp/h03b/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": "201904041100",
+    "time_step": 0,
+    "time_delta": 86400,
+    "time_refHH": ["00"]
+  },
+  "variables": {
+    "input": {
+      "rain_data": {
+        "id": {
+          "__comment": "variable name in original grib file: Instantaneous_rain_rate",
+          "var_type": [ ["var2d", "accumulated"], ["var2d", "istantaneous"] ],
+          "var_name": ["IRRATE_Data", "IRRATE_QualityIndex"],
+          "var_file": ["rain_data", "rain_data"],
+          "var_method_get": [null, null],
+          "var_method_compute": [null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "Precipitation rate at ground by GEO/IR supported by LEO/MW",
+            "Quality Index precipitation rate at ground by GEO/IR supported by LEO/MW"],
+          "standard_name": ["Instantaneous_rain_rate", "Quality_index_precipitation"],
+          "Missing_value": [999.0, 999.0],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "units": ["kg.m-2.s-1", "%"]
+        }
+      }
+    },
+    "outcome": {
+      "rain_data":{
+        "id": {
+          "var_type": [ ["var2d", "integrated"],  ["var2d", "istantaneous"] ],
+          "var_name": ["Rain", "Quality"],
+          "var_file": ["rain_product", "rain_product"],
+          "var_colormap": ["rain_colormap", null],
+          "var_method_save": ["write2DVar", "write2DVar"]
+        },
+        "attributes": {
+          "long_name": [
+            "Precipitation rate at ground by GEO/IR supported by LEO/MW",
+            "Quality Index precipitation rate at ground by GEO/IR supported by LEO/MW"],
+          "standard_name": ["rain", "quality"],
+          "Missing_value": [-9999.0, -9999],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [3600, 1],
+          "units": ["mm/h", "%"],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "description": "http://hsaf.meteoam.it/description-h03b.php"
+        }
+      }
+    }
+  }
+}

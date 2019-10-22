@@ -1,0 +1,90 @@
+{
+  "data_info":{
+    "domain": "Barbados",
+    "ws": {
+      "folder": "/share/c-hydro/data/dynamic/source/ws/$yyyy/$mm/$dd/",
+      "file": "$VAR_$DOMAIN_$yyyy$mm$dd$HH$MM.csv",
+      "update": true,
+      "fields": ["longitude", "latitude", "data", "time_start", "time_end", "unit", "name", "altitude", "code"]
+    },
+    "log": {
+      "folder": "/share/c-hydro/log/",
+      "file": "fp_downloader_drops_ws_log_realtime.txt",
+      "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+    },
+    "land": {
+      "folder": "/share/c-hydro/data/static/common/gridded/",
+      "file": "barbados.dem.txt"
+    }
+  },
+  "variable_info": {
+    "rain": {
+      "download": true,
+      "name": "Rain",
+      "sensor": "Raingauge",
+      "units": "mm"
+    },
+    "air_temperature": {
+      "download": false,
+      "name": "AirTemperature",
+      "sensor": "Thermometer",
+      "units": "C"
+    },
+    "radiation": {
+      "download": false,
+      "name": "IncomingRadiation",
+      "sensor": "RadiationSensor",
+      "units": "W m-2"
+    },
+    "relative_humidity": {
+      "download": false,
+      "name": "RelativeHumidity",
+      "sensor": "Hygrometer",
+      "units": "%"
+    },
+    "wind_speed": {
+      "download": false,
+      "name": "Wind",
+      "sensor": "WindSensor",
+      "units": "m s-1"
+    },
+    "wind_direction": {
+      "download": false,
+      "name": "WindDirection",
+      "sensor": "WindDirection",
+      "units": "degree"
+    },
+    "snow_height": {
+      "download": false,
+      "name": "SnowHeight",
+      "sensor": "Snowgauge",
+      "units": "cm"
+    },
+    "air_pressure": {
+      "download": false,
+      "name": "AirPressure",
+      "sensor": "Barometer",
+      "units": ""
+    }
+  },
+  "time_info": {
+    "time_get": "201810052300",
+    "time_period": 12,
+    "time_frequency": "H"
+  },
+  "drops_info":{
+    "library_path" : "/share/c-hydro/library/acrofour_merged/",
+    "library_jvm": "/opt/jre1.8.0_45/lib/amd64/server/libjvm.so",
+    "library_source": "DROPS4",
+    "library_file": {
+      "JTDS": "jtds-1.2.jar",
+      "LDAP": "ldap.jar",
+      "ACRO4": "ACR4_Lib_MAURY.jar"
+    },
+    "library_server": {
+      "HTTP": "130.251.104.243",
+      "LDAP": "192.168.1.3",
+      "Drops": "192.168.1.3"
+    }
+  }
+}

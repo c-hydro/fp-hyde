@@ -1,0 +1,140 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_ancillary_data": true,
+      "cleaning_dynamic_ancillary_data": true,
+      "cleaning_dynamic_ancillary_archive": true,
+      "cleaning_dynamic_product_data": true
+    },
+    "ancillary": {
+      "domain" : "italy"
+    },
+    "general": {
+      "title": "HSAF - H10 snow product",
+      "web-site": "http://hsaf.meteoam.it/",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "4.0.1 [20191003]",
+      "project-info": "HSAF Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    }
+  },
+  "data": {
+    "static": {
+      "grid_ref": {
+        "filename": "grid_h10.workspace",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/snow/ancillary/"
+      },
+      "land": {
+        "land_ref": {
+          "filename": "DEM_Italy_latlon_0.0042.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/snow/gridded/"
+        },
+        "land_ancillary": {
+          "filename": "geo_h10.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/snow/ancillary/"
+        }
+      },
+      "colormap": {
+        "snow_cover_colormap" : {
+          "filename": "HTML.Colormap.H10_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/snow/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "input": {
+        "snow_cover_data": {
+          "filename": "h10_$yyyy$mm$dd_day_merged.H5.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/h10/$yyyy/$mm/$dd/"
+        },
+        "snow_cover_ancillary": {
+          "filename": "h10_$yyyy$mm$dd_$DOMAIN.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/h10/$yyyy/$mm/$dd/"
+        }
+      },
+      "outcome": {
+        "snow_cover_product": {
+          "filename": "hsaf_h10_$yyyy$mm$dd$HH$MM_$DOMAIN.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/h10/$yyyy/$mm/$dd/"
+        }
+      }
+    },
+    "log": {
+        "filename": "hyde_dynamicdata_hsaf_snow_h10_log_local.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/hsaf/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": "20181205",
+    "time_step": "0",
+    "time_delta": "86400",
+    "time_refHH": "00"
+  },
+  "variables": {
+    "input": {
+      "snow_cover_data": {
+        "id": {
+          "var_type": "var2d",
+          "var_name": "SC",
+          "var_file": "snow_cover_data"
+        },
+        "attributes": {
+          "flag_masks": ["1", "2", "3", "4", "5", "5"],
+          "flag_values":  ["0", "42", "85", "170", "212", "233"],
+          "flag_meanings":  ["snow", "cloud", "bare_ground", "water", "dark", "no_data"],
+          "ScaleFactor": 100,
+          "Missing_value": 233,
+          "_FillValue": -9999
+        }
+      },
+      "snow_cover_quality": {
+        "id": {
+          "var_type": "var2d",
+          "var_name": "SC_Q_Flags",
+          "var_file": "snow_cover_data"
+        },
+        "attributes":{
+          "ScaleFactor": 100,
+          "Missing_value": 0,
+          "_FillValue": -9999
+        }
+      }
+    },
+    "outcome": {
+      "snow_cover_data":{
+        "id": {
+          "var_type": ["var2d", "daily"],
+          "var_name": "snow_cover",
+          "var_file": "snow_cover_product"
+        },
+        "attributes": {
+          "long_name": "snow cover - snow detection (snow mask) by VIS/IR radiometry",
+          "standard_name": "snow_cover",
+          "ancillary_variables": "snow_quality",
+          "units": "%",
+          "description": "http://hsaf.meteoam.it/description-sn-obs-1.php"
+        }
+      },
+      "snow_cover_quality":{
+        "id": {
+          "var_type": ["var2d", "daily"],
+          "var_name": "snow_quality",
+          "var_file": "snow_cover_product"
+        },
+        "attributes": {
+          "standard_name": "snow_quality",
+          "long_name": "snow quality - snow detection (snow mask) by VIS/IR radiometry",
+          "description": "http://hsaf.meteoam.it/description-sn-obs-1.php"
+        }
+      }
+    }
+  }
+}

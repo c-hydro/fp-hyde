@@ -1,0 +1,93 @@
+#----------------------------------------------------------------------------
+# DROPS CONFIGURATION
+- java 8 (for running on command line)
+- pycharm-community-2017.1.2 (for debugging)
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# PYCHARM EDITION FOR DEBUGGING (NOT WORK WITH OTHER VERSION)
+# -- pycharm-community-2017.1.2
+# -- java version 8
+
+Switch the Java runtime used to run PyCharm #
+
+ -  On the Help menu, click Find Action, or press Ctrl+Shift+A.
+ -  Find and select the Switch Boot JDK action.
+ -  Select the desired JDK and click OK.
+
+By default, the list includes runtimes that PyCharm is able to detect. If you want to use a runtime that was not detected, click The Browse button and specify the location of the desired Java home directory.
+
+The path to the selected runtime is stored in the pycharm.jdk file in the PyCharm configuration directory. To revert to the default JetBrains Runtime, you can delete this file, or modify the path to point to another Java runtime.
+
+You can also override the runtime used for PyCharm by adding the PYCHARM_JDK environment variable with the path to the desired JDK home directory. 
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# JAVA and JAVAC Version (FOR RUN IN COMMAND LINE)
+fabio@delogu:~$ sudo update-alternatives --config java
+[sudo] password for fabio: 
+There are 2 choices for the alternative java (providing /usr/bin/java).
+
+  Selection    Path                                            Priority   Status
+------------------------------------------------------------
+  0            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1111      auto mode
+  1            /usr/lib/jvm/java-11-openjdk-amd64/bin/java      1111      manual mode
+* 2            /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java   1081      manual mode
+#----------------------------------------------------------------------------
+
+fabio@delogu:~$ sudo update-alternatives --config javac
+There are 2 choices for the alternative javac (providing /usr/bin/javac).
+
+  Selection    Path                                          Priority   Status
+------------------------------------------------------------
+  0            /usr/lib/jvm/java-11-openjdk-amd64/bin/javac   1111      auto mode
+  1            /usr/lib/jvm/java-11-openjdk-amd64/bin/javac   1111      manual mode
+* 2            /usr/lib/jvm/java-8-openjdk-amd64/bin/javac    1081      manual mode
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# Rename interface connection (if needed) to eth0
+# https://pete.akeo.ie/2016/05/help-i-lost-all-networking-on-my.html
+
+root@pi ~ # networkctl
+		IDX LINK             TYPE               OPERATIONAL SETUP
+  		1 lo               loopback           carrier     unmanaged
+  		2 enxa1b2c3d4e5f6  ether              routable    unmanaged
+ 
+2 links listed.
+root@pi ~ # sudo ifconfig enxa1b2c3d4e5f6 down
+root@pi ~ # sudo ip link set enxa1b2c3d4e5f6 name eth0
+root@pi ~ # systemctl restart networking
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# Setting connection for DROPS-DB service
+# Adding these lines in /etc/network/interfaces
+# auto eth0:1
+# iface eth0:1 inet static
+#        address 172.16.104.136
+#        netmask 255.255.255.0
+# and writing in command line:
+#     sudo ifdown eth0:1
+#     sudo ifup eth0:1
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# To restart service (first time that you updated interface):
+root@pi ~ # sudo /etc/init.d/networking restart
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# NOTA BENE: (oppure cambiare il nome alla rete con la nomenclatura fino alla 15.04)
+dalla versione 15.10 i nomi delle interfaces sono cambiati in eno1 ecc...
+quindi la precedente diventa:
+
+auto eno1:1
+iface eno1:1 inet static
+        address 172.16.104.136
+        netmask 255.255.255.0
+
+# di conseguenza:
+#     sudo ifdown eno1:1
+#     sudo ifup eno1:1
+#----------------------------------------------------------------------------

@@ -1,0 +1,163 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_data": true,
+      "cleaning_dynamic_ancillary_in": true,
+      "cleaning_dynamic_ancillary_out": true,
+      "cleaning_dynamic_out": true,
+      "cleaning_dynamic_tmp": true,
+      "zipping_dynamic_out": true
+    },
+    "ancillary": {
+      "domain" : "regional_domain",
+	  "write_engine": "netcdf4",
+      "zip_format": ".gz"
+    },
+    "general": {
+      "title": "RFarm Model",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "4.0.0 [20190902]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    },
+    "parameters": {
+      "ensemble": {"start": 1, "end": 33},
+      "ratio_s": 4,
+      "ratio_t": 1,
+      "slope_s": null,
+      "slope_t": null,
+      "cs_sf": 2,
+      "ct_sf": 2,
+      "multi_core": false,
+      "domain_extension": 0,
+      "tmp": true
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "terrain_data": {
+          "filename": "marche.dem.txt",
+          "folder": "/hydro/data/static_data/land/"
+        },
+        "grid_data": {
+          "filename": "rf.lami-2i.grid_data.workspace",
+          "folder": "/hydro/data/static_data/ancillary/rf_lami-2i/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": null,
+          "folder" : "/hydro/data/static_data/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "template": {
+        "datetime_input": "%Y%m%d",
+        "datetime_outcome": "%Y%m%d%H%M",
+        "sub_path_time": "%Y/%m/%d",
+        "ensemble": "{:03d}"
+      },
+      "time": {
+        "time_forecast_period": 48,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 0,
+        "time_observed_frequency": "H",
+        "time_rounding": "H"
+      },
+      "input": {
+        "rain_input_data": {
+          "__comment__": "20181220-lami-2i.t00z.PRECI1",
+          "filename": "{datetime_input}-lami-2i.t00z.PRECI1",
+          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+        },
+        "rain_input_ancillary" : {
+          "filename" : "{datetime_input}_lami_2i_t00z_precipitaion1h.workspace",
+          "folder": "/hydro/data/dynamic_data/ancillary/rfarm_lami-2i/{sub_path_time}/"
+        }
+      },
+      "outcome": {
+        "rain_outcome_ancillary": {
+          "filename": "rf.lami-2i.{datetime_outcome}_{ensemble}.workspace",
+          "folder": "/hydro/data/dynamic_data/ancillary/rfarm_lami-2i/{sub_path_time}/"
+        },
+        "rain_outcome_data": {
+          "filename": "rf.lami-2i.{datetime_outcome}.nc",
+          "folder": "/hydro/data/dynamic_data/outcome/rainfarm/lami-2i/{sub_path_time}/{ensemble}/"
+        }
+      }
+    },
+    "log": {
+        "filename": "rfarm_lami-2i_log_realtime.txt",
+        "folder": "/hydro/log/"
+    },
+    "temp": {
+        "filename": null,
+        "folder": "/hydro/tmp/rfarm_lami-2i/"
+    },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_period": 0,
+    "time_frequency": "D",
+    "time_rounding": "D"
+  },
+  "variables": {
+    "input": {
+      "rain_data": {
+        "id": {
+          "var_type": ["var3d", "accumulated"],
+          "var_source": "lami_2i",
+          "var_format": "grib",
+          "var_name": "Total Precipitation",
+          "var_file": "rain_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "total_precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "kg m**-2",
+          "description": ""
+        }
+      }
+    },
+    "outcome": {
+      "rain_data":{
+        "id": {
+          "var_type": ["var3d", "accumulated"],
+          "var_source": null,
+          "var_format": "netcdf",
+          "var_name": "Rain",
+          "var_file": "rfarm_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "total_precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "mm",
+          "description": ""
+        }
+      }
+    }
+  }
+}

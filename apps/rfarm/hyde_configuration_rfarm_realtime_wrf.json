@@ -1,0 +1,163 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_data": true,
+      "cleaning_dynamic_ancillary_in": true,
+      "cleaning_dynamic_ancillary_out": true,
+      "cleaning_dynamic_out": true,
+      "cleaning_dynamic_tmp": false,
+      "zipping_dynamic_out": true
+    },
+    "ancillary": {
+      "domain" : "regional_domain",
+      "write_engine": "netcdf4",
+      "zip_format": ".gz"
+    },
+    "general": {
+      "title": "RFarm Model",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "4.0.0 [20190902]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    },
+    "parameters": {
+      "ensemble": {"start": 1, "end": 30},
+      "ratio_s": 6,
+      "ratio_t": 1,
+      "slope_s": null,
+      "slope_t": null,
+      "cs_sf": 2,
+      "ct_sf": 2,
+      "multi_core": false,
+      "domain_extension": 0,
+      "tmp": true
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "terrain_data": {
+          "filename": "barbados.dem.txt",
+          "folder": "/share/c-hydro/data/static/common/gridded/"
+        },
+        "grid_data": {
+          "filename": "rfarm.wrf.grid_data.workspace",
+          "folder": "/share/c-hydro/data/static/common/ancillary/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": null,
+          "folder" : "/share/c-hydro/data/static/common/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "template": {
+        "datetime_input": "%Y-%m-%d_%H:00:00",
+        "datetime_outcome": "%Y%m%d%H%M",
+        "sub_path_time": "%Y/%m/%d/%H%M/",
+        "ensemble": "{:03d}"
+      },
+      "time": {
+        "time_forecast_period": 48,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 0,
+        "time_observed_frequency": "H",
+        "time_rounding": "H"
+      },
+      "input": {
+        "rain_input_data": {
+          "__comment__": "wrfout_d01_2018-10-05_00:00:00_PLEV_BIL.nc, wrfout_d02_2019-08-12_00:00:00_PLEV_BIL.nc",
+          "filename": "wrfout_d02_{datetime_input}_PLEV_BIL.nc",
+          "folder": "/share/c-hydro/data/dynamic/source/wrf/{sub_path_time}/"
+        },
+        "rain_input_ancillary" : {
+          "filename" : "wrf_{datetime_input}_rain.workspace",
+          "folder": "/share/c-hydro/data/dynamic/ancillary/rfarm/{sub_path_time}/"
+        }
+      },
+      "outcome": {
+        "rain_outcome_ancillary": {
+          "filename": "rfarm_{datetime_outcome}_{ensemble}.workspace",
+          "folder": "/share/c-hydro/data/dynamic/ancillary/rfarm/{sub_path_time}/"
+        },
+        "rain_outcome_data": {
+          "filename": "rfarm.wrf.{datetime_outcome}.nc",
+          "folder": "/share/c-hydro/data/dynamic/outcome/rfarm/{sub_path_time}/{ensemble}"
+        }
+      }
+    },
+    "log": {
+        "filename": "hyde_rfarm_realtime_log.txt",
+        "folder": "/share/c-hydro/log/"
+    },
+    "temp": {
+        "filename": null,
+        "folder": "/share/c-hydro/tmp/rfarm/"
+    },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_period": 0,
+    "time_frequency": "12H",
+    "time_rounding": "12H"
+  },
+  "variables": {
+    "input": {
+      "rain_data": {
+        "id": {
+          "var_type": ["var2d", "accumulated"],
+          "var_source": "wrf",
+          "var_format": "netcdf",
+          "var_name": "RAINNC",
+          "var_file": "rain_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "total_precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "mm",
+          "description": "ACCUMULATED TOTAL GRID SCALE PRECIPITATION"
+        }
+      }
+    },
+    "outcome": {
+      "rain_data":{
+        "id": {
+          "var_type": ["var3d", "accumulated"],
+          "var_source": null,
+          "var_format": "netcdf",
+          "var_name": "Rain",
+          "var_file": "rfarm_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "total_precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "mm",
+          "description": "ACCUMULATED TOTAL GRID SCALE PRECIPITATION"
+        }
+      }
+    }
+  }
+}

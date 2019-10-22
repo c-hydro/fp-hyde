@@ -1,0 +1,61 @@
+{
+  "data_info":{
+    "product": "MYD10A1",
+    "version": "006",
+    "flag": {
+      "source_data": false,
+      "outcome_data": false
+    },
+    "tiles":{
+      "tile1": {"H": 18, "V": 4},
+      "tile2": {"H": 18, "V": 5},
+      "tile3": {"H": 19, "V": 4},
+      "tile4": {"H": 19, "V": 5}
+    },
+    "temp": {
+      "folder": "/home/hsaf/hsaf_datasets/dynamic/source/modis_snow/$yyyy/$mm/$dd/temp/",
+      "file_download_tile": "modis_http_downloader_$yyyy$mm$dd_$tile.sh",
+      "file_mosaic_tiles": "modis_mrt_mosaic_tiles.prm",
+      "file_mosaic_data": "modis_mrt_mosaic_data_$product_$version_$tiles.hdf",
+      "file_resample_parameters": "modis_mrt_resample_params.txt",
+      "file_resample_data": "modis_mrt_resample_data_$product_$version_$tiles_$yyyy$mm$dd.hdf"
+    },
+    "source": {
+      "folder": "/home/hsaf/hsaf_datasets/dynamic/source/modis_snow/$yyyy/$mm/$dd/",
+      "file": "$product.A$yyyy$jd.$tile.$version.$yyyy*.hdf",
+      "http": "https://$data_root/$data_folder/$product.$version/$yyyy.$mm.$dd/"
+    },
+    "outcome": {
+      "folder": "/home/hsaf/hsaf_datasets/dynamic/source/modis_snow/$yyyy/$mm/$dd/",
+      "file": "$product_$version_$yyyy$mm$dd.hdf4",
+      "zip": true
+    }
+  },
+  "time_info": {
+    "time_get": null,
+    "time_period": 6,
+    "time_frequency": "D"
+  },
+  "http_info":{
+    "website": "urs.earthdata.nasa.gov",
+    "user": "fabiodelogu",
+    "password": "Cuba1978",
+    "proxy": "130.251.104.8",
+    "data_root": "n5eil01u.ecs.nsidc.org",
+    "data_folder":"MOSA"
+  },
+  "mrt_info":{
+    "bin" : "/home/hsaf/library/mrt-4.1/bin/",
+    "app_mosaic": {
+      "activation": true
+    },
+    "app_resample": {
+      "activation": true,
+      "special_subset": "OUTPUT_PROJ_COORDS",
+      "resampling_method": "NN",
+      "proj": "GEO",
+      "datum": "WGS84"
+    }
+  }
+}
+

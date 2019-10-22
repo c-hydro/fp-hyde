@@ -1,0 +1,90 @@
+{
+  "data_info":{
+    "domain": "Marche",
+    "ws": {
+      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ws/$yyyy/$mm/$dd/",
+      "file": "$VAR_$DOMAIN_$yyyy$mm$dd$HH$MM.csv",
+      "update": true,
+      "fields": ["longitude", "latitude", "data", "time_start", "time_end", "unit", "name", "altitude", "code"]
+    },
+    "log": {
+      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/ws/",
+      "file": "fp_downloader_drops_ws_log.txt",
+      "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+    },
+    "land": {
+      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ws/gridded/",
+      "file": "marche.dem.txt"
+    }
+  },
+  "variable_info": {
+    "rain": {
+      "download": true,
+      "name": "Rain",
+      "sensor": "Raingauge",
+      "units": "mm"
+    },
+    "air_temperature": {
+      "download": true,
+      "name": "AirTemperature",
+      "sensor": "Thermometer",
+      "units": "C"
+    },
+    "radiation": {
+      "download": false,
+      "name": "IncomingRadiation",
+      "sensor": "RadiationSensor",
+      "units": "W m-2"
+    },
+    "relative_humidity": {
+      "download": false,
+      "name": "RelativeHumidity",
+      "sensor": "Hygrometer",
+      "units": "%"
+    },
+    "wind_speed": {
+      "download": false,
+      "name": "Wind",
+      "sensor": "WindSensor",
+      "units": "m s-1"
+    },
+    "wind_direction": {
+      "download": false,
+      "name": "WindDirection",
+      "sensor": "WindDirection",
+      "units": "degree"
+    },
+    "snow_height": {
+      "download": false,
+      "name": "SnowHeight",
+      "sensor": "Snowgauge",
+      "units": "cm"
+    },
+    "air_pressure": {
+      "download": false,
+      "name": "AirPressure",
+      "sensor": "Barometer",
+      "units": ""
+    }
+  },
+  "time_info": {
+    "time_get": "201909161200",
+    "time_period": 6,
+    "time_frequency": "H"
+  },
+  "drops_info":{
+    "library_path" : "/home/fabio/Documents/Work_Area/Code_Development/Library/acrofour_merged/",
+    "library_jvm": null,
+    "library_source": "MERGED",
+    "library_file": {
+      "JTDS": "jtds-1.2.jar",
+      "LDAP": "ldap.jar",
+      "ACRO4": "ACR4_Lib_MAURY.jar"
+    },
+    "library_server": {
+      "HTTP": "130.251.104.243",
+      "LDAP": "130.251.104.19",
+      "Drops": "130.251.104.19"
+    }
+  }
+}

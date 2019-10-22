@@ -1,0 +1,294 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_ancillary_data": true,
+      "cleaning_dynamic_ancillary_data": true,
+      "cleaning_dynamic_ancillary_archive": true,
+      "cleaning_dynamic_product_data": true
+    },
+    "ancillary": {
+      "domain" : "europe"
+    },
+    "general": {
+      "title": "HSAF - H05B precipitation product",
+      "web-site": "http://hsaf.meteoam.it/",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "3.0.4 [20191004]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "land_ref": {
+          "filename": "Mask_Europe_LatLon_0.066.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/precipitation/gridded/"
+        },
+        "land_ancillary": {
+          "filename": "geo_h05b.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/precipitation/ancillary/h05b/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": "HTML.Colormap.H05B_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/hsaf/precipitation/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_forecast_step": 0,
+        "time_forecast_delta": 0,
+        "time_observed_step": 2,
+        "time_observed_delta": 10800,
+        "time_reference_type": {"units": "hours",
+                                "rounding": -3,
+                                "steps": ["00", "03", "06", "09", "12", "15", "18", "21"]
+        }
+      },
+      "input": {
+        "__comment": "original grib file name --> h05B_$yyyy$mm$dd_$HH$MM_03_fdk.grb.gz",
+        "rain_data_hh_03": {
+          "filename": "h05B_$yyyy$mm$dd_$HH$MM_03_europe.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/h05b/$yyyy/$mm/$dd/"
+        },
+        "rain_data_hh_06": {
+          "filename": "h05B_$yyyy$mm$dd_$HH$MM_06_europe.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/h05b/$yyyy/$mm/$dd/"
+        },
+        "rain_data_hh_12": {
+          "filename": "h05B_$yyyy$mm$dd_$HH$MM_12_europe.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/h05b/$yyyy/$mm/$dd/"
+        },
+        "rain_data_hh_24": {
+          "filename": "h05B_$yyyy$mm$dd_$HH$MM_24_europe.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/h05b/$yyyy/$mm/$dd/"
+        },
+        "rain_ancillary": {
+          "filename": "h05b_$yyyy$mm$dd_$HH$MM_$DOMAIN.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/h05b/$yyyy/$mm/$dd/"
+        }
+      },
+      "outcome": {
+        "rain_product": {
+          "filename": "hsaf_h05b_$yyyy$mm$dd$HH$MM_$DOMAIN.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/h05b/$yyyy/$mm/$dd/"
+        }
+      }
+    },
+    "log": {
+      "filename": "hyde_dynamicdata_hsaf_precipitation_h05b_local.txt",
+      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/"
+      },
+    "temp": {
+      "filename": null,
+      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/tmp/h05b/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_step": 0,
+    "time_delta": 86400,
+    "time_refHH": ["00"]
+  },
+  "variables": {
+    "input": {
+      "rain_data_hh_03": {
+        "id": {
+          "__comment": "variable name in original grib file: Estimated_precipitation",
+          "var_type": [ ["var2d", "accumulated"], ["var2d", "istantaneous"] ],
+          "var_name": ["ESTP_Data", "ESTP_QualityIndex"],
+          "var_file": ["rain_data_hh_03", "rain_data_hh_03"],
+          "var_method_get": [null, null],
+          "var_method_compute": [null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (3 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (3 accumulated hours)"],
+          "standard_name": ["Estimated_precipitation", "Quality_index_precipitation"],
+          "Missing_value": [999.0, 999.0],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "units": ["kg.m-2", "%"]
+        }
+      },
+      "rain_data_hh_06": {
+        "id": {
+          "__comment": "variable name in original grib file: Estimated_precipitation",
+          "var_type": [ ["var2d", "accumulated"], ["var2d", "istantaneous"] ],
+          "var_name": ["ESTP_Data", "ESTP_QualityIndex"],
+          "var_file": ["rain_data_hh_06", "rain_data_hh_06"],
+          "var_method_get": [null, null],
+          "var_method_compute": [null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (6 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (6 accumulated hours)"],
+          "standard_name": ["Estimated_precipitation", "Quality_index_precipitation"],
+          "Missing_value": [999.0, 999.0],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "units": ["kg.m-2", "%"]
+        }
+      },
+      "rain_data_hh_12": {
+        "id": {
+          "__comment": "variable name in original grib file: Estimated_precipitation",
+          "var_type": [ ["var2d", "accumulated"], ["var2d", "istantaneous"] ],
+          "var_name": ["ESTP_Data", "ESTP_QualityIndex"],
+          "var_file": ["rain_data_hh_12", "rain_data_hh_12"],
+          "var_method_get": [null, null],
+          "var_method_compute": [null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (12 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (12 accumulated hours)"],
+          "standard_name": ["Estimated_precipitation", "Quality_index_precipitation"],
+          "Missing_value": [999.0, 999.0],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "units": ["kg.m-2", "%"]
+        }
+      },
+      "rain_data_hh_24": {
+        "id": {
+          "__comment": "variable name in original grib file: Estimated_precipitation",
+          "var_type": [ ["var2d", "accumulated"], ["var2d", "istantaneous"] ],
+          "var_name": ["ESTP_Data", "ESTP_QualityIndex"],
+          "var_file": ["rain_data_hh_24", "rain_data_hh_24"],
+          "var_method_get": [null, null],
+          "var_method_compute": [null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (24 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (24 accumulated hours)"],
+          "standard_name": ["Estimated_precipitation", "Quality_index_precipitation"],
+          "Missing_value": [999.0, 999.0],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "units": ["kg.m-2", "%"]
+        }
+      }
+    },
+    "outcome": {
+      "rain_data_hh_03":{
+        "id": {
+          "var_type": [ ["var2d", "accumulated"],  ["var2d", "istantaneous"] ],
+          "var_name": ["Accumulated_Rain_H_03", "Quality_H_03"],
+          "var_file": ["rain_product", "rain_product"],
+          "var_colormap": ["rain_colormap", null],
+          "var_method_save": ["write2DVar", "write2DVar"]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (3 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (3 accumulated hours)"],
+          "standard_name": ["rain", "quality"],
+          "Missing_value": [-9999.0, -9999],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "units": ["mm", "%"],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "description": "http://hsaf.meteoam.it/description-h05b.php"
+        }
+      },
+    "rain_data_hh_06":{
+        "id": {
+          "var_type": [ ["var2d", "accumulated"],  ["var2d", "istantaneous"] ],
+          "var_name": ["Accumulated_Rain_H_06", "Quality_H_06"],
+          "var_file": ["rain_product", "rain_product"],
+          "var_colormap": ["rain_colormap", null],
+          "var_method_save": ["write2DVar", "write2DVar"]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (6 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (6 accumulated hours)"],
+          "standard_name": ["rain", "quality"],
+          "Missing_value": [-9999.0, -9999],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "units": ["mm", "%"],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "description": "http://hsaf.meteoam.it/description-h05b.php"
+        }
+      },
+    "rain_data_hh_12":{
+        "id": {
+          "var_type": [ ["var2d", "accumulated"],  ["var2d", "istantaneous"] ],
+          "var_name": ["Accumulated_Rain_H_12", "Quality_H_12"],
+          "var_file": ["rain_product", "rain_product"],
+          "var_colormap": ["rain_colormap", null],
+          "var_method_save": ["write2DVar", "write2DVar"]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (12 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (12 accumulated hours)"],
+          "standard_name": ["rain", "quality"],
+          "Missing_value": [-9999.0, -9999],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "units": ["mm", "%"],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "description": "http://hsaf.meteoam.it/description-h05b.php"
+        }
+      },
+    "rain_data_hh_24":{
+        "id": {
+          "var_type": [ ["var2d", "accumulated"],  ["var2d", "istantaneous"] ],
+          "var_name": ["Accumulated_Rain_H_24", "Quality_H_24"],
+          "var_file": ["rain_product", "rain_product"],
+          "var_colormap": ["rain_colormap", null],
+          "var_method_save": ["write2DVar", "write2DVar"]
+        },
+        "attributes": {
+          "long_name": [
+            "Accumulated precipitation at ground by blended MW and IR (24 accumulated hours)",
+            "Quality Index precipitation at ground by blended MW and IR (24 accumulated hours)"],
+          "standard_name": ["rain", "quality"],
+          "Missing_value": [-9999.0, -9999],
+          "_FillValue": [-9999.0, -9999],
+          "ScaleFactor": [1, 1],
+          "units": ["mm", "%"],
+          "Valid_range": [ [0, null], [0, 100] ],
+          "interp_radius_x": [0.04, 0.04],
+          "interp_radius_y": [0.04, 0.04],
+          "description": "http://hsaf.meteoam.it/description-h05b.php"
+        }
+      }
+    }
+  }
+}
