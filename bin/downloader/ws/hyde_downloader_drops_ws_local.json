@@ -79,7 +79,7 @@
     "library_file": {
       "JTDS": "jtds-1.2.jar",
       "LDAP": "ldap.jar",
-      "ACRO4": "ACR4_Lib_MAURY.jar"
+      "ACRO4": "ACR4_Lib.jar"
     },
     "library_server": {
       "HTTP": "130.251.104.243",

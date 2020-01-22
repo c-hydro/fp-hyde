@@ -1,0 +1,2532 @@
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:42:08 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_20180827.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  2400  2400 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  2400  2400 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  2400  2400 463.3127      0    254    255
+  4) NDSI               1  INT16  2400  2400 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  2400  2400 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  2400  2400 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  2400  2400 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 15.562266608930 
+    LL:  39.994423054211 0.000000000000 
+    LR:  39.994423054211 15.562266608930 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  15.562266608930 49.999999995507 
+    LL:  0.000000000000 39.994423054211 
+    LR:  15.562266608930 39.994423054211 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  1698  2641 0.0059      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  1698  2641 0.0059      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  1698  2641 0.0059      0    254    255
+  4) NDSI              INT16  1698  2641 0.0059      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  1698  2641 0.0059      0    100    255
+  6) orbit_pnt          INT8  1698  2641 0.0059      0     15     -1
+  7) granule_pnt       UINT8  1698  2641 0.0059      0    254    255
+
+End Time:  Thu Sep  6 15:42:11 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:42:11 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_20180828.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  2400  2400 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  2400  2400 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  2400  2400 463.3127      0    254    255
+  4) NDSI               1  INT16  2400  2400 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  2400  2400 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  2400  2400 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  2400  2400 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 15.562266608930 
+    LL:  39.994423054211 0.000000000000 
+    LR:  39.994423054211 15.562266608930 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  15.562266608930 49.999999995507 
+    LL:  0.000000000000 39.994423054211 
+    LR:  15.562266608930 39.994423054211 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  1698  2641 0.0059      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  1698  2641 0.0059      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  1698  2641 0.0059      0    254    255
+  4) NDSI              INT16  1698  2641 0.0059      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  1698  2641 0.0059      0    100    255
+  6) orbit_pnt          INT8  1698  2641 0.0059      0     15     -1
+  7) granule_pnt       UINT8  1698  2641 0.0059      0    254    255
+
+End Time:  Thu Sep  6 15:42:14 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:42:14 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_20180829.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  2400  2400 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  2400  2400 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  2400  2400 463.3127      0    254    255
+  4) NDSI               1  INT16  2400  2400 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  2400  2400 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  2400  2400 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  2400  2400 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 15.562266608930 
+    LL:  39.994423054211 0.000000000000 
+    LR:  39.994423054211 15.562266608930 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  15.562266608930 49.999999995507 
+    LL:  0.000000000000 39.994423054211 
+    LR:  15.562266608930 39.994423054211 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  1698  2641 0.0059      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  1698  2641 0.0059      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  1698  2641 0.0059      0    254    255
+  4) NDSI              INT16  1698  2641 0.0059      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  1698  2641 0.0059      0    100    255
+  6) orbit_pnt          INT8  1698  2641 0.0059      0     15     -1
+  7) granule_pnt       UINT8  1698  2641 0.0059      0    254    255
+
+End Time:  Thu Sep  6 15:42:16 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:42:33 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_20180830.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 15.56 
+    LL:  40.00 0.00 
+    LR:  40.00 13.05 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  2400  2400 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  2400  2400 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  2400  2400 463.3127      0    254    255
+  4) NDSI               1  INT16  2400  2400 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  2400  2400 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  2400  2400 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  2400  2400 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 15.562266608930 
+    LL:  39.994423054211 0.000000000000 
+    LR:  39.994423054211 15.562266608930 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  15.562266608930 49.999999995507 
+    LL:  0.000000000000 39.994423054211 
+    LR:  15.562266608930 39.994423054211 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  1698  2641 0.0059      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  1698  2641 0.0059      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  1698  2641 0.0059      0    254    255
+  4) NDSI              INT16  1698  2641 0.0059      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  1698  2641 0.0059      0    100    255
+  6) orbit_pnt          INT8  1698  2641 0.0059      0     15     -1
+  7) granule_pnt       UINT8  1698  2641 0.0059      0    254    255
+
+End Time:  Thu Sep  6 15:42:36 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:47:45 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v04.006.2018241033058.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v05.006.2018241032937.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v05.006.2018241033055.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v04.006.2018241033140.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 0]
+   file[ 1]  file[ 2]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:47:50 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:47:50 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180827.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:48:01 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:48:54 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h19v04.006.2018242040953.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h18v05.006.2018242041003.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h19v05.006.2018242040916.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h18v04.006.2018242040909.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 0]
+   file[ 1]  file[ 2]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:48:59 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:49:00 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180828.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:49:10 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:50:25 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h19v04.006.2018243215439.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h18v05.006.2018243214951.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h19v05.006.2018243214933.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h18v04.006.2018243215024.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 0]
+   file[ 1]  file[ 2]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:50:30 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:50:30 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180829.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:50:40 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:51:53 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h19v04.006.2018244033404.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h18v05.006.2018244032802.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h19v05.006.2018244032758.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h18v04.006.2018244033030.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 0]
+   file[ 1]  file[ 2]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:51:59 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:51:59 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180830.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:52:09 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:52:53 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018243.h19v04.006.2018245034852.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018243.h18v05.006.2018245034828.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018244.h19v05.006.2018246033625.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018243.h18v04.006.2018245035155.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 0]
+   file[ 1]  file[ 2]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:52:59 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:52:59 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180831.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:53:11 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:53:54 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h19v04.006.2018246033403.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h18v05.006.2018246033400.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h19v05.006.2018246033625.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h18v04.006.2018246033122.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 0]
+   file[ 1]  file[ 2]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:53:59 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:54:02 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180901.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:54:13 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:54:41 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v04.006.2018241033140.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v05.006.2018241033055.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v05.006.2018241032937.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v04.006.2018241033058.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 0]  file[ 3]
+   file[ 2]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:54:46 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:54:46 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180827.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:54:56 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:54:56 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h18v04.006.2018242040909.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h19v05.006.2018242040916.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h18v05.006.2018242041003.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/MYD10A1.A2018240.h19v04.006.2018242040953.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 0]  file[ 3]
+   file[ 2]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:55:01 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:01 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/28/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180828.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:55:10 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:10 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h18v04.006.2018243215024.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h19v05.006.2018243214933.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h18v05.006.2018243214951.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/MYD10A1.A2018241.h19v04.006.2018243215439.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 0]  file[ 3]
+   file[ 2]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:55:15 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:15 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/29/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180829.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:55:25 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:25 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h18v04.006.2018244033030.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h19v05.006.2018244032758.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h18v05.006.2018244032802.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/MYD10A1.A2018242.h19v04.006.2018244033404.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 0]  file[ 3]
+   file[ 2]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:55:31 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:31 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/30/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180830.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:55:42 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:43 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018243.h18v04.006.2018245035155.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018244.h19v05.006.2018246033625.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018243.h18v05.006.2018245034828.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/MYD10A1.A2018243.h19v04.006.2018245034852.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 0]  file[ 3]
+   file[ 2]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:55:49 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:55:49 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/31/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180831.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:56:05 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:56:07 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h18v04.006.2018246033122.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h19v05.006.2018246033625.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h18v05.006.2018246033400.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/MYD10A1.A2018244.h19v04.006.2018246033403.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 0]  file[ 3]
+   file[ 2]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 15:56:13 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 15:56:13 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/09/01/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180901.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 15:56:26 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 16:25:32 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v05.006.2018241032937.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v05.006.2018241033055.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v04.006.2018241033058.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v04.006.2018241033140.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 2]
+   file[ 0]  file[ 1]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 16:25:37 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 16:25:37 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180827.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 16:25:47 2018
+
+Finished processing!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Mosaic Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 16:26:35 2018
+
+------------------------------------------------------------------
+
+Input filenames (4):
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v05.006.2018241033055.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v05.006.2018241032937.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h19v04.006.2018241033058.hdf
+   /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/MYD10A1.A2018239.h18v04.006.2018241033140.hdf
+Output filename: /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+Mosaic Array:
+   file[ 3]  file[ 2]
+   file[ 1]  file[ 0]
+
+Mosaic : processing band NDSI_Snow_Cover
+
+Mosaic : processing band NDSI_Snow_Cover_Basic_QA
+
+Mosaic : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+Mosaic : processing band NDSI
+
+Mosaic : processing band Snow_Albedo_Daily_Tile
+
+Mosaic : processing band orbit_pnt
+
+Mosaic : processing band granule_pnt
+
+Output mosaic image info
+------------------------
+output image corners (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.114476531502 
+    LL:  29.999999997306 0.000000000000 
+    LR:  29.999999997306 23.094010764881 
+
+output image corners (X-Y projection units):
+    UL:  0.000000000000 5559752.598333000205 
+    UR:  2223901.039332999848 5559752.598333000205 
+    LL:  0.000000000000 3335851.558999999892 
+    LR:  2223901.039332999848 3335851.558999999892 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI              INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt       UINT8  4800  4800 463.3127      0    254    255
+
+End Time:  Thu Sep  6 16:26:40 2018
+
+Finished mosaicking!
+
+******************************************************************************
+
+******************************************************************************
+
+MODIS Reprojection Tool (v4.1 March 2009)
+Start Time:  Thu Sep  6 16:26:40 2018
+
+------------------------------------------------------------------
+
+
+Input image and reprojection info
+---------------------------------
+input_filename:          /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_mosaic_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05.hdf
+output_filename:         /home/fabio/Desktop/PyCharm_Workspace_Python3/fp-ws/dynamic/source/modis/2018/08/27/temp/modis_mrt_resample_data_MYD10A1_006_h18v04_h18v05_h19v04_h19v05_20180827.hdf
+input_filetype:          HDF-EOS
+output_filetype:         HDF-EOS
+input_projection_type:   SIN
+input_datum:             WGS84
+output_projection_type:  GEO
+output_datum:            WGS84
+resampling_type:         NN
+input projection parameters:  6371007.18 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+output projection parameters: 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 
+
+input image corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+input image spatial subset corners (lat/lon):
+    UL:  50.00 0.00 
+    UR:  50.00 31.11 
+    LL:  30.00 0.00 
+    LR:  30.00 23.09 
+
+     band          select   type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover    1  UINT8  4800  4800 463.3127      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA   1  UINT8  4800  4800 463.3127      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA   1  UINT8  4800  4800 463.3127      0    254    255
+  4) NDSI               1  INT16  4800  4800 463.3127      0  10000      0
+  5) Snow_Albedo_Daily_Tile   1  UINT8  4800  4800 463.3127      0    100    255
+  6) orbit_pnt          1   INT8  4800  4800 463.3127      0     15     -1
+  7) granule_pnt        1  UINT8  4800  4800 463.3127      0    254    255
+
+
+SINUSOIDAL PROJECTION PARAMETERS:
+
+   Radius of Sphere:     6371007.181000 meters
+   Longitude of Center:     0.000000 degrees
+   False Easting:      0.000000 meters 
+   False Northing:     0.000000 meters 
+
+NNResample : processing band NDSI_Snow_Cover
+
+NNResample : processing band NDSI_Snow_Cover_Basic_QA
+
+NNResample : processing band NDSI_Snow_Cover_Algorithm_Flags_QA
+
+NNResample : processing band NDSI
+
+NNResample : processing band Snow_Albedo_Daily_Tile
+
+NNResample : processing band orbit_pnt
+
+NNResample : processing band granule_pnt
+
+Output image info
+-----------------
+output image extents (lat/lon):
+    UL:  49.999999995507 0.000000000000 
+    UR:  49.999999995507 31.117695981722 
+    LL:  29.994601320315 0.000000000000 
+    LR:  29.994601320315 31.117695981722 
+
+output image extents (X-Y projection units):
+    UL:  0.000000000000 49.999999995507 
+    UR:  31.117695981722 49.999999995507 
+    LL:  0.000000000000 29.994601320315 
+    LR:  31.117695981722 29.994601320315 
+
+     band               type lines smpls pixsiz      min    max   fill
+  1) NDSI_Snow_Cover   UINT8  3678  5721 0.0054      0    100    255
+  2) NDSI_Snow_Cover_Basic_QA  UINT8  3678  5721 0.0054      0      4    255
+  3) NDSI_Snow_Cover_Algorithm_Flags_QA  UINT8  3678  5721 0.0054      0    254    255
+  4) NDSI              INT16  3678  5721 0.0054      0  10000      0
+  5) Snow_Albedo_Daily_Tile  UINT8  3678  5721 0.0054      0    100    255
+  6) orbit_pnt          INT8  3678  5721 0.0054      0     15     -1
+  7) granule_pnt       UINT8  3678  5721 0.0054      0    254    255
+
+End Time:  Thu Sep  6 16:26:50 2018
+
+Finished processing!
+
+******************************************************************************
+

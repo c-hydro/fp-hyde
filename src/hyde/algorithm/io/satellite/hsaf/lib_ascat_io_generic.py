@@ -29,18 +29,18 @@ def create_dset(time, data, terrain, geox, geoy, attrs=None):
     dset = xr.Dataset(coords={'time': (['time'], pd.DatetimeIndex([time]))})
     dset.coords['time'] = dset.coords['time'].astype('datetime64[ns]')
 
-    da_terrain = xr.DataArray(terrain,
+    da_terrain = xr.DataArray(np.flipud(terrain),
                               dims=['south_north', 'west_east'],
                               coords={'Longitude': (['south_north', 'west_east'], geox),
-                                      'Latitude': (['south_north', 'west_east'], geoy)})
+                                      'Latitude': (['south_north', 'west_east'], np.flipud(geoy))})
 
     dset['terrain'] = da_terrain
 
     for var_name, var_data in data.items():
-        var_da = xr.DataArray(var_data,
+        var_da = xr.DataArray(np.flipud(var_data),
                               dims=['south_north', 'west_east'],
                               coords={'Longitude': (['south_north', 'west_east'], geox),
-                                      'Latitude': (['south_north', 'west_east'], geoy)})
+                                      'Latitude': (['south_north', 'west_east'], np.flipud(geoy))})
 
         if var_name in list(attrs.keys()):
             if valid_range_attr in list(attrs[var_name].keys()):

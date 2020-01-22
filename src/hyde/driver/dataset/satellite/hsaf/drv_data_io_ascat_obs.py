@@ -3,8 +3,8 @@ Library Features:
 
 Name:          drv_data_io_ascat_obs
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20190805'
-Version:       '1.0.0'
+Date:          '20191122'
+Version:       '1.0.1'
 """
 #################################################################################
 # Library
@@ -290,7 +290,7 @@ class DataProductWrapper:
         # -------------------------------------------------------------------------------------
         # Set class to organize data
         self.ascat_organizer = AscatOrganizerNRT(
-            self.time.time_run,
+            self.time.time_step,
             self.filepath_data_out_ref,
             self.filepath_data_out,
             self.filepath_data_analysis,
@@ -326,7 +326,7 @@ class DataProductWrapper:
         )
 
         # Starting info time
-        log_stream.info(' ---> Time == Step: ' + self.time.time_run.strftime(time_format) + ' ... ')
+        log_stream.info(' ---> Time == Step: ' + self.time.time_step.strftime(time_format) + ' ... ')
 
         # Method to compose data in organic ssm time-series
         log_stream.info(' ----> Create nrt time-series data ... ')
@@ -356,7 +356,7 @@ class DataProductWrapper:
             log_stream.info(' ----> Create nrt map data ... PREVIOUSLY CREATED')
 
         # Ending info time (done)
-        log_stream.info(' ---> Time == Step: ' + self.time.time_run.strftime(time_format) + ' ... DONE')
+        log_stream.info(' ---> Time == Step: ' + self.time.time_step.strftime(time_format) + ' ... DONE')
         # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -376,16 +376,22 @@ class DataProductWrapper:
             tmpl_values = {'datetime':  None, 'sub_path_time': None, 'cell': None,
                            'time_start': self.time.time_from, 'time_end': self.time.time_to}
 
+            # Definition of time reference for nrt product
+            time_ref = self.time.time_run
+
             # Dump data if n equal or greater then this
             if write_n_resampled is None:
                 write_n_resampled = 2000
 
         else:
             # Starting info time
-            log_stream.info(' ---> Time == Step: ' + self.time.time_run.strftime(time_format) + ' ... ')
+            log_stream.info(' ---> Time == Step: ' + self.time.time_step.strftime(time_format) + ' ... ')
 
             tmpl_tags = None
             tmpl_values = None
+
+            # Definition of time reference for nrt product
+            time_ref = self.time.time_step
 
             # Dump data if n equal or greater then this
             if write_n_resampled is None:
@@ -401,7 +407,7 @@ class DataProductWrapper:
 
             # Initialize class for resampling data
             ascat_resampler_configure = AscatResamplerConfigure(
-                self.time.time_run,
+                time_ref,
                 ascat_product,
                 ascat_pathname_in,
                 ascat_pathname_out,
@@ -426,7 +432,7 @@ class DataProductWrapper:
             log_stream.info(' ---> Time == Start: ' + self.time.time_from.strftime(time_format) +
                             ' - End: ' + self.time.time_to.strftime(time_format) + ' ... DONE')
         else:
-            log_stream.info(' ---> Time == Step: ' + self.time.time_run.strftime(time_format) + ' ... DONE')
+            log_stream.info(' ---> Time == Step: ' + self.time.time_step.strftime(time_format) + ' ... DONE')
 
     # -------------------------------------------------------------------------------------
 

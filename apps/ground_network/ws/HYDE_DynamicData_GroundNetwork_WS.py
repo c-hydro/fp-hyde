@@ -7,7 +7,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 HYDE_DynamicData_GroundNetwork_WS.py -settingfile configuration_product.json -time YYYYMMDDHHMM
+python3 HYDE_DynamicData_GroundNetwork_WS.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
 20180914 (2.5.0) --> Beta release for HyDE library
@@ -44,7 +44,7 @@ from src.hyde.driver.dataset.ground_network.ws.drv_data_ancillary_ws import Data
 # Method to get script argument(s)
 def GetArgs():
     oParser = ArgumentParser()
-    oParser.add_argument('-settingfile', action="store", dest="sSettingFile")
+    oParser.add_argument('-settings_file', action="store", dest="sSettingFile")
     oParser.add_argument('-time', action="store", dest="sTimeArg")
     oParserValue = oParser.parse_args()
 
@@ -53,7 +53,7 @@ def GetArgs():
     if oParserValue.sSettingFile:
         sSettingsFile = oParserValue.sSettingFile
     else:
-        sSettingsFile = 'hyde_configuration_groundnetwork_ws.json'
+        sSettingsFile = 'configuration.json'
 
     if oParserValue.sTimeArg:
         sTimeArg = oParserValue.sTimeArg

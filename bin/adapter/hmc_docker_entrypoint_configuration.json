@@ -1,0 +1,55 @@
+{
+  "tags": {
+    "run_path_root": "string"
+  },
+  "variable": {
+    "_comment": "environment and local docker variable(s) definition",
+    "env_variable": {
+      "run_time_now": "RUN_TIME_NOW",
+      "run_time_step_obs": "RUN_TIME_STEPS_OBS",
+      "run_time_step_for": "RUN_TIME_STEPS_FOR",
+      "run_mount_folder_static": "MOUNT_DATA_STATIC",
+      "run_mount_folder_dynamic_forcing_obs": "MOUNT_DATA_DYNAMIC_FORCING_OBS",
+      "run_mount_folder_dynamic_forcing_for": "MOUNT_DATA_DYNAMIC_FORCING_FOR"
+    },
+    "local_variable": {
+      "run_domain": "marche",
+      "run_name": "wrf_deterministic",
+      "run_ens_mode": false,
+      "run_ens_var": "RFarm_ID",
+      "run_ens_min": 1,
+      "run_ens_max": 12,
+      "run_path_root": "/home/fabio/fp/"
+    }
+  },
+  "file" : {
+    "_comment": "filename(s) docker definition",
+    "file_app_runner_configuration_parameters": "hmc_docker_run_configuration_parameters_custom.json",
+    "file_app_runner_configuration_data": "hmc_docker_run_configuration_data_custom.json",
+    "file_app_runner_log": "hmc_docker_run_configuration_log_custom.txt",
+  },
+  "folder" : {
+    "_comment": "folder(s) docker definition",
+    "folder_hmc_library" :"{run_path_root}/fp_envs/fp_libs_system/hmc/",
+    "folder_data_static_land_point": "{run_path_root}/fp_data/static_data/point/",
+    "folder_data_static_land_gridded": "{run_path_root}/fp_data/static_data/gridded/",
+    "folder_data_dynamic_restart_gridded": "{run_path_root}/fp_data/restart_data/data_state/gridded/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_restart_point": "{run_path_root}/fp_data/restart_data/data_state/point/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_forcing_gridded": "{run_path_root}/fp_data/dynamic_data/data_forcing/gridded/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_forcing_point": "{run_path_root}/fp_data/dynamic_data/data_forcing/point/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_forcing_ts": "{run_path_root}/fp_data/dynamic_data/data_forcing/timeseries/",
+    "folder_data_dynamic_output_gridded": "{run_path_root}/fp_data/results_data/data_output/gridded/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_output_point": "{run_path_root}/fp_data/results_data/data_output/point/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_output_ts": "{run_path_root}/fp_data/results_data/data_output/timeseries/",
+    "folder_data_dynamic_state_gridded": "{run_path_root}/fp_data/results_data/data_state/gridded/%yyyy/%mm/%dd/",
+    "folder_data_dynamic_state_point": "{run_path_root}/fp_data/results_data/data_state/point/%yyyy/%mm/%dd/",
+    "folder_run_exec": "{run_path_root}/fp_run/exec",
+    "folder_run_tmp": "{run_path_root}/fp_run/tmp",
+    "folder_run_cache" :"{run_path_root}/fp_run/cache/",
+    "folder_run_library" :"{run_path_root}/fp_library/",
+    "folder_app_runner": "{run_path_root}/fp_package/fp_hmc/",
+    "folder_app_runner_configuration_parameters": "{run_path_root}/fp_package/fp_hmc/",
+    "folder_app_runner_configuration_data": "{run_path_root}/fp_package/fp_hmc/",
+    "folder_app_runner_log": "{run_path_root}/fp_logs/",
+  }
+}

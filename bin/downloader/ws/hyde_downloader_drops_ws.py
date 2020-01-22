@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-DROPS Downloading Tool - DROPS Weather Stations
+HYDE Downloading Tool - DROPS Weather Stations
 
 __date__ = '20190918'
 __version__ = '1.0.2'
@@ -9,7 +9,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_drops_ws.py -settingfile configuration_product.json
+python3 hyde_downloader_drops_ws.py -settings_file configuration.json
 
 NOTE:
 Debugging on pycharm-community.2017.2
@@ -20,7 +20,7 @@ https://pete.akeo.ie/2016/05/help-i-lost-all-networking-on-my.html
 
 Set connection for DROPS-DB service
 Add these lines in /etc/network/interfaces
-auto eth0:1
+auto eth0:drops
 iface eth0:drops inet static
     address 172.16.104.136
     netmask 255.255.255.0
@@ -59,9 +59,9 @@ from src.hyde.dataset.db.drops.lib_db_drops_utils_io import writeSensorDataFrame
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
-sAlgName = 'DROPS DOWNLOADING TOOL - DROPS WEATHER STATIONS'
-sAlgVersion = '1.0.1'
-sAlgRelease = '2018-09-10'
+sAlgName = 'HYDE DOWNLOADING TOOL - DROPS WEATHER STATIONS'
+sAlgVersion = '1.0.2'
+sAlgRelease = '2019-09-18'
 # Algorithm parameter(s)
 sTimeFormat = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -317,13 +317,13 @@ def setTags(sString, oTags):
 # Method to get script argument(s)
 def getSettings():
     oParser = ArgumentParser()
-    oParser.add_argument('-settingfile', action="store", dest="sFileSettings")
+    oParser.add_argument('-settings_file', action="store", dest="sFileSettings")
     oParserValue = oParser.parse_args()
 
     if oParserValue.sFileSettings:
         sFileSettings = oParserValue.sFileSettings
     else:
-        sFileSettings = 'fp_downloader_drops_ws.json'
+        sFileSettings = 'configuration.json'
 
     return sFileSettings
 # -------------------------------------------------------------------------------------

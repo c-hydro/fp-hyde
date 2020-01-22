@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Annex B - Rainfarm &mdash; hyde 1.9.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Annex A - Hydrological Model Continuum" href="annex_a.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hyde
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="executables.html">Executables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annex_a.html">Annex A - Hydrological Model Continuum</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Annex B - Rainfarm</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hyde</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Annex B - Rainfarm</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/annex_b.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="annex-b-rainfarm">
+<h1>Annex B - Rainfarm<a class="headerlink" href="#annex-b-rainfarm" title="Permalink to this headline">¶</a></h1>
+<p>Rainfarm belongs to the family of metagaussian models and it is based on a nonlinear transformation of a linearly correlated process. This approach is closely related to the Turning Bands Method and has been used both for satellite-based rainfall measurement validation and for stochastic rainfall modelling.</p>
+<p>The model is able to generate small-scale rainfall fields that take into account not only the total amount of precipitation predicted by the meteorological model but also its linear correlation structure and the position of the main rainfall patterns. Due to the straightforward link between the model parameters and the large-scale field, this model is suitable for operational downscaling procedures.</p>
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="_images/rfarm_example_horizontal.png"><img alt="example of Rainfarm application." src="_images/rfarm_example_horizontal.png" style="width: 500.0px; height: 250.0px;" /></a>
+<p class="caption"><span class="caption-text">Time average of the original, LAM field panel (a) and of one realization of the stochastic field generated by the Rainfarm panel (b). The values indicate the average precipitation in mm/h.</span></p>
+</div>
+<p>Rainfarm uses the spectral information of large-scale meteorological predictions and generates fine resolution precipitation fields by propagating this information to smaller scales. The basic idea is to reconstruct the Fourier spectrum of the small-scale precipitation field by preserving the LAM information at the scales where we are confident in the meteorological prediction. The rainfall field is seen as the superposition of a finite number of harmonics with amplitudes decreasing as spatial and temporal scales become smaller. For a given realization (the predicted field at hand) the harmonics at large scales are assumed to be well predicted by the meteorological model, and should be preserved. A major concern is to figure out which are the scales below which the forecasted fields are considered to be unreliable.</p>
+<table border="1" class="colwidths-auto docutils" id="id2">
+<caption><span class="caption-text">Summary of the model Rainfarm parameters</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<tbody valign="top">
+<tr class="row-odd"><td>Parameter</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate nohighlight">\(L_0\)</span></td>
+<td>Reliable spatial scale of LAM</td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate nohighlight">\(T_0\)</span></td>
+<td>Reliable temporal scale of LAM</td>
+</tr>
+</tbody>
+</table>
+<p>As shown in the previous section, the Rainfarm model has four free parameters, named <span class="math notranslate nohighlight">\(L_0\)</span>, <span class="math notranslate nohighlight">\(T_0\)</span>, <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span>. <span class="math notranslate nohighlight">\(L_0\)</span> and <span class="math notranslate nohighlight">\(T_0\)</span> represent the spatial and temporal resolutions at which the precipitation prediction is considered reliable and they should be fixed by the user depending on the numerical model considered. The spectral parameters <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span> are estimated in real-time from the LAM power spectrum. The RainFARM works as follows. The aggregation of the LAM field on spatial and temporal scales <span class="math notranslate nohighlight">\(L_0\)</span> and <span class="math notranslate nohighlight">\(T_0\)</span>, generates the starting field, called <span class="math notranslate nohighlight">\(P\)</span>. From this coarse-grained prediction RainFARM produces downscaled fields by following these steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Computation of the Fourier transform of the coarse-grained LAM-predicted field <span class="math notranslate nohighlight">\(P(X, Y, T)\)</span>.   This procedure generates a spatial-temporal Fourier spectrum <span class="math notranslate nohighlight">\(\dot{P}(K_X, K_Y, \Omega)\)</span> defined as follows:</li>
+</ol>
+<div class="figure align-center">
+<img alt="Rainfarm equation 1." src="_images/rfarm_eq1.png" />
+</div>
+<p>Where <span class="math notranslate nohighlight">\(D_X\)</span>, <span class="math notranslate nohighlight">\(D_Y\)</span> and <span class="math notranslate nohighlight">\(D_T\)</span> are the domain sizes in space and time respectively. Here, <span class="math notranslate nohighlight">\(D_X\)</span>, <span class="math notranslate nohighlight">\(D_Y\)</span> are the wave numbers in the X and Y directions and <span class="math notranslate nohighlight">\(\Omega\)</span> is the angular frequency. Clearly, <span class="math notranslate nohighlight">\(K_X, K_Y &lt;= \pi/L_0\)</span> and <span class="math notranslate nohighlight">\(\Omega &lt;= \pi/T_0\)</span>, where <span class="math notranslate nohighlight">\(\pi/L_0\)</span> is the Nyquist wavenumber and <span class="math notranslate nohighlight">\(\pi/T_0\)</span> is the Nyquist frequency of the field to be downscaled.</p>
+<ol class="arabic simple" start="2">
+<li>Estimate of the space-time power spectrum <span class="math notranslate nohighlight">\(\vert{\dot{P}(K_X, K_Y, \Omega)^2}\vert\)</span> of the aggregated LAM field <span class="math notranslate nohighlight">\(P\)</span> as the square of the modulus of its Fourier transform <span class="math notranslate nohighlight">\(\hat{P}\)</span>.</li>
+<li>Extrapolation of the power spectrum <span class="math notranslate nohighlight">\(\vert{\hat{P}^2}\vert\)</span> to small scales. To do so, we assume the power spectrum of the rainfall field to have an approximate power-law behavior, consistent with the outcome of several analyses on the structure of precipitation fields. The procedure estimates the spatial and temporal logarithmic slopes (<span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span> respectively) of the LAM power spectrum, <span class="math notranslate nohighlight">\(\vert{\hat{P}}\vert\)</span>. For simplicity, we assume isotropy in the two spatial directions.</li>
+<li>Generation of a Fourier spectrum <span class="math notranslate nohighlight">\(\hat{g}(k_x, k_y, \omega)\)</span>, defined as:</li>
+</ol>
+<div class="figure align-center">
+<img alt="Rainfarm equation 2." src="_images/rfarm_eq2.png" />
+</div>
+<p>where <span class="math notranslate nohighlight">\(\theta(k_x, k_y, \omega)\)</span> are random, uniformly distributed phases. The wavenumbers (<span class="math notranslate nohighlight">\(K_x)\)</span> and <span class="math notranslate nohighlight">\(k_y\)</span>) and the frequency (<span class="math notranslate nohighlight">\(\omega\)</span>) range from the scales corresponding to the downscaling domain size to those associated with the downscaling resolution. We use the functional form:</p>
+<div class="figure align-center">
+<img alt="Rainfarm equation 3." src="_images/rfarm_eq3.png" />
+</div>
+<p>By inverting the Fourier spectrum, , we obtain a Gaussian field defined on the whole range of scales between the domain size and the downscaling resolution, which we normalize to unit variance.</p>
+<ol class="arabic simple" start="5">
+<li>Generation of a synthetic precipitation field, <span class="math notranslate nohighlight">\(\hat{r}(x, y, t)\)</span>, by taking a nonlinear transformation of the Gaussian field <span class="math notranslate nohighlight">\(q\)</span>. Here we use the simple transformation:</li>
+</ol>
+<div class="figure align-center">
+<img alt="Rainfarm equation 4." src="_images/rfarm_eq4.png" />
+</div>
+<p>which leads to a log-normal field <span class="math notranslate nohighlight">\(\hat{r}\)</span>.</p>
+<ol class="arabic simple" start="6">
+<li>We force the synthetic field to be equal to the original field <span class="math notranslate nohighlight">\(P\)</span> when aggregated on the scales <span class="math notranslate nohighlight">\(L_0, T_0\)</span> by defining a new field:</li>
+</ol>
+<div class="figure align-center">
+<img alt="Rainfarm equation 5." src="_images/rfarm_eq5.png" />
+</div>
+<p>Where <span class="math notranslate nohighlight">\(\hat{R}\)</span> represents the field aggregated at the scale <span class="math notranslate nohighlight">\(L_0, T_0\)</span>. When aggregated on space and time scales larger or equal to <span class="math notranslate nohighlight">\(L_0\)</span> and to <span class="math notranslate nohighlight">\(T_0\)</span>, the field behaves exactly as the original field <span class="math notranslate nohighlight">\(P\)</span>. The stochastic nature of the downscaled field <span class="math notranslate nohighlight">\(r\)</span>  is associated with the choice of the set of random Fourier phases. By choosing different sets of random Fourier phases, one can generate a large number of stochastic fields which are all equal to <span class="math notranslate nohighlight">\(P\)</span> when aggregated on space and time scales larger than  <span class="math notranslate nohighlight">\(L_0\)</span> and  <span class="math notranslate nohighlight">\(T_0\)</span>, and which are different, but with similar statistical properties, on smaller scales.</p>
+</div></blockquote>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="annex_a.html" class="btn btn-neutral float-left" title="Annex A - Hydrological Model Continuum" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Fabio Delogu
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

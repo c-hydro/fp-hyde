@@ -1,0 +1,122 @@
+{
+    "__comment": " ### HMC configuration file - Run settings ### ",
+    "GeneralInfo": {
+        "Conventions": "CF-1.7",
+        "title": "HMC Run Manager",
+        "institution": "CIMA Research Foundation - www.cimafoundation.org",
+        "website": "http://continuum.cimafoundation.org",
+        "source": "",
+        "history": "Python settings algorithm for running hydrological model Continuum (HMC)",
+        "references": "http://cf-pcmdi.llnl.gov/ ; http://cf-pcmdi.llnl.gov/documents/cf-standard-names/ecmwf-grib-mapping",
+        "authors": "Fabio Delogu",
+        "email": "fabio.delogu@cimafoundation.org",
+        "project": "HMC - Hydrological Model Continuum",
+        "version": "2.0.7",
+        "date": "20180521"
+    },
+    "ParamsInfo": {
+        "Run_Params": {
+            "_LEXIS_Note": "RunDomain, RunName, RunMode",
+            "RunDomain": "marche",
+            "RunName": "wrf_deterministic",
+            "RunMode": {
+                "EnsMode": false,
+                "EnsVar": {
+                    "VarName": "RFarm_ID",
+                    "VarMin": 1,
+                    "VarMax": 4,
+                    "VarStep": 1
+                }
+            }
+        },
+        "Run_VarExec": {
+            "RunModelExec": "HMC_Model_V2_$RUN.x",
+            "RunModelNamelist": "$DOMAIN.info.txt",
+            "RunModelCLine": "$UC $UH $CT $CF $DOMAIN $CPI $KSATRATIO $WTABLEHBR $SLOPEMAX"
+        },
+        "Run_ConfigFile": {
+            "_LEXIS_Note": "FileData, FileLog",
+            "FileData": "hmc_docker_data_custom.json",
+            "FileLog": "hmc_docker_log_custom.txt"
+        },
+        "Run_Path": {
+            "_LEXIS_Note": "PathTemp, PathCache, PathExec, PathLibrary",
+            "PathTemp": "/home/fabio/fp_run/tmp",
+            "PathCache": "/home/fabio/fp_run/cache/",
+            "PathExec": "/home/fabio/fp_run/exec",
+            "PathLibrary": "/home/fabio/fp_library/"
+        },
+        "Time_Params": {
+            "_LEXIS_Note": "TimeNow, TimeDelta, TimeStepsObs, TimeStepsFor",
+            "TimeNow": "201807020000",
+            "TimeDelta": 3600,
+            "TimeStepObs": 0,
+            "TimeStepFor": "hmc_docker_parameters_custom.json",
+            "TimeStepCheck": 4,
+            "TimeRestart": {
+                "RestartStep": 24,
+                "RestartHH": "00"
+            },
+            "TimeWorldRef": {
+                "RefType": "gmt",
+                "RefLoad": 0,
+                "RefSave": 0
+            },
+            "TimeTcMax": -9999
+        },
+        "HMC_Params": {
+            "Ct": 0.5,
+            "Cf": 0.02,
+            "Uc": 20,
+            "Uh": 1.5,
+            "CPI": 0.3,
+            "KSatRatio": 1,
+            "WTableHbr": 500,
+            "SlopeMax": 70
+        },
+        "HMC_Flag": {
+            "Flag_OS": 10,
+            "Flag_Restart": 1,
+            "Flag_FlowDeep": 1,
+            "Flag_DtPhysConv": 1,
+            "Flag_Snow": 0,
+            "Flag_Snow_Assim": 0,
+            "Flag_SM_Assim": 0,
+            "Flag_DebugSet": 0,
+            "Flag_DebugLevel": 3,
+            "Flag_CoeffRes": 0,
+            "Flag_WS": 0,
+            "Flag_ReleaseMass": 1,
+            "Flag_LAI": 0,
+            "Flag_Albedo": 0
+        },
+        "HMC_Dt": {
+            "Dt_Model": 3600,
+            "Dt_PhysConv": 50
+        },
+        "HMC_Data": {
+            "ForcingGridSwitch": 0,
+            "ForcingScaleFactor": -9999,
+            "ForcingGeo": [
+                -9999.0,
+                -9999.0
+            ],
+            "ForcingRes": [
+                -9999.0,
+                -9999.0
+            ],
+            "ForcingDims": [
+                -9999.0,
+                -9999.0
+            ],
+            "ForcingDataThr": 95
+        }
+    },
+    "GeoSystemInfo": {
+        "epsg_code": 4326,
+        "grid_mapping_name": "latitude_longitude",
+        "longitude_of_prime_meridian": 0.0,
+        "semi_major_axis": 6378137.0,
+        "inverse_flattening": 298.257223563
+    }
+}

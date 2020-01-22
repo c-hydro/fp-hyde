@@ -11,11 +11,11 @@ Version:       '1.0.0'
 import logging
 import inspect
 
-import fp.dataset.ground_network.ws.lib_ws_variables as oVarMethods
-from fp.analysis.lib_analysis_interpolation_ancillary import filterData_ValidRange
+import src.hyde.dataset.ground_network.ws.lib_ws_variables as oVarMethods
+from src.common.analysis.lib_analysis_interpolation_ancillary import filterData_ValidRange
 
-from fp.default.lib_default_args import sLoggerName
-from fp.driver.configuration.drv_configuration_debug import Exc
+from src.common.default.lib_default_args import sLoggerName
+from src.common.driver.configuration.drv_configuration_debug import Exc
 
 # Logging
 oLogStream = logging.getLogger(sLoggerName)
@@ -24,11 +24,13 @@ oLogStream = logging.getLogger(sLoggerName)
 # import matplotlib.pylab as plt
 #################################################################################
 
+
 # -------------------------------------------------------------------------------------
 # Class data object
 class DataObj(dict):
     pass
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Class to compute data variable

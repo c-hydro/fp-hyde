@@ -1,0 +1,531 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_ancillary_data": true,
+      "cleaning_dynamic_ancillary_source": true,
+      "cleaning_dynamic_ancillary_outcome": true,
+      "cleaning_dynamic_product": true
+    },
+    "ancillary": {
+      "domain" : "Nera"
+    },
+    "general": {
+      "title": "GroundNetwork - Weather stations product",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "2.5.0 [20180914]",
+      "project-info": "FloodProofs - OpChain Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    },
+    "georeference": {
+      "bounding_box": null,
+      "ncols": null,
+      "nrows": null,
+      "xllcorner": null,
+      "yllcorner": null,
+      "cellsize": null,
+      "nodata_value": null
+    }
+  },
+  "data": {
+    "static": {
+      "grid_ref": {
+        "filename": "grid_ws.workspace",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/ancillary/"
+      },
+      "land": {
+        "land_ref": {
+          "filename": "nera.dem.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/land/"
+        },
+        "land_ancillary": {
+          "filename": "geo_ws.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/ancillary/"
+        }
+      },
+      "predictor": {
+        "aspect_data":{
+          "filename": "nera.aspect.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/land/"
+        },
+        "slope_data":{
+          "filename": "nera.slope.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/land/"
+        },
+        "hillshade_data":{
+          "filename": "nera.hillshade.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/land/"
+        },
+        "roughness_data":{
+          "filename": "nera.roughness.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/land/"
+        },
+        "predictor_ancillary":{
+          "filename": "predictor_ws.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/land/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": "HTML.Colormap.WS_Rain_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap/"
+        },
+        "air_temperature_colormap" : {
+          "filename": "HTML.Colormap.WS_AirTemperature_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap"
+        },
+        "incoming_radiation_colormap" : {
+          "filename": "HTML.Colormap.WS_IncomingRadiation_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap"
+        },
+        "wind_colormap" : {
+          "filename": "HTML.Colormap.WS_Wind_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap"
+        },
+        "relative_humidity_colormap" : {
+          "filename": "HTML.Colormap.WS_RelativeHumidity_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap"
+        },
+        "air_pressure_colormap" : {
+          "filename": "HTML.Colormap.WS_AirPressure_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap/"
+        },
+        "snow_height_colormap" : {
+          "filename": "HTML.Colormap.WS_SnowHeight_GP.txt",
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/static/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_forecast_step": 0,
+        "time_forecast_delta": 0,
+        "time_observed_step": 24,
+        "time_observed_delta": 3600,
+        "time_reference_type": {"units": null,
+                                "rounding": null,
+                                "steps": null
+        }
+      },
+      "source": {
+        "rain_data": {
+          "filename": "rain_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "air_temperature_data": {
+          "filename": "air_temperature_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "incoming_radiation_data": {
+          "filename": "incoming_radiation_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "wind_data": {
+          "filename": "wind_speed_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "relative_humidity_data": {
+          "filename": "relative_humidity_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "air_pressure_data": {
+          "filename": "air_pressure_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "snow_height_data": {
+          "filename": "snow_height_$yyyy$mm$dd$HH$MM.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/source/ws_csv/$yyyy/$mm/$dd/"
+        },
+        "source_ancillary": {
+          "filename": "ws_source_$yyyy$mm$dd$HH$MM.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/ancillary/ws/$yyyy/$mm/$dd/"
+        }
+      },
+      "outcome": {
+        "ws_product": {
+          "filename": "hmc.forcing-grid.$yyyy$mm$dd$HH$MM.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/outcome/ws/$yyyy/$mm/$dd/"
+        },
+        "outcome_ancillary": {
+          "filename": "ws_outcome_$yyyy$mm$dd$HH$MM.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/dynamic/ancillary/ws/$yyyy/$mm/$dd/"
+        }
+      }
+    },
+    "log": {
+        "filename": "hyde_groundnetwork_ws_calibration_regmarche_log.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-calibration/log/",
+        "history": true
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": "201911010000",
+    "time_step": 1800,
+    "time_delta": 86400,
+    "time_refHH": ["00"]
+  },
+  "variables": {
+    "source": {
+      "rain_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["Rain"],
+          "var_file": "rain_data",
+          "var_handle": ["rain_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeRain",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 0.2,
+              "interp_radius_y": 0.2
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "rain",
+          "standard_name": "rain",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "mm"
+        }
+      },
+      "air_temperature_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["AirTemperature"],
+          "var_file": "air_temperature_data",
+          "var_handle": ["air_temperature_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeAirTemperature",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 0.8,
+              "interp_radius_y": 0.8
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "Air Temperature",
+          "standard_name": "air_temperature",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [-30, 60],
+          "units": "C"
+        }
+      },
+      "incoming_radiation_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["IncomingRadiation"],
+          "var_file": "incoming_radiation_data",
+          "var_handle": ["incoming_radiation_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeIncomingRadiation",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 0.8,
+              "interp_radius_y": 0.8
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "Incoming Radiation",
+          "standard_name": "incoming_radiation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [-200, 1500],
+          "units": "W/m^2"
+        }
+      },
+      "wind_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["Wind"],
+          "var_file": "wind_data",
+          "var_handle": ["wind_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeWindSpeed",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 0.8,
+              "interp_radius_y": 0.8
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "Wind",
+          "standard_name": "wind",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, 20],
+          "units": "m/s"
+        }
+      },
+      "relative_humidity_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["RelativeHumidity"],
+          "var_file": "relative_humidity_data",
+          "var_handle": ["relative_humidity_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeRelativeHumidity",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 0.8,
+              "interp_radius_y": 0.8
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "RelativeHumidity",
+          "standard_name": "relative_humidity",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, 100],
+          "units": "%"
+        }
+      },
+      "air_pressure_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["AirPressure"],
+          "var_file": "air_pressure_data",
+          "var_handle": ["air_pressure_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeAirPressure",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 0.8,
+              "interp_radius_y": 0.8
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "AirPressure",
+          "standard_name": "air_pressure",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": null,
+          "units": ""
+        }
+      },
+      "snow_height_data": {
+        "id": {
+          "var_type": ["var2d", "point"],
+          "var_mode": true,
+          "var_name": ["SnowHeight"],
+          "var_file": "snow_height_data",
+          "var_handle": ["snow_height_data", "snow_kernel_data"],
+          "var_method_get": "",
+          "var_method_compute": {
+            "name": "computeSnowHeight",
+            "params": {
+              "interp_method": "idw",
+              "interp_nodata": -9999.0,
+              "interp_radius_x": 1.5,
+              "interp_radius_y": 1.5,
+              "regression_radius_influence": 0.00018
+            }
+          }
+        },
+        "attributes": {
+          "long_name": "SnowHeight",
+          "standard_name": "snow_height",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "cm"
+        }
+      }
+    },
+    "outcome": {
+      "rain_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Rain"],
+          "var_file": "ws_product",
+          "var_colormap": "rain_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Rain",
+          "standard_name": "rain",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "mm",
+          "Valid_range": [0, null],
+          "description": ""
+        }
+      },
+      "air_temperature_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Air_Temperature"],
+          "var_file": "ws_product",
+          "var_colormap": "air_temperature_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Air Temperature",
+          "standard_name": "air_temperature",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "C",
+          "Valid_range": [-30, 60],
+          "description": ""
+        }
+      },
+      "incoming_radiation_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Incoming_Radiation"],
+          "var_file": "ws_product",
+          "var_colormap": "incoming_radiation_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Incoming Radiation",
+          "standard_name": "incoming_radiation",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "W m-2",
+          "Valid_range": [-200, 1500],
+          "description": ""
+        }
+      },
+      "wind_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Wind"],
+          "var_file": "ws_product",
+          "var_colormap": "wind_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Wind",
+          "standard_name": "wind",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "m s-1",
+          "Valid_range": [0, 25],
+          "description": ""
+        }
+      },
+      "relative_humidity_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Relative_Humidity"],
+          "var_file": "ws_product",
+          "var_colormap": "relative_humidity_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "RelativeHumidity",
+          "standard_name": "relative_humidity",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "%",
+          "Valid_range": [0, 100],
+          "description": ""
+        }
+      },
+      "air_pressure_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Air_Pressure"],
+          "var_file": "ws_product",
+          "var_colormap": "air_pressure_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Air Pressure",
+          "standard_name": "air_pressure",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "",
+          "Valid_range": null,
+          "description": ""
+        }
+      },
+      "snow_height_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Snow_Height"],
+          "var_file": "ws_product",
+          "var_colormap": "snow_height_colormap",
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Snow Height",
+          "standard_name": "snow_height",
+          "ancillary_variables": "Snow_Kernel",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "cm",
+          "Valid_range": [0, null],
+          "description": ""
+        }
+      },
+      "snow_kernel_data":{
+        "id": {
+          "var_type": ["var2d", "interpolated"],
+          "var_mode": true,
+          "var_name": ["Snow_Kernel"],
+          "var_file": "ws_product",
+          "var_colormap": null,
+          "var_method_save": "write2DVar"
+        },
+        "attributes": {
+          "long_name": "Snow Kernel",
+          "standard_name": "snow_kernel",
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "units": "-",
+          "Valid_range": [0, 1],
+          "description": ""
+        }
+      }
+    }
+  }
+}

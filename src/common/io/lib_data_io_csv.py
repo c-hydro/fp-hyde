@@ -21,11 +21,13 @@ from src.common.driver.configuration.drv_configuration_debug import Exc
 oLogStream = logging.getLogger(sLoggerName)
 #################################################################################
 
+
 # --------------------------------------------------------------------------------
 # Initialize dictionary object
 class ObjCSV(object):
     pass
 # --------------------------------------------------------------------------------
+
 
 # --------------------------------------------------------------------------------
 # Method to open csv file
@@ -51,6 +53,7 @@ def openFile(sFileName, sFileMode=None, sFileDelimiter=','):
 
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
 # Method to read csv file
 def readFile2Data(sFileName, sFileDelimiter=',', sFileMode='rb'):
@@ -63,6 +66,7 @@ def readFile2Data(sFileName, sFileDelimiter=',', sFileMode='rb'):
     return oFileData
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
 # Method to write csv file
 def writeFile(sFileName, sFileMode='w'):
@@ -71,6 +75,7 @@ def writeFile(sFileName, sFileMode='w'):
     return oFile
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
 # Method to close csv file
 def closeFile():
@@ -78,12 +83,14 @@ def closeFile():
     pass
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
 # Method to read file to data frame
 def readFile2DataFrame(sFileName, sFileDelimiter=','):
     oDataFrame = read_csv(sFileName, delimiter=sFileDelimiter)
     return oDataFrame
 # --------------------------------------------------------------------------------
+
 
 # --------------------------------------------------------------------------------
 # Method to write dataframe to csv file
@@ -95,6 +102,7 @@ def writeDataFrame2File(sFileName, oDataFrame, sDataSeparetor=',',
                       index=bDataIndex, index_label=False, header=bDataHeader,
                       columns=oVarName)
 # --------------------------------------------------------------------------------
+
 
 # --------------------------------------------------------------------------------
 # Method to parse file in csv format

@@ -1011,6 +1011,10 @@ class DataProductBuilder:
         oVarWS = {}
         for sVarKey, oVarDef in self.oVarDef.items():
 
+            # DEBUG
+            # sVarKey = 'air_temperature_data'
+            # oVarDef = self.oVarDef[sVarKey]
+
             # -------------------------------------------------------------------------------------
             # Get input variable information
             oVarType = oVarDef['id']['var_type']

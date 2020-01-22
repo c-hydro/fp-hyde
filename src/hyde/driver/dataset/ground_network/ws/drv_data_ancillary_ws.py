@@ -13,10 +13,10 @@ import rasterio
 
 from os.path import exists
 
-from fp.dataset.ground_network.ws.lib_ws_ancillary_snow import computeSnowPredictor
+from src.hyde.dataset.ground_network.ws.lib_ws_ancillary_snow import computeSnowPredictor
 
-from fp.default.lib_default_args import sLoggerName
-from fp.driver.configuration.drv_configuration_debug import Exc
+from src.common.default.lib_default_args import sLoggerName
+from src.common.driver.configuration.drv_configuration_debug import Exc
 
 # Logging
 oLogStream = logging.getLogger(sLoggerName)

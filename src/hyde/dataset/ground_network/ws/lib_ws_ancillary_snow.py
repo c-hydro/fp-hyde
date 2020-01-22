@@ -22,7 +22,7 @@ from src.common.utils.lib_utils_apps_file import deleteFolder
 from src.common.utils.lib_utils_apps_process import execProcess
 from src.common.utils.lib_utils_op_string import randomString
 from src.common.default.lib_default_args import sLoggerName
-from src.hyde.driver.configuration.drv_configuration_debug import Exc
+from src.common.driver.configuration.drv_configuration_debug import Exc
 
 # Logging
 oLogStream = logging.getLogger(sLoggerName)
