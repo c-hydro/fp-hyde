@@ -1,7 +1,7 @@
 Flood PROOFS Modelling System
 =============================
 
-Welcome to the **FloodPROOFS Modelling System** GitHub repository. This is a Modelling System supported by the Italian Civil Department (DPC) and is used for preventing and reducing hydrogeological risk.
+Welcome to the **Flood-PROOFS Modelling System** GitHub repository. This is a Modelling System supported by the Italian Civil Department (DPC) and is used for preventing and reducing hydrogeological risk.
 
 Background
 **********
@@ -16,6 +16,7 @@ Components
 **********
 
 The Flood-PROOFS forecasting chain consists in the following different parts, which are summarized as follows:
+
     • **Processing**: tools to organize input and output datasets written in python3 language usually named **Hydrological Data Engines [hyde]** package;
     • **Simulation**: tools to set and run Hydrological Model Continuum (HMC) written both in python3 and fortran programming language usually named **Hydrological Model Continuum [hmc]** package;
     • **Publishing and Visualization**: tools to control, view and analyze results written both in python3 and R programming language usually named as **Hydrological Analysis tools [hat]** package;
@@ -83,7 +84,7 @@ Usually, to build Continuum for production use, options have to set as follows:
 
 Potential Users
 ***************
-The FloodPROOFS Modelling System has been released to enable different applications (for example local/regional scenario assessment) and further development by external users.
+The Flood-PROOFS Modelling System has been released to enable different applications (for example local/regional scenario assessment) and further development by external users.
 
 Potential users are anticipated to predominately be interested in the ability to run the system with local data (including scenario modelling) and to modify the system with new capabilities. The potential collaborators have expressed a range of potential goals for their use of the modelling system, including performing comparisons with existing models, tailoring the hydrological performance to specific land uses and cropping types.
 
@@ -113,12 +114,12 @@ If you want to contribute please follow these steps:
 Authors
 *******
 
-All authors involved in the docker development for Flood-PROOFS system are reported in this authors_ file.
+All authors involved in the library development for the Flood-PROOFS modelling system are reported in this authors_ file.
 
 License
 *******
 
-By accessing or using the FloodPROOFS modelling system, code, data or documentation, you agree to be bound by the FloodPROOFS license available. See the license_ for details. 
+By accessing or using the Flood-PROOFS modelling system, code, data or documentation, you agree to be bound by the FloodPROOFS license available. See the license_ for details. 
 
 Changelog
 *********
