@@ -1,6 +1,3 @@
-.. _license_label: LICENSE.rst
-
-
 Flood PROOFS Modelling System
 =============================
 
@@ -15,11 +12,10 @@ The Flood-PROOFS system manages the data flow deriving from various modelling to
 
 The system has been operating since 2008 at various Functional Centers (Autonomous Region of Valle d'Aosta and Marche) where it is used for the issue of hydro-meteorological warnings for civil protection purposes. At the technical offices of the Valle d'Aosta Water Company (CVA) it is instead useful to study and implement strategies to mitigate flood events or to secure facilities in the event of flooding.
 
-
 Components
 **********
 
-The Flood-PROOFS forecasting chain consists in three different parts, which are summarized as follows:
+The Flood-PROOFS forecasting chain consists in the following different parts, which are summarized as follows:
     • **Processing**: tools to organize input and output datasets written in python3 language usually named **Hydrological Data Engines [hyde]** package;
     • **Simulation**: tools to set and run Hydrological Model Continuum (HMC) written both in python3 and fortran programming language usually named **Hydrological Model Continuum [hmc]** package;
     • **Publishing and Visualization**: tools to control, view and analyze results written both in python3 and R programming language usually named as **Hydrological Analysis tools [hat]** package;
@@ -42,13 +38,16 @@ The libraries and the packages are mainly divided in four categories:
     • python3 packages and applications;
     • R packages and applications;
     • fortran libraries;
-    • other software and applications (Jupyter Notebook, QGIS, Panoply, cdo, ncview ...)
+    • other software and applications (Jupyter Notebook, QGIS, Panoply, cdo, ncview ...).
+
+The section for installing all needed libraries and environments is usually named **fp-envs** and the users can find it in Flood-PROOFS
+modelling system repository hosted by GitHub [1_].
 
 Python3 libraries
 -----------------
 
 The python3 standard library is not sufficient to correctly install all Flood-PROOFS applications; for this reason some extra libraries are needed to guarantee all functionalities. 
-To install all python3 libraries a bash script named “setup_fp_env_python.sh” is provided [6_]; basically, the script calls a **miniconda** [7_] installation that allow to get all needed libraries and install them into “$HOME/user/fp_libs_python/” folder. During the installation, a virtual environment named “fp_env_python” is created too.
+To install all python3 libraries a bash script named **setup_fp_env_python.sh** is provided [6_]; basically, the script calls a **miniconda** [7_] installation that allow to get all needed libraries and install them into “$HOME/user/fp_libs_python/” folder. During the installation, a virtual environment named “fp_env_python” is created too.
 Once all libraries are correctly installed and configurated, to activate “fp_env_python” by command-line is necessary to execute the following:
 
 .. code-block:: bash
@@ -56,7 +55,7 @@ Once all libraries are correctly installed and configurated, to activate “fp_e
    >> export PATH="$HOME/fp_libs_python/bin:$PATH"
    >> source activate fp_env_python
 
-By default, the “fp_env_python” environment is shown in parentheses () or brackets [] at the beginning of your command prompt:
+By default, the **fp_env_python** environment is shown in parentheses () or brackets [] at the beginning of your command prompt:
 
 .. code-block:: bash
 
@@ -68,12 +67,12 @@ Fortran libraries
 -----------------
 
 Hydrological model Continuum needs netcdf4 library to read input provided by other preprocessing tools and to write output for external applications (such as Panoply, cdo, ncview ...).
-To set and compile netcdf4 library a bash script named “setup_fp_env_system.sh” is provided. 
+To set and compile netcdf4 library a bash script named **setup_fp_env_system.sh** is provided. 
 Script downloads **zlib** [8_], **hdf5** [9_] and **netcdf4** [10_] libraries from their repositories; after downloading source compressed archives, script creates a folder in “$HOME/user/fp_libs_system/” where all libraries will be compilled and installed. During the installation, a environment file named “fp_env_system” is created for saving LD_LIBRARY_PATH (for native code libraries) and PATH (for executables) references of installed libraries.
 
 HMC libraries
 -------------
-After preparing all necessary libraries and environmental settings, source files of HMC must be compiled to run properly [11_]; usually, sources are compiled using **GNU compilers** (such as gcc and gfortran) that have to be installed on user’s machine. To compile and optimize HMC codes a bash file named “setup_fp_env_hmc.sh” is provided. Using this setup file, user will have to answer some questions about how to compile HMC codes.
+After preparing all necessary libraries and environmental settings, source files of HMC must be compiled to run properly [11_]; usually, sources are compiled using **GNU compilers** (such as gcc and gfortran) that have to be installed on user’s machine. To compile and optimize HMC codes a bash file named **setup_fp_env_hmc.sh** is provided. Using this setup file, user will have to answer some questions about how to compile HMC codes.
 Usually, to build Continuum for production use, options have to set as follows:
 
     • set compiler type [1] for using GNU/GFortran compiler;
@@ -90,52 +89,31 @@ Potential users are anticipated to predominately be interested in the ability to
 
 Broadly speaking, there are four potential user categories of the FloodPROOFS modelling system:
 
-    • **Data user**: who accessing the model outputs through the Bureau's website.
+    • **Data user**: who accessing the model outputs for using them in their analysis.
     • **Case study user**: who work to evaluate his/her case using data over a selected time period.
     • **Applying users**: who would primarily be interested in applying the current model to a region of interest using localised and/or scenario data where available.
     • **Contributor users**: who will extend the capabilities of the model with new research and coding (modify the system with new capabilities)
 
 It is expected that the majority of early adopters of the FloodPROOFS modelling system will be Applying users looking to apply the system with local data/scenarios, with more Contributor users adopting the system as it becomes well known and established.
 
-Contribute
-**********
+Contribute and Guidelines
+*************************
 
 We are happy if you want to contribute. Please raise an issue explaining what is missing or if you find a bug. We will also gladly accept pull requests against our master branch for new features or bug fixes.
 
-Development setup
------------------
-
-For Development we also recommend a "conda" environment. You can create one including test dependencies and debugger by running 
-
-.. code-block:: bash
-
-   >> conda env create -n fp_env_dev -c <list_of_packages>
-
-or alternatively using a file:
-
-.. code-block:: bash
-
-   >> "conda env create -n fp_env_dev  -f <file_of_packages.yml> 
-
-This will create a new "fp_env_dev" environment which you can activate by using "source activate fp_env_dev".
-
-Guidelines
-----------
-
 If you want to contribute please follow these steps:
-    • Fork the one of the Flood-PROOFS repositories to your account
-    • Clone the repository, make sure you use "git clone --recursive" to also get the test data repository.
-    • make a new feature branch from the repository master branch
-    • Add your feature
-    • Please include tests for your contributions in one of the test directories. We use py.test so a simple function called "test_my_feature" is enough
-    • submit a pull request to our master branch
+
+    • fork the one of the Flood-PROOFS repositories to your account;
+    • clone the repository, make sure you use "git clone --recursive" to also get the test data repository;
+    • make a new feature branch from the repository master branch;
+    • add your feature;
+    • please include tests for your contributions in one of the test directories;
+    • submit a pull request to our master branch.
 
 Authors
 *******
 
-    .. include:: AUTHORS.rst
-        :start-line: 4
-        :tab-width: 8
+All authors involved in the docker development for Flood-PROOFS system are reported in this authors_ file.
 
 License
 *******
@@ -174,3 +152,4 @@ References
 .. _11: https://github.com/c-hydro/hmc-dev
 .. _license: LICENSE.rst
 .. _changelog: CHANGELOG.rst
+.. _authors: AUTHORS.rst

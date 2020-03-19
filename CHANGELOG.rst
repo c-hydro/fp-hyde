@@ -2,6 +2,32 @@
 Changelog
 =========
 
+Version 1.9.4 [2020-03-19]
+**************************
+APP: **HYDE_DynamicData_NWP_GFS_025.py**
+		- Release for Hyde package
+
+APP: **HYDE_DynamicData_NWP_ECMWF_0100.py**
+    - Beta release for HyDE package
+    	- Previous version(s)
+    		- [2017-05-10] Latest operational version for NWP ECMWF 0100
+    		- [2015-09-23] Latest operational version for NWP ECMWF 0125
+
+APP: **HYDE_DynamicData_NWP_WRF.py**
+		- Application refactoring 
+
+DRV: **lib_astrorad_core.py**
+		- Beta release for HyDE package for Astronomical Radiation Model
+			- Previous version(s)
+				- [2017-05-23] Refactoring for Python3
+				- [2015-11-03] Beta release
+
+BIN: **hyde_downloader_satellite_gsmap.py**
+		- Release for Hyde package
+
+BIN: **hyde_downloader_nwp_gfs.py**
+		- Release for Hyde package
+
 Version 1.9.3 [2019-11-22]
 **************************
 APP: **HYDE_DynamicData_HSAF_ASCAT_OBS_NRT.py**
@@ -96,6 +122,9 @@ APP: **HYDE_Model_RFarm.py**
 		  - [2015-09-24] Final release for operational chain mode
 		  - [2015-08-23] Final release for experimental project
 		  - [2014-04-08] Final release for experimental mode
+
+DRV: **lib_rfarm_core.py**
+		- Beta release for HyDE package for RainFarm model
 
 Version 1.4.0 [2019-08-05]
 **************************

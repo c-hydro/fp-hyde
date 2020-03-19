@@ -3,7 +3,7 @@ Library Features:
 
 Name:          lib_utils_apps_file
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20180521'
+Date:          '20200210'
 Version:       '2.0.7'
 """
 
@@ -22,8 +22,8 @@ from os.path import exists, split, join
 
 from src.common.utils.lib_utils_apps_zip import getExtZip, addExtZip, removeExtZip, deleteFileUnzip
 
-from src.common.default.lib_default_args import sLoggerName
-from src.common.default.lib_default_args import sZipExt as sZipExt_Default
+from src.common.default.lib_default_args import logger_name
+from src.common.default.lib_default_args import zip_ext as zip_ext_default
 
 from src.common.utils.lib_utils_op_system import createFolder, deleteFolder, copyFile, deleteFileName, createTemp
 
@@ -33,7 +33,7 @@ from src.common.driver.dataset.drv_data_io_zip import Drv_Data_Zip
 from src.common.driver.configuration.drv_configuration_debug import Exc
 
 # Logging
-oLogStream = logging.getLogger(sLoggerName)
+log_stream = logging.getLogger(logger_name)
 
 # Debug
 # import matplotlib.pylab as plt
@@ -185,7 +185,7 @@ def selectFileDriver(sFileName, sZipExt=None, sFileMode=None):
 
 # -------------------------------------------------------------------------------------
 # Method to zip file data
-def zipFileData(sFileName, sFileZipExt=sZipExt_Default):
+def zipFileData(sFileName, sFileZipExt=zip_ext_default):
 
     oZipDrv = Drv_Data_Zip(sFileName, 'z', None, sFileZipExt).oFileWorkspace
     [oFileZip_IN, oFileZip_OUT] = oZipDrv.oFileLibrary.openZip(
@@ -196,7 +196,7 @@ def zipFileData(sFileName, sFileZipExt=sZipExt_Default):
     oZipDrv.oFileLibrary.zipFile(oFileZip_IN, oFileZip_OUT)
     oZipDrv.oFileLibrary.closeZip(oFileZip_IN, oFileZip_OUT)
 
-    oLogStream.info(' ------> Zip file: ' + oZipDrv.sFileName_OUT)
+    log_stream.info(' ------> Zip file: ' + oZipDrv.sFileName_OUT)
 
     # Remove unzipped file
     deleteFileUnzip(sFileName, True)
@@ -205,49 +205,49 @@ def zipFileData(sFileName, sFileZipExt=sZipExt_Default):
 
 # -------------------------------------------------------------------------------------
 # Method to handle file Data (in netCDF, binary and ASCII formats)
-def handleFileData(sFileName, sFileType=None, sPathTemp=None, bFileTemp=True):
+def handleFileData(file_name, file_type=None, path_tmp=None, file_tmp=True):
 
     # -------------------------------------------------------------------------------------
     # Check file availability on disk
-    if exists(sFileName):
+    if exists(file_name):
 
         # -------------------------------------------------------------------------------------
         # Create temporary folder to copy file from source (to manage multiprocess request)
-        sFolderTemp = createTemp(sPathTemp)
+        folder_tmp = createTemp(path_tmp)
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
         # Get source file path and name
-        [sPathName_Source, sFileName_Source] = split(sFileName)
-        sFile_Source = join(sPathName_Source, sFileName_Source)
+        [folder_name_src, file_name_src] = split(file_name)
+        file_src = join(folder_name_src, file_name_src)
 
         # Get destination file path and name
-        sPathName_Destination = sFolderTemp
-        sFileName_Destination = sFileName_Source
+        folder_name_dst = folder_tmp
+        file_name_dst = file_name_src
 
-        sFile_Destination = join(sPathName_Destination, sFileName_Destination)
+        file_dst = join(folder_name_dst, file_name_dst)
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
         # Create destination folder (if needed)
-        if bFileTemp:
-            createFolder(sPathName_Destination)
+        if file_tmp:
+            createFolder(folder_name_dst)
             # Copy file in temporary folder (to manage multiprocess file request)
-            copyFile(sFile_Source, sFile_Destination)
+            copyFile(file_src, file_dst)
         else:
             # Temporary file and folder not used
-            sPathName_Destination = sPathName_Source
-            sFile_Destination = sFile_Source
+            folder_name_dst = folder_name_src
+            file_dst = file_src
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
         # Get zip extension (if exists)
-        [sZipType_Destination, bZipType_Destination] = getExtZip(sFile_Destination)
+        [zip_type_dst, zip_active_dst] = getExtZip(file_dst)
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
         # Check file is compressed or not
-        if bZipType_Destination is True:
+        if zip_active_dst is True:
 
             # -------------------------------------------------------------------------------------
             # Check script for zipped file
@@ -255,38 +255,38 @@ def handleFileData(sFileName, sFileType=None, sPathTemp=None, bFileTemp=True):
 
                 # -------------------------------------------------------------------------------------
                 # Unzip file
-                oZipDriver = Drv_Data_Zip(sFile_Destination, 'u', None, sZipType_Destination).oFileWorkspace
-                [oFile_ZIP, oFile_UNZIP] = oZipDriver.oFileLibrary.openZip(oZipDriver.sFileName_IN,
-                                                                           oZipDriver.sFileName_OUT,
-                                                                           oZipDriver.sZipMode)
-                oZipDriver.oFileLibrary.unzipFile(oFile_ZIP, oFile_UNZIP)
-                oZipDriver.oFileLibrary.closeZip(oFile_ZIP, oFile_UNZIP)
+                oZipDriver = Drv_Data_Zip(file_dst, 'u', None, zip_type_dst).oFileWorkspace
+                [file_zip_handle, file_unzip_handle] = oZipDriver.oFileLibrary.openZip(
+                    oZipDriver.sFileName_IN, oZipDriver.sFileName_OUT, oZipDriver.sZipMode)
+
+                oZipDriver.oFileLibrary.unzipFile(file_zip_handle, file_unzip_handle)
+                oZipDriver.oFileLibrary.closeZip(file_zip_handle, file_unzip_handle)
 
                 # Open unzipped file
-                oFileDriver = Drv_Data_IO(oZipDriver.sFileName_OUT,  sFileType=sFileType).oFileWorkspace
-                oFileHandle = oFileDriver.oFileLibrary.openFile(oZipDriver.sFileName_OUT, 'r')
-                bFileOpen = True
+                file_drv = Drv_Data_IO(oZipDriver.sFileName_OUT,  sFileType=file_type).oFileWorkspace
+                file_handle = file_drv.oFileLibrary.openFile(oZipDriver.sFileName_OUT, 'r')
+                file_open = True
 
                 # Delete unzipped file
                 deleteFileName(oZipDriver.sFileName_OUT)
 
                 # Temporary file and folder are used
-                if bFileTemp:
+                if file_tmp:
                     # Delete zipped temporary file
-                    deleteFileName(sFile_Destination)
+                    deleteFileName(file_dst)
                     # Delete temporary folder
-                    deleteFolder(sPathName_Destination)
+                    deleteFolder(folder_name_dst)
                 # -------------------------------------------------------------------------------------
 
-            except BaseException:
+            except BaseException as BExp:
 
                 # -------------------------------------------------------------------------------------
                 # Exit for errors in unzip or open file
-                Exc.getExc(' =====> WARNING: handle file ' + sFileName + ' FAILED! '
-                           'Errors in unzipping or opening file!', 2, 1)
-                oFileDriver = None
-                oFileHandle = None
-                bFileOpen = False
+                log_stream.warning('Handle file ' + file_name + ' FAILED! Errors in unzipping or opening file!')
+                log_stream.warning('Exception found ' + str(BExp))
+                file_drv = None
+                file_handle = None
+                file_open = False
                 # -------------------------------------------------------------------------------------
 
         else:
@@ -297,27 +297,28 @@ def handleFileData(sFileName, sFileType=None, sPathTemp=None, bFileTemp=True):
 
                 # -------------------------------------------------------------------------------------
                 # Open file
-                oFileDriver = Drv_Data_IO(sFile_Destination, sFileType=sFileType).oFileWorkspace
-                oFileHandle = oFileDriver.oFileLibrary.openFile(sFile_Destination, 'r')
-                bFileOpen = True
+                file_drv = Drv_Data_IO(file_dst, sFileType=file_type).oFileWorkspace
+                file_handle = file_drv.oFileLibrary.openFile(file_dst, 'r')
+                file_open = True
 
                 # Temporary file and folder are used
-                if bFileTemp:
+                if file_tmp:
                     # Delete zipped temporary file
-                    deleteFileName(sFile_Destination)
+                    deleteFileName(file_dst)
                     # Delete temporary folder
-                    deleteFolder(sPathName_Destination)
+                    deleteFolder(folder_name_dst)
                 # -------------------------------------------------------------------------------------
 
-            except BaseException:
+            except BaseException as BExp:
 
                 # -------------------------------------------------------------------------------------
                 # Exit for errors in read file
-                Exc.getExc(' =====> WARNING: handle file ' + sFileName + ' FAILED! '
-                           'Errors in opening file!', 2, 1)
-                oFileDriver = None
-                oFileHandle = None
-                bFileOpen = False
+                log_stream.warning('Handle file ' + file_name + ' FAILED! Errors in opening file!')
+                log_stream.warning('Exception found ' + str(BExp))
+
+                file_drv = None
+                file_handle = None
+                file_open = False
                 # -------------------------------------------------------------------------------------
 
             # -------------------------------------------------------------------------------------
@@ -326,15 +327,15 @@ def handleFileData(sFileName, sFileType=None, sPathTemp=None, bFileTemp=True):
 
         # -------------------------------------------------------------------------------------
         # Exit for errors in finding file
-        Exc.getExc(' =====> WARNING: handle file ' + sFileName + ' FAILED! File not found!', 2, 1)
-        oFileDriver = None
-        oFileHandle = None
-        bFileOpen = False
+        log_stream.warning('Handle file ' + file_name + ' FAILED! File not found!!')
+        file_drv = None
+        file_handle = None
+        file_open = False
         # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Return variable(s)
-    return oFileHandle, oFileDriver, bFileOpen
+    return file_handle, file_drv, file_open
     # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------

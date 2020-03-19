@@ -1,90 +1,184 @@
 {
-  "data_info":{
-    "domain": "Bolivia",
-    "ws": {
-      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ws/$yyyy/$mm/$dd/",
-      "file": "$VAR_$DOMAIN_$yyyy$mm$dd$HH$MM.csv",
-      "update": true,
-      "fields": ["longitude", "latitude", "data", "time_start", "time_end", "unit", "name", "altitude", "code"]
+  "algorithm":{
+    "flags": {
+      "downloading_mp": true,
+      "cleaning_dynamic_data_ancillary": false,
+      "cleaning_dynamic_data_global": true,
+      "cleaning_dynamic_data_domain": true,
+      "cleaning_dynamic_data_tmp": false
+    },
+    "ancillary": {
+      "domain" : "guyana",
+      "process_mp": 20,
+      "type": [
+        "surface_rain",
+        "heightAboveGround_10m_wind",
+        "heightAboveGround_2m_temperature",
+        "heightAboveGround_2m_relative_humidity",
+        "surface_radiation"],
+      "cdo_exec": "/home/fabio/Desktop/Apps/cdo-1.9.6_NC-4.6.0_HDF-1.8.17_ECCODES-2.12.5/bin/cdo",
+      "cdo_deps": ["/home/fabio/Desktop/Library/eccodes-2.12.5/lib/"]
+    },
+    "general": {
+      "title": "NWP GFS 0.25 degree",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.5.0 [20200313]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Downloading tool developed by CIMA Research Foundation"
+    },
+    "template": {
+      "domain": "string_domain",
+      "ancillary_sub_path_time": "%Y/%m/%d/%H",
+      "ancillary_datetime": "%Y%m%d%H%M",
+      "outcome_sub_path_time": "%Y/%m/%d/",
+      "outcome_datetime": "%Y%m%d",
+      "run_hour": "{:02d}",
+      "run_step": "{:03d}",
+      "run_datetime": "%Y%m%d",
+      "run_lon_right": "string_lr",
+      "run_lon_left": "string_lf",
+      "run_lat_bottom" : "string_lb",
+      "run_lat_top": "string_lt"
+    }
+  },
+  "data": {
+    "static": {
+      "bounding_box": {
+        "lon_right": -65,
+        "lon_left": -55,
+        "lat_bottom": 0,
+        "lat_top": 10
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_forecast_period": 120,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 0,
+        "time_observed_frequency": "H",
+        "time_rounding": "H"
+      },
+      "source": {
+        "url_root":
+        [
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?",
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?",
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?",
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?",
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?"
+        ],
+        "url_file":
+        [
+          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}",
+          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}",
+          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}",
+          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}",
+          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}"
+        ],
+        "url_lev" :
+        [
+          "&lev_surface=on",
+          "&lev_10_m_above_ground=on",
+          "&lev_2_m_above_ground=on",
+          "&lev_2_m_above_ground=on",
+          "&lev_surface=on"
+        ],
+        "url_vars":
+        [
+          "&var_APCP=on",
+          "&var_UGRD=on&var_VGRD=on",
+          "&var_TMP=on",
+          "&var_RH=on",
+          "&var_ALBDO=on&var_DLWRF=on&var_DSWRF=on"
+        ],
+        "url_bbox":
+        [
+          "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90",
+          "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90",
+          "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90",
+          "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90",
+          "&leftlon=0&rightlon=360&toplat=90&bottomlat=-90"
+        ],
+        "url_loc" :
+        [
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}"
+        ]
+      },
+      "ancillary": {
+        "filename":
+        [
+          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_srf_rain.grib2",
+          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_10m_wind.grib2",
+          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_2m_temperature.grib2",
+          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_2m_relative_humidity.grib2",
+          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_srf_radiation.grib2"
+        ],
+        "folder":
+        [
+          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}"
+        ]
+      },
+      "outcome": {
+        "global": {
+          "filename": [
+            "gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_rain.nc",
+            "gfs.t{run_hour}z.0p25.{outcome_datetime}_10m_wind.nc",
+            "gfs.t{run_hour}z.0p25.{outcome_datetime}_2m_temperature.nc",
+            "gfs.t{run_hour}z.0p25.{outcome_datetime}_2m_relative_humidity.nc",
+            "gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_radiation.nc"
+          ],
+          "folder": [
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}"
+          ]
+        },
+        "domain" : {
+          "filename": [
+            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_rain.nc",
+            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_10m_wind.nc",
+            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_2m_temperature.nc",
+            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_2m_relative_humidity.nc",
+            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_radiation.nc"
+          ],
+          "folder": [
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
+            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}"
+          ]
+        }
+      }
     },
     "log": {
-      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/ws/",
-      "file": "fp_downloader_drops_ws_log.txt",
-      "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+        "filename": "hyde_downloader_nwp_gfs_025_local_log.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/gfs_025/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
     },
-    "land": {
-      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ws/gridded/",
-      "file": "marche.dem.txt"
+    "bin": {
+      "filename": "",
+      "folder": ""
     }
   },
-  "variable_info": {
-    "rain": {
-      "download": true,
-      "name": "Rain",
-      "sensor": "Raingauge",
-      "units": "mm"
-    },
-    "air_temperature": {
-      "download": true,
-      "name": "AirTemperature",
-      "sensor": "Thermometer",
-      "units": "C"
-    },
-    "radiation": {
-      "download": false,
-      "name": "IncomingRadiation",
-      "sensor": "RadiationSensor",
-      "units": "W m-2"
-    },
-    "relative_humidity": {
-      "download": false,
-      "name": "RelativeHumidity",
-      "sensor": "Hygrometer",
-      "units": "%"
-    },
-    "wind_speed": {
-      "download": false,
-      "name": "Wind",
-      "sensor": "WindSensor",
-      "units": "m s-1"
-    },
-    "wind_direction": {
-      "download": false,
-      "name": "WindDirection",
-      "sensor": "WindDirection",
-      "units": "degree"
-    },
-    "snow_height": {
-      "download": false,
-      "name": "SnowHeight",
-      "sensor": "Snowgauge",
-      "units": "cm"
-    },
-    "air_pressure": {
-      "download": false,
-      "name": "AirPressure",
-      "sensor": "Barometer",
-      "units": ""
-    }
-  },
-  "time_info": {
-    "time_get": "201909161200",
-    "time_period": 6,
-    "time_frequency": "H"
-  },
-  "drops_info":{
-    "library_path" : "/home/fabio/Documents/Work_Area/Code_Development/Library/acrofour_merged/",
-    "library_jvm": null,
-    "library_source": "MERGED",
-    "library_file": {
-      "JTDS": "jtds-1.2.jar",
-      "LDAP": "ldap.jar",
-      "ACRO4": "ACR4_Lib_MAURY.jar"
-    },
-    "library_server": {
-      "HTTP": "130.251.104.243",
-      "LDAP": "130.251.104.19",
-      "Drops": "130.251.104.19"
-    }
+  "time": {
+    "time_now": null,
+    "time_period": 3,
+    "time_frequency": "6H",
+    "time_rounding": "6H"
   }
 }

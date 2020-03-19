@@ -12,6 +12,7 @@ Version:       '2.0.7'
 import logging
 import datetime
 import tempfile
+import os
 
 from os import remove
 from os.path import exists
@@ -26,6 +27,28 @@ oLogStream = logging.getLogger(__name__)
 # Debug
 # import matplotlib.pylab as plt
 #######################################################################################
+
+
+# -------------------------------------------------------------------------------------
+# Method to remove empty folders recursively
+def removeEmptyFolders(path, removeRoot=True):
+    if not os.path.isdir(path):
+        return
+
+    # remove empty subfolders
+    files = os.listdir(path)
+    if len(files):
+        for f in files:
+            fullpath = os.path.join(path, f)
+            if os.path.isdir(fullpath):
+                removeEmptyFolders(fullpath)
+
+    # if folder empty, delete it
+    files = os.listdir(path)
+    if len(files) == 0 and removeRoot:
+        os.rmdir(path)
+# -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Method to copy file from source to destination

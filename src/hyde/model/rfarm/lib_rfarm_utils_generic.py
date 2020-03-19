@@ -21,13 +21,12 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_name
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 import src.hyde.model.rfarm.lib_rfarm_utils_regrid as lib_regrid
 
 log_stream = logging.getLogger(logger_name)
 
 # Debug
-import matplotlib.pylab as plt
 #######################################################################################
 
 

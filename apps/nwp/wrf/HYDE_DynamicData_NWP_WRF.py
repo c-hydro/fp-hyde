@@ -1,8 +1,8 @@
 """
 Hyde Processing Tool - NWP WRF
 
-__date__ = '20191018'
-__version__ = '1.1.1'
+__date__ = '20200317'
+__version__ = '1.2.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
@@ -10,8 +10,9 @@ General command line:
 python3 HYDE_DynamicData_NWP_WRF.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
+20200317 (1.2.0) --> Refactoring using classes and super methods
 20191018 (1.1.1) --> Manage issue(s) in input definition of "time" variable
-20190916 (1.1.0) --> Refactoring to HyDE package in Python3
+20190916 (1.1.0) --> Refactoring for HyDE package in Python3
 20180713 (1.0.0) --> Beta release for flood-proofs monitoring system and new codes for Python 3
 20130730 (0.0.1) --> Starting version released for drihm2us project
 """
@@ -22,46 +23,38 @@ Version:
 import time
 import argparse
 
-# Partial library
-from os.path import exists
-
 from src.common.log.lib_logging import setLoggingFile
-from src.common.utils.lib_utils_op_string import defineString
-from src.common.utils.lib_utils_op_dict import removeDictKey
-from src.common.utils.lib_utils_file_workspace import savePickle, restorePickle
 
-from src.hyde.driver.dataset.generic.drv_data_io_geo import DataGeo
+from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_formatter, logger_handle, logger_name
+from src.hyde.driver.configuration.nwp.wrf.drv_configuration_time_wrf import DataTime
+from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_geo import DataGeo
+
 from src.hyde.driver.configuration.generic.drv_configuration_algorithm import DataAlgorithm
-from src.hyde.driver.configuration.generic.drv_configuration_time import DataTime
-from src.hyde.driver.configuration.generic.drv_configuration_tags import DataTags
-from src.hyde.driver.configuration.generic.drv_configuration_debug import Exc
-
-from src.hyde.driver.dataset.nwp.wrf.drv_data_io_wrf import DataProductCleaner, DataProductTime, DataProductBuilder, \
-    DataProductAnalyzer, DataProductFinalizer
+from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_base import DataProductTime, DataProductBuilder
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to get script argument(s)
 def GetArgs():
-    oParser = argparse.ArgumentParser()
-    oParser.add_argument('-settings_file', action="store", dest="sSettingFile")
-    oParser.add_argument('-time', action="store", dest="sTimeArg")
-    oParserValue = oParser.parse_args()
+    parser_handle = argparse.ArgumentParser()
+    parser_handle.add_argument('-settings_file', action="store", dest="settings_file")
+    parser_handle.add_argument('-time', action="store", dest="time")
+    parser_values = parser_handle.parse_args()
 
-    sScriptName = oParser.prog
+    script_name = parser_handle.prog
 
-    if oParserValue.sSettingFile:
-        sSettingsFile = oParserValue.sSettingFile
+    if parser_values.settings_file:
+        script_settings_file = parser_values.settings_file
     else:
-        sSettingsFile = 'configuration.json'
+        script_settings_file = 'configuration.json'
 
-    if oParserValue.sTimeArg:
-        sTimeArg = oParserValue.sTimeArg
+    if parser_values.time:
+        script_time = parser_values.time
     else:
-        sTimeArg = ''
+        script_time = None
 
-    return sScriptName, sSettingsFile, sTimeArg
+    return script_name, script_settings_file, script_time
 # -------------------------------------------------------------------------------------
 
 
@@ -71,173 +64,133 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
-    sProgramVersion = '1.1.1'
-    sProjectName = 'HyDE'
-    sAlgType = 'DataDynamic'
-    sAlgName = 'NWP WRF Barbados'
+    project_name = 'HYDE'
+    alg_version = '1.2.0'
+    alg_type = 'DataDynamic'
+    alg_name = 'NWP WRF Processing Tool'
     # Time algorithm information
-    dStartTime = time.time()
+    time_start = time.time()
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Get script argument(s)
-    [sScriptName, sFileSetting, sTimeArg] = GetArgs()
+    [script_name, script_file_settings, script_time] = GetArgs()
 
     # Set algorithm configuration
-    oDrv_Data_Settings = DataAlgorithm(sFileSetting)
-    [oData_Settings, oData_Path, oData_Flags, oData_ColorMap] = oDrv_Data_Settings.getDataSettings()
+    driver_algorithm_settings = DataAlgorithm(script_file_settings)
+    [data_algorithm_settings, data_algorithm_path,
+     data_algorithm_flags, data_algorithm_colormap] = driver_algorithm_settings.getDataSettings()
 
     # Set logging file
-    oLogStream = setLoggingFile(oData_Path['log'])
+    log_stream = setLoggingFile(data_algorithm_path['log'], logger_name, logger_handle, logger_formatter)
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Start Program
-    oLogStream.info('[' + sProjectName + ' ' + sAlgType + ' - ' + sAlgName + ' (Version ' + sProgramVersion + ')]')
-    oLogStream.info('[' + sProjectName + '] Start Program ... ')
+    log_stream.info('[' + project_name + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
+    log_stream.info('[' + project_name + '] Start Program ... ')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Get algorithm time
-    oLogStream.info(' --> Set algorithm time ... ')
-    oDrv_Time = DataTime(sTimeArg,
-                         iTimeStep=int(oData_Settings['time']['time_step']),
-                         iTimeDelta=int(oData_Settings['time']['time_delta']),
-                         oTimeRefHH=oData_Settings['time']['time_refHH'])
-    oData_Time = oDrv_Time.getDataTime(bTimeReverse=True)
-    oLogStream.info(' --> Set algorithm time ... DONE')
-    # -------------------------------------------------------------------------------------
-
-    # -------------------------------------------------------------------------------------
-    # Clean ancillary static file
-    DataProductCleaner(
-        flag=oData_Flags['cleaning_static_ancillary_data'],
-        file=[oData_Path['land_ancillary'], oData_Path['grid_ref']]
-    ).cleanDataProduct()
+    log_stream.info(' --> Set algorithm time ... ')
+    driver_algorithm_time = DataTime(
+        script_time,
+        time_now=data_algorithm_settings['time']['time_now'],
+        time_period_past=int(data_algorithm_settings['time']['time_period']),
+        time_frequency=data_algorithm_settings['time']['time_frequency'],
+        time_rounding=data_algorithm_settings['time']['time_rounding'])
+    data_algorithm_time = driver_algorithm_time.getDataTime()
+    log_stream.info(' --> Set algorithm time ... DONE')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Get data geo
-    oLogStream.info(' --> Set land data ... ')
-    oDrv_Data_Geo = DataGeo(oData_Path['land_ref'])
-    if not exists(oData_Path['land_ancillary']):
-        oData_Geo = oDrv_Data_Geo.getDataGeo()
-        savePickle(oData_Path['land_ancillary'], oData_Geo)
-        oLogStream.info(' --> Set land data ... DONE')
-    else:
-        oData_Geo = restorePickle(oData_Path['land_ancillary'])
-        oLogStream.info(' --> Set land data ... LOADED from ancillary saved file.')
+    log_stream.info(' --> Set grid data ... ')
+    data_algorithm_geo = DataGeo(
+        data_algorithm_path['terrain_data'], data_algorithm_path['grid_data'],
+        file_updating=data_algorithm_flags['cleaning_static_data'])
+    data_geo = data_algorithm_geo.getDataGeo()
+    log_stream.info(' --> Set grid data ... DONE')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Iterate over time steps
-    for sTimeStep in oData_Time['a1oTimeStep']:
+    for time_step in data_algorithm_time['time_steps']:
 
         # -------------------------------------------------------------------------------------
         # Get data time
-        oLogStream.info(' --> Get dynamic time ... ')
-        oDrv_DataTime_Dynamic = DataProductTime(
-            time=sTimeStep,
-            settings=oData_Settings)
-        oTimeObj = oDrv_DataTime_Dynamic.computeDataTime()
-        oLogStream.info(' --> Get dynamic time ... DONE')
+        log_stream.info(' --> Get dynamic time ... ')
+        driver_dynamic_time = DataProductTime(
+            time_step=time_step,
+            time_run=data_algorithm_time['time_run'],
+            time_settings=data_algorithm_settings['data']['dynamic']['time'])
+        data_dynamic_time = driver_dynamic_time.computeDataTime()
+        log_stream.info(' --> Get dynamic time ... DONE')
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
-        # Set data tags $yyyy/$mm/$dd/
-        sRunTime = sTimeStep[0:4] + '/' + sTimeStep[4:6] + '/' + sTimeStep[6:8] + '/' + sTimeStep[8:10] + sTimeStep[10:12]
-        oDrv_Data_Tags = DataTags({'$yyyy': sTimeStep[0:4],
-                                   '$mm': sTimeStep[4:6], '$dd': sTimeStep[6:8], '$HH': sTimeStep[8:10],
-                                   '$MM': sTimeStep[10:12],
-                                   '$RUNTIME': sRunTime,
-                                   '$DOMAIN': oData_Settings['algorithm']['ancillary']['domain']})
-        oData_Tags = oDrv_Data_Tags.setDataTags()
-        # Info time
-        oLogStream.info(' --> Set time step: ' + sTimeStep)
+        # Build, compute and save product
+        log_stream.info(' --> Initialize product driver ... ')
+        driver_product = DataProductBuilder(
+            time_run=data_dynamic_time.time_step,
+            time_range=data_dynamic_time.time_range,
+            variable_info_in=data_algorithm_settings['variables']['source'],
+            variable_info_out=data_algorithm_settings['variables']['outcome'],
+            data_domain=data_algorithm_settings['algorithm']['ancillary']['domain'],
+            data_geo=data_geo,
+            template=data_algorithm_settings['data']['dynamic']['template'],
+            parameters=data_algorithm_settings['algorithm']['parameters'],
+            file_ancillary_in=data_algorithm_path['nwp_source_ancillary'],
+            file_ancillary_processing=data_algorithm_path['nwp_processing_ancillary'],
+            file_ancillary_out=data_algorithm_path['nwp_outcome_ancillary'],
+            file_data=data_algorithm_path,
+            file_ancillary_in_updating=data_algorithm_flags['cleaning_dynamic_ancillary_source'],
+            file_ancillary_processing_updating=data_algorithm_flags['cleaning_dynamic_ancillary_processing'],
+            file_ancillary_out_updating=data_algorithm_flags['cleaning_dynamic_ancillary_outcome'],
+            file_ancillary_tmp_cleaning=data_algorithm_flags['cleaning_dynamic_tmp'],
+            file_out_updating=data_algorithm_flags['cleaning_dynamic_product'],
+            file_out_write_engine=data_algorithm_settings['algorithm']['ancillary']['write_engine'],
+            file_out_mode_zipping=data_algorithm_flags['zipping_dynamic_product'],
+            file_out_ext_zipping=data_algorithm_settings['algorithm']['ancillary']['zip_format'],
+        )
+        log_stream.info(' --> Initialize product driver ... DONE')
 
-        # Clean ancillary and product dynamic files
-        DataProductCleaner(
-            flag=[oData_Flags['cleaning_dynamic_ancillary_data'],
-                  oData_Flags['cleaning_dynamic_product_data']],
-            file=[defineString(oData_Path['wrf_ancillary_data_collected'], oData_Tags),
-                  defineString(oData_Path['wrf_product'], oData_Tags)]
-        ).cleanDataProduct()
-        # -------------------------------------------------------------------------------------
+        # Collect product datasets
+        log_stream.info(' --> Collect product datasets ... ')
+        data_dynamic_collected = driver_product.collect()
+        log_stream.info(' --> Collect product data ... DONE')
 
-        # -------------------------------------------------------------------------------------
-        # Get data dynamic
-        oLogStream.info(' --> Get dynamic data ... ')
-        oDrv_DataBuilder_Dynamic = DataProductBuilder(
-            time=oTimeObj,
-            settings=oData_Settings,
-            wrf_data_file=defineString(oData_Path['wrf_data'],
-                                       removeDictKey(oData_Tags, ['Year', 'Month', 'Day', 'Hour', 'Minute'])))
+        # Process product datasets
+        log_stream.info(' --> Process product datasets ... ')
+        data_dynamic_processed = driver_product.process(data_dynamic_collected)
+        log_stream.info(' --> Process product datasets ... DONE')
 
-        if not exists(defineString(oData_Path['wrf_ancillary_data_collected'], oData_Tags)):
-            oData_Dynamic = oDrv_DataBuilder_Dynamic.getDataProduct()
-            savePickle(defineString(oData_Path['wrf_ancillary_data_collected'], oData_Tags),
-                       oData_Dynamic)
-            oLogStream.info(' --> Get dynamic data ... DONE')
-        else:
-            oData_Dynamic = restorePickle(defineString(oData_Path['wrf_ancillary_data_collected'], oData_Tags))
-            oLogStream.info(' --> Get dynamic data ... LOADED from ancillary saved file.')
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Compute data dynamic
-        oLogStream.info(' --> Compute dynamic data ... ')
-        oDrv_DataAnalyzer_Dynamic = DataProductAnalyzer(
-            time=oTimeObj,
-            settings=oData_Settings,
-            data=oData_Dynamic,
-            grid_ref_file=defineString(oData_Path['grid_ref'], oData_Tags))
-        if not exists(defineString(oData_Path['wrf_product'], oData_Tags)):
-            oData_Dynamic = oDrv_DataAnalyzer_Dynamic.computeDataProduct(oData_Geo)
-            oLogStream.info(' --> Compute dynamic data ... DONE')
-        else:
-            oLogStream.info(' --> Compute dynamic data ... SKIPPED! Data previously computed.')
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Save data dynamic
-        oLogStream.info(' --> Save dynamic data ... ')
-        oDrv_DataFinalizer_Dynamic = DataProductFinalizer(
-            time=sTimeStep,
-            settings=oData_Settings,
-            data=oData_Dynamic,
-            wrf_product_file=defineString(oData_Path['wrf_product'], oData_Tags),
-            wrf_colormap_file=defineString(oData_ColorMap, oData_Tags))
-        if not exists(defineString(oData_Path['wrf_product'], oData_Tags)):
-            oDrv_DataFinalizer_Dynamic.saveDataProduct(oData_Geo)
-            oLogStream.info(' --> Save dynamic data ... DONE')
-        else:
-            oLogStream.info(' --> Save dynamic data ... SKIPPED! Data previously saved.')
+        # Save product datasets
+        log_stream.info(' --> Save product datasets ... ')
+        driver_product.save(data_dynamic_processed)
+        log_stream.info(' --> Save product datasets ... DONE')
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
         # Clean ancillary archive file(s)
-        DataProductCleaner(
-            flag=oData_Flags['cleaning_dynamic_ancillary_archive'],
-            file=[defineString(oData_Path['wrf_ancillary_data_collected'], oData_Tags)]
-        ).cleanDataProduct()
+        driver_product.clean()
         # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Note about script parameter(s)
-    oLogStream.info('NOTE - Algorithm parameter(s)')
-    oLogStream.info('Script: ' + str(sScriptName))
+    log_stream.info('NOTE - Algorithm parameter(s)')
+    log_stream.info('Script: ' + str(script_name))
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # End Program
-    dTimeElapsed = round(time.time() - dStartTime, 1)
+    time_elapsed = round(time.time() - time_start, 1)
 
-    oLogStream.info('[' + sProjectName + ' ' + sAlgType + ' - ' + sAlgName + ' (Version ' + sProgramVersion + ')]')
-    oLogStream.info('End Program - Time elapsed: ' + str(dTimeElapsed) + ' seconds')
-
-    Exc.getExc('', 0, 0)
+    log_stream.info('[' + project_name + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
+    log_stream.info('End Program - Time elapsed: ' + str(time_elapsed) + ' seconds')
     # -------------------------------------------------------------------------------------
 
 

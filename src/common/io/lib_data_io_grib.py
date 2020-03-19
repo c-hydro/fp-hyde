@@ -414,9 +414,22 @@ def getFileAttr(oFile, iIndex=None, oVarKeyNA=None):
 
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
-# Method to get geographical reference
-def getVarGeo_LAMI_2i(oFileHandle, iIdx=0):
+# Method to get geographical reference for ecmwf 0100
+def getVarGeo_ECMWF_0100(file_handle):
+    geo_x, geo_y = getVarGeo_NWP(file_handle)
+    return geo_x, geo_y
+
+
+# Method to get geographical reference for lami-2i
+def getVarGeo_LAMI_2i(file_handle):
+    geo_x, geo_y = getVarGeo_NWP(file_handle)
+    return geo_x, geo_y
+
+
+# Method to get geographical reference generic
+def getVarGeo_NWP(oFileHandle, iIdx=0):
 
     # Check method
     a2dGeoY = None
@@ -451,9 +464,16 @@ def getVarGeo_LAMI_2i(oFileHandle, iIdx=0):
 
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
-# Get variable(s) attribute(s) for LAMI 2i
+# Get variable(s) attribute(s) for LAMI 2I
 def getVarAttr_LAMI_2i(oFileHandle, oVarComp=None, oVarKeyNA=None):
+    oVarAttrs = getVarAttr_NWP(oFileHandle, oVarComp=oVarComp, oVarKeyNA=oVarKeyNA)
+    return oVarAttrs
+
+
+# Get variable(s) attribute(s) for generic NWP
+def getVarAttr_NWP(oFileHandle, oVarComp=None, oVarKeyNA=None):
 
     # Check method
     oVarAttrs = None
@@ -539,9 +559,16 @@ def getVarAttr_LAMI_2i(oFileHandle, oVarComp=None, oVarKeyNA=None):
     return oVarAttrs
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
-# Method to get time variable from LAMI 2i model
+# Method to get time variable for LAMI 2I
 def getVarTime_LAMI_2i(oFileHandle, oVarComp):
+    oVarTime = getVarTime_NWP(oFileHandle, oVarComp)
+    return oVarTime
+
+
+# Method to get time variable from NWP
+def getVarTime_NWP(oFileHandle, oVarComp):
 
     # Check method
     oVarTime = None
@@ -610,9 +637,16 @@ def getVarTime_LAMI_2i(oFileHandle, oVarComp):
     return oVarTime
 # --------------------------------------------------------------------------------
 
+
 # --------------------------------------------------------------------------------
-# Method to get 3d variable from LAMI 2i model
+# Method to get 3d variable from LAMI 2I
 def getVar3D_LAMI_2i(oFileHandle, oVarComp=None):
+    oVarData = getVar3D_NWP(oFileHandle, oVarComp=oVarComp)
+    return oVarData
+
+
+# Method to get 3d variable from generic NWP
+def getVar3D_NWP(oFileHandle, oVarComp=None):
 
     # Check method
     oVarData = None

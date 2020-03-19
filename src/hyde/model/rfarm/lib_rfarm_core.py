@@ -14,12 +14,11 @@ import logging
 import numpy as np
 
 import src.hyde.model.rfarm.lib_rfarm_apps as lib_apps
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_name
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 
 log_stream = logging.getLogger(logger_name)
 
 # Debug
-import matplotlib.pylab as plt
 #######################################################################################
 
 

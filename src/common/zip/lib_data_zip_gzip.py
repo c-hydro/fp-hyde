@@ -4,15 +4,17 @@ Library Features:
 Name:          lib_data_zip_gzip
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
 Date:          '20190913'
-Version:       '2.1.0'
+Version:       '2.1.1'
 """
 #################################################################################
 # Library
 import logging
 import gzip
 
+from src.common.default.lib_default_args import logger_name
+
 # Logging
-log_stream = logging.getLogger(__name__)
+log_stream = logging.getLogger(logger_name)
 #################################################################################
 
 

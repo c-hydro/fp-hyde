@@ -79,8 +79,8 @@ def setLoggingFile(sLoggerFile=sLoggerFile_Default, sLoggerName=sLoggerName_Defa
         # Add handle to logger
         oLoggerStream.addHandler(oLogHandle)
 
-
     else:
+
         oLogHandle = logging.NullHandler()
         # Add handle to logger
         oLoggerStream.addHandler(oLogHandle)

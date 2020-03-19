@@ -10,7 +10,7 @@ __author__ = 'Fabio Delogu            (fabio.delogu@cimafoundation.org,
 __library__ = 'hyde'
 
 General command line:
-python3 HYDE_Model_RFarm.py -settingsfile configuration_model.json -time YYYYMMDDHHMM
+python3 HYDE_Model_RFarm.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version(s):
 20190902 (4.0.0) --> Porting in Hyde package and python 3.x
@@ -28,10 +28,10 @@ import argparse
 
 from src.common.log.lib_logging import setLoggingFile
 
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_formatter, logger_handle, logger_name
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_formatter, logger_handle, logger_name
 
 from src.hyde.driver.configuration.generic.drv_configuration_algorithm import DataAlgorithm
-from src.hyde.driver.configuration.rfarm.drv_configuration_time_rfarm import DataTime
+from src.hyde.driver.configuration.model.rfarm.drv_configuration_time_rfarm import DataTime
 
 from src.hyde.driver.model.rfarm.drv_model_rfarm_geo import DataGeo
 from src.hyde.driver.model.rfarm.drv_model_rfarm_base import ModelTime, ModelRunner
@@ -42,7 +42,7 @@ from src.hyde.driver.model.rfarm.drv_model_rfarm_base import ModelTime, ModelRun
 # Method to get script argument(s)
 def getArgs():
     args_parser = argparse.ArgumentParser()
-    args_parser.add_argument('-settingsfile', action="store", dest="settings_file")
+    args_parser.add_argument('-settings_file', action="store", dest="settings_file")
     args_parser.add_argument('-time', action="store", dest="time_arg")
     args_values = args_parser.parse_args()
 
@@ -51,7 +51,7 @@ def getArgs():
     if 'settings_file' in args_values:
         settings_file = args_values.settings_file
     else:
-        settings_file = 'hsaf_configuration_model_rfarm.json'
+        settings_file = 'configuration.json'
 
     if 'time_arg' in args_values:
         time_arg = args_values.time_arg

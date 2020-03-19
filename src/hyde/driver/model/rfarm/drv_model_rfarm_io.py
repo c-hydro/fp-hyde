@@ -19,14 +19,14 @@ from src.common.default.lib_default_conventions import oVarConventions as var_de
 from src.common.utils.lib_utils_apps_file import handleFileData
 from src.common.utils.lib_utils_op_dict import mergeDict
 
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_generic import create_darray_3d, create_dset, write_dset
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_grib import read_data_lami_2i
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_grib import convert_data_lami_2i, convert_time_lami_2i
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_netcdf import read_data_wrf
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_netcdf import convert_data_wrf, convert_time_wrf
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_generic import write_obj, read_obj
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import create_darray_3d, create_dset, write_dset
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import read_data_lami_2i
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import convert_data_lami_2i, convert_time_lami_2i
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import read_data_wrf
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import convert_data_wrf, convert_time_wrf
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import write_obj, read_obj
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_name
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 
 from src.hyde.model.rfarm.lib_rfarm_utils_generic import computeEnsemble
 

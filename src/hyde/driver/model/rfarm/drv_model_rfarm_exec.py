@@ -16,7 +16,7 @@ import pandas as pd
 
 from src.common.utils.lib_utils_op_system import createTemp
 
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_name, time_format
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name, time_format
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
 
 from src.hyde.model.rfarm.lib_rfarm_utils_generic import extendGrid, computeGrid, \

@@ -14,9 +14,9 @@ import logging
 from os import makedirs, remove
 from os.path import join, split, exists
 
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_name
-from src.hyde.algorithm.geo.rfarm.lib_rfarm_geo import load_domain
-from src.hyde.algorithm.io.rfarm.lib_rfarm_io_generic import read_obj, write_obj, create_darray_2d
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
+from src.hyde.algorithm.geo.model.rfarm.lib_rfarm_geo import load_domain
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import read_obj, write_obj
 
 # Log
 log_stream = logging.getLogger(logger_name)

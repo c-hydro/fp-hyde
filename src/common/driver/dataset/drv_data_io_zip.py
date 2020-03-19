@@ -3,8 +3,8 @@ Class Features:
 
 Name:          drv_data_io_zip
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20180521'
-Version:       '2.0.7'
+Date:          '20200227'
+Version:       '2.0.8'
 
 ZIP values:
 sZipType: 'NoZip', 'GZip', 'BZ2'
@@ -16,13 +16,12 @@ import logging
 import os
 from os.path import join
 
-import src.common.utils.lib_utils_apps_zip as Lib_File_Zip_Apps
+import src.common.utils.lib_utils_apps_zip as lib_zip_apps
 
-from src.common.default.lib_default_args import sLoggerName
-from src.common.driver.configuration.drv_configuration_debug import Exc
+from src.common.default.lib_default_args import logger_name
 
 # Log
-oLogStream = logging.getLogger(sLoggerName)
+log_stream = logging.getLogger(logger_name)
 
 # Debug
 # import matplotlib.pylab as plt
@@ -53,7 +52,7 @@ class Drv_Data_Zip:
         self.sFileName_IN = sFileName_IN
         self.sFileName_OUT = sFileName_OUT
         self.sZipMode = sZipMode
-        self.sZipType = sZipType
+        self.sZipType = self.__cleanZipExt(sZipType)
 
         # Define filename IN
         self.__setFileNameIN()
@@ -84,9 +83,20 @@ class Drv_Data_Zip:
         else:
             
             if sZipMode == 'z':
-                Exc.getExc(' =====> ERROR: zip or unzip functions are not selected! Please check zip tag!', 1, 1)
+                log_stream.error(' ===> Zip or unzip functions are not selected! Please check zip tag!')
+                raise IOError(' Functions for zip or unzip libraries are not correctly selected')
             elif sZipMode == 'u':
-                Exc.getExc(' =====> WARNING: zip or unzip functions are not selected! Please check zip tag!', 2, 1)
+                log_stream.warning(' ===> zip or unzip functions are not selected! Please check zip tag!')
+
+    # ------------------------------------------------------------------------------
+
+    # ------------------------------------------------------------------------------
+    # Method to remove unrequested character in zip extension
+    @staticmethod
+    def __cleanZipExt(zip_ext):
+
+        zip_ext = zip_ext.replace('.', '')
+        return zip_ext
 
     # ------------------------------------------------------------------------------
 
@@ -99,7 +109,8 @@ class Drv_Data_Zip:
             self.sFilePath_IN = os.path.split(self.sFileName_IN)[0]
             self.sFileName_IN = os.path.split(self.sFileName_IN)[1]
         else:
-            Exc.getExc(' =====> ERROR: input filename is not defined! Please check driver argument(s)!', 1, 1)
+            log_stream.error(' ===> Input filename is not defined! Please check driver argument(s)!!')
+            raise IOError(' Input filename is not defined!')
     # ------------------------------------------------------------------------------
 
     # ------------------------------------------------------------------------------
@@ -116,11 +127,11 @@ class Drv_Data_Zip:
             if not self.sFileName_OUT:
                 if self.sZipMode is 'z':
                     sFilePath_OUT = self.sFilePath_IN
-                    [sFileName_OUT, sZipType] = Lib_File_Zip_Apps.addExtZip(self.sFileName_IN, sZipType)
+                    [sFileName_OUT, sZipType] = lib_zip_apps.addExtZip(self.sFileName_IN, sZipType)
                 elif self.sZipMode is 'u':
-                    self.sZipType = Lib_File_Zip_Apps.getExtZip(self.sFileName_IN)[0]
+                    self.sZipType = lib_zip_apps.getExtZip(self.sFileName_IN)[0]
                     sFilePath_OUT = self.sFilePath_IN
-                    [sFileName_OUT, sZipType] = Lib_File_Zip_Apps.removeExtZip(self.sFileName_IN, self.sZipType)
+                    [sFileName_OUT, sZipType] = lib_zip_apps.removeExtZip(self.sFileName_IN, self.sZipType)
                 elif self.sZipMode is '' or self.sZipMode is None:
                     pass
             else:

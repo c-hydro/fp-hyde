@@ -3,8 +3,8 @@ Class Features:
 
 Name:          drv_data_io_type
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20180521'
-Version:       '2.0.7'
+Date:          '20200228'
+Version:       '2.0.8'
 """
 
 #################################################################################
@@ -16,12 +16,10 @@ from os.path import split
 from os.path import exists
 
 from src.common.utils.lib_utils_op_system import defineFileExt
-
-from src.common.default.lib_default_args import sLoggerName
-from src.common.driver.configuration.drv_configuration_debug import Exc
+from src.common.default.lib_default_args import logger_name
 
 # Logging
-oLogStream = logging.getLogger(sLoggerName)
+log_stream = logging.getLogger(logger_name)
 #################################################################################
 
 
@@ -144,9 +142,9 @@ class FileUnknown:
     # --------------------------------------------------------------------------------
     # Method to print information about unknown file
     def printInfo(self):
-        Exc.getExc(' =====> WARNING: file ' + join(self.sFilePath, self.sFileName) +
-                   ' has unknown extension! Please check library or file format!', 2, 1)
-        Exc.getExc(' =====> ERROR: file format unknown!', 1, 1)
+        log_stream.error(' ===> file ' + join(self.sFilePath, self.sFileName) +
+                         ' has unknown extension! Please check library or file format!')
+        raise IOError('File format unknown')
     # --------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------

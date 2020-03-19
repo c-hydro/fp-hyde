@@ -17,7 +17,7 @@ import pandas as pd
 from copy import deepcopy
 
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
-from src.hyde.algorithm.settings.rfarm.lib_rfarm_args import logger_name, time_units, time_format, time_calendar
+from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name, time_units, time_format, time_calendar
 
 from src.hyde.driver.model.rfarm.drv_model_rfarm_io import RFarmData, RFarmResult
 from src.hyde.driver.model.rfarm.drv_model_rfarm_exec import RFarmModel

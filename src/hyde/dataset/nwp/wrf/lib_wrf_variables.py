@@ -3,471 +3,660 @@ Library Features:
 
 Name:          lib_wrf_variables
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20190917'
-Version:       '1.0.1'
+Date:          '2020302'
+Version:       '1.0.0'
 """
 
 #######################################################################################
 # Library
 import logging
-import warnings
+import numpy as np
+import pandas as pd
 
-from numpy import sqrt, empty, nan, exp, where
-
-from src.common.default.lib_default_args import sLoggerName
-from src.hyde.driver.configuration.generic.drv_configuration_debug import Exc
+from src.hyde.algorithm.io.nwp.wrf.lib_wrf_io_generic import reshape_var3d, create_darray_3d
+from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_name
 
 # Logging
-oLogStream = logging.getLogger(sLoggerName)
+log_stream = logging.getLogger(logger_name)
+
+# Debug
+# import matplotlib.pylab as plt
 #######################################################################################
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute rain field(s)
-def computeRain(oVarData_Rain, oVarUnits=None,  oVarType=None, iVarIdxStart=None, iVarIdxEnd=None):
+# Method to define variable attribute(s)
+def getVarAttributes(var_attrs_in):
+    var_attrs_tmp = {}
+    for var_attrs_step in var_attrs_in:
+        for var_attr_key, var_attr_value in var_attrs_step.items():
+            if var_attr_key not in list(var_attrs_tmp.keys()):
+                var_attrs_tmp[var_attr_key] = var_attr_value
+            else:
+                var_attr_tmp = var_attrs_tmp[var_attr_key]
+                var_attr_list = [var_attr_tmp, var_attr_value]
+                var_attr_list = list(set(var_attr_list))
+                var_attrs_tmp[var_attr_key] = var_attr_list
 
-    # Init results
-    oVarData_RainIst = None
-
-    # Set variable units and types
-    if oVarUnits is None:
-        oVarUnits = ['mm']
-    if oVarType is None:
-        oVarType = ['accumulated']
-
-    # Get variables dimensions
-    iVarDim_Rain = oVarData_Rain.ndim
-
-    # Set variable indexes
-    if iVarDim_Rain == 3:
-        if iVarIdxStart is None:
-            iIdxStart = 0
+    var_attr_out = {}
+    for var_attr_key, var_attr_value in var_attrs_tmp.items():
+        if isinstance(var_attr_value, list) and var_attr_value.__len__() == 1:
+            var_attr_out[var_attr_key] = var_attr_value[0]
         else:
-            iIdxStart = iVarIdxStart
-    else:
-        iIdxStart = None
+            var_attr_out[var_attr_key] = var_attr_value
 
-    if iVarDim_Rain == 3:
-        if iVarIdxEnd is None:
-            iIdxEnd = oVarData_Rain.shape[2]
+    return var_attr_out
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to compute WindSpeed
+def computeWindSpeed(var_dset, var_name,
+                     var_time=None, var_geo_x=None, var_geo_y=None,
+                     var_units=None, var_step_type=None):
+
+    # Set args
+    if var_step_type is None:
+        var_step_type = ['instant']
+    if var_units is None:
+        var_units = ['m s**-1']
+    if var_geo_y is None:
+        var_geo_y = ['latitude']
+    if var_geo_x is None:
+        var_geo_x = ['longitude']
+    if var_time is None:
+        var_time = ['valid_time']
+
+    # Parse args
+    var_name_1 = list(var_name)[0]
+    var_name_2 = list(var_name)[1]
+    var_name_3 = list(var_name)[2]
+    var_units = var_units[0]
+    var_step_type = var_step_type[0]
+    var_time = var_time[0]
+    var_geo_x = var_geo_x[0]
+    var_geo_y = var_geo_y[0]
+
+    # Get values
+    var_da_in_1 = var_dset[var_name_1]
+    var_values_in_1 = var_da_in_1.values
+    var_dims_in_1 = var_da_in_1.dims
+
+    var_da_in_2 = var_dset[var_name_2]
+    var_values_in_2 = var_da_in_2.values
+    var_dims_in_2 = var_da_in_2.dims
+
+    var_time = var_dset[var_name_1][var_time]
+    var_geo_x = var_dset[var_name_1][var_geo_x]
+    var_geo_y = var_dset[var_name_1][var_geo_y]
+
+    var_time_str_1 = var_dims_in_1[0].lower()
+    if (var_time_str_1 == 'step') or (var_time_str_1 == 'time'):
+        var_values_in_1 = reshape_var3d(var_values_in_1)
+    var_shape_in_1 = var_values_in_1.shape
+
+    var_time_str_2 = var_dims_in_2[0].lower()
+    if (var_time_str_2 == 'step') or (var_time_str_2 == 'time'):
+        var_values_in_2 = reshape_var3d(var_values_in_2)
+    var_shape_in_2 = var_values_in_2.shape
+
+    # Check attributes
+    if not (var_units == 'm s-1') and not (var_units == 'm s**-1'):
+        log_stream.error(' ===> Wind components units are not allowed! Check your data!')
+        raise IOError('Data units is not allowed!')
+    if not (var_step_type == 'instant') and not (var_step_type == 'instantaneous'):
+        log_stream.error(' ===> Wind components allowed only in instantaneous format! Check your data!')
+        raise IOError('Data type is not allowed!')
+    if not var_shape_in_1 == var_shape_in_2:
+        log_stream.error(' ===> Wind dimensions are not the same! Check your data!')
+        raise IOError('Data dimensions are not allowed!')
+    else:
+        var_shape_in = list({var_shape_in_1, var_shape_in_2})[0]
+
+    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out[:, :, :] = np.nan
+    for var_step in range(0, var_shape_in[2]):
+        var_values_step_1 = var_values_in_1[:, :, var_step]
+        var_values_step_2 = var_values_in_2[:, :, var_step]
+        var_values_out[:, :, var_step] = np.sqrt(var_values_step_1 ** 2 + var_values_step_2 ** 2) * 0.7
+
+    var_da_in_1 = create_darray_3d(var_values_in_1, var_time, var_geo_x, var_geo_y,
+                                   dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                   dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                   dims_order=['latitude', 'longitude', 'time'])
+    var_da_in_2 = create_darray_3d(var_values_in_2, var_time, var_geo_x, var_geo_y,
+                                   dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                   dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                   dims_order=['latitude', 'longitude', 'time'])
+    var_da_out = create_darray_3d(var_values_out, var_time, var_geo_x, var_geo_y,
+                                  dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                  dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                  dims_order=['latitude', 'longitude', 'time'])
+
+    var_dset_out = var_da_in_1.to_dataset(name=var_name_1)
+    var_dset_out[var_name_2] = var_da_in_2
+    var_dset_out[var_name_3] = var_da_out
+
+    return var_dset_out
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to compute WindSpeed
+def computeRain(var_dset, var_name,
+                var_time=None, var_geo_x=None, var_geo_y=None,
+                var_units=None, var_step_type=None):
+
+    # Set args
+    if var_step_type is None:
+        var_step_type = ['accum']
+    if var_units is None:
+        var_units = ['m']
+    if var_geo_y is None:
+        var_geo_y = ['latitude']
+    if var_geo_x is None:
+        var_geo_x = ['longitude']
+    if var_time is None:
+        var_time = ['valid_time']
+
+    # Parse args
+    var_name = list(var_name)[0]
+    var_units = var_units[0]
+    var_step_type = var_step_type[0]
+    var_time = var_time[0]
+    var_geo_x = var_geo_x[0]
+    var_geo_y = var_geo_y[0]
+
+    # Get values
+    var_da_in = var_dset[var_name]
+    var_values_in = var_da_in.values
+    var_dims_in = var_da_in.dims
+
+    var_time = var_dset[var_time]
+    var_geo_x = var_dset[var_geo_x]
+    var_geo_y = var_dset[var_geo_y]
+
+    if (var_units == 'kg m**-2') or (var_units == 'Kg m**-2'):
+        var_units = 'mm'
+
+    if var_units == 'm':
+        var_scale_factor = 1000
+    elif var_units == 'mm':
+        var_scale_factor = 1
+    else:
+        log_stream.error(' ===> Rain components units are not allowed! Check your data!')
+        raise IOError('Selected units are not allowed!')
+
+    var_time_str = var_dims_in[0].lower()
+    if (var_time_str == 'step') or (var_time_str == 'time'):
+        var_values_in = reshape_var3d(var_values_in)
+    var_shape_in = var_values_in.shape
+
+    # Check attributes
+    if not (var_units == 'mm') and not (var_units == 'm'):
+        log_stream.error(' ===> Rain components units are not allowed! Check your data!')
+        raise IOError('Data units is not allowed!')
+    if not (var_step_type == 'accum') and not (var_step_type == 'accumulated'):
+        log_stream.error(' ===> Rain components allowed only in accumulated format! Check your data!')
+        raise IOError('Data type is not allowed!')
+
+    var_values_step_start = None
+    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out[:, :, :] = np.nan
+    for var_step in range(0, var_shape_in[2]):
+
+        var_values_step_tmp = var_values_in[:, :, var_step]
+
+        if var_values_step_start is None:
+            var_values_step_end = var_values_step_tmp
+            var_values_step = var_values_step_end
+            var_values_step_start = var_values_step_end
         else:
-            iIdxEnd = iVarIdxEnd
+            var_values_step_end = var_values_step_tmp
+            var_values_step = var_values_step_end - var_values_step_start
+            var_values_step_start = var_values_step_end
+
+        var_values_step[var_values_step < 0.0] = 0.0
+        var_values_out[:, :, var_step] = var_values_step / var_scale_factor
+
+    var_da_out = create_darray_3d(var_values_out, var_time, var_geo_x, var_geo_y,
+                                  dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                  dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                  dims_order=['latitude', 'longitude', 'time'])
+
+    var_dset_out = var_da_out.to_dataset(name=var_name)
+
+    return var_dset_out
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to compute AirTemperature
+def computeAirTemperature(var_dset, var_name,
+                          var_time=None, var_geo_x=None, var_geo_y=None,
+                          var_units=None, var_step_type=None):
+
+    # Set args
+    if var_step_type is None:
+        var_step_type = ['instant']
+    if var_units is None:
+        var_units = ['K']
+    if var_geo_y is None:
+        var_geo_y = ['latitude']
+    if var_geo_x is None:
+        var_geo_x = ['longitude']
+    if var_time is None:
+        var_time = ['valid_time']
+
+    # Parse args
+    var_name = list(var_name)[0]
+    var_units = var_units[0]
+    var_step_type = var_step_type[0]
+    var_time = var_time[0]
+    var_geo_x = var_geo_x[0]
+    var_geo_y = var_geo_y[0]
+
+    # Get values
+    var_da_in = var_dset[var_name]
+    var_values_in = var_da_in.values
+    var_dims_in = var_da_in.dims
+
+    var_time = var_dset[var_time]
+    var_geo_x = var_dset[var_geo_x]
+    var_geo_y = var_dset[var_geo_y]
+
+    var_time_str = var_dims_in[0].lower()
+    if (var_time_str == 'step') or (var_time_str == 'time'):
+        var_values_in = reshape_var3d(var_values_in)
+    var_shape_in = var_values_in.shape
+
+    # Check attributes
+    if not (var_units == 'K'):
+        log_stream.error(' ===> Air Temperature components units are not allowed! Check your data!')
+        raise IOError('Data units is not allowed!')
+    if not (var_step_type == 'instant') and not (var_step_type == 'instantaneous'):
+        log_stream.error(' ===> Air Temperature components allowed only in instantaneous format! Check your data!')
+        raise IOError('Data type is not allowed!')
+
+    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out[:, :, :] = np.nan
+    for var_step in range(0, var_shape_in[2]):
+        var_values_step = var_values_in[:, :, var_step]
+        var_values_out[:, :, var_step] = var_values_step - 273.15
+
+    var_da_out = create_darray_3d(var_values_out, var_time, var_geo_x, var_geo_y,
+                                  dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                  dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                  dims_order=['latitude', 'longitude', 'time'])
+
+    var_dset_out = var_da_out.to_dataset(name=var_name)
+
+    return var_dset_out
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to compute RelativeHumidity using Q, T and pressure
+def computeRH_from_Q(var_dset, var_name,
+                     var_time=None, var_geo_x=None, var_geo_y=None,
+                     var_units=None, var_step_type=None):
+
+    # Set args
+    if var_step_type is None:
+        var_step_type = ['instant']
+    if var_units is None:
+        var_units = ['m s**-1']
+    if var_geo_y is None:
+        var_geo_y = ['latitude']
+    if var_geo_x is None:
+        var_geo_x = ['longitude']
+    if var_time is None:
+        var_time = ['valid_time']
+
+    # Parse args
+    var_name_1 = list(var_name)[0]
+    var_name_2 = list(var_name)[1]
+    var_name_3 = list(var_name)[2]
+    var_name_4 = list(var_name)[3]
+    var_units_1 = var_units[0]
+    var_units_2 = var_units[1]
+    var_units_3 = var_units[2]
+    var_units_4 = var_units[3]
+
+    var_step_type = var_step_type[0]
+    var_time = var_time[0]
+    var_geo_x = var_geo_x[0]
+    var_geo_y = var_geo_y[0]
+
+    # Get values
+    var_da_in_1 = var_dset[var_name_1]
+    var_values_in_1 = var_da_in_1.values
+    var_dims_in_1 = var_da_in_1.dims
+
+    var_da_in_2 = var_dset[var_name_2]
+    var_values_in_2 = var_da_in_2.values
+    var_dims_in_2 = var_da_in_2.dims
+
+    var_da_in_3 = var_dset[var_name_3]
+    var_values_in_3 = var_da_in_3.values
+    var_dims_in_3 = var_da_in_3.dims
+
+    var_time = var_dset[var_name_1][var_time]
+    var_geo_x = var_dset[var_name_1][var_geo_x]
+    var_geo_y = var_dset[var_name_1][var_geo_y]
+
+    var_time_str_1 = var_dims_in_1[0].lower()
+    if (var_time_str_1 == 'step') or (var_time_str_1 == 'time'):
+        var_values_in_1 = reshape_var3d(var_values_in_1)
+    var_shape_in_1 = var_values_in_1.shape
+
+    var_time_str_2 = var_dims_in_2[0].lower()
+    if (var_time_str_2 == 'step') or (var_time_str_2 == 'time'):
+        var_values_in_2 = reshape_var3d(var_values_in_2)
+    var_shape_in_2 = var_values_in_2.shape
+
+    var_time_str_3 = var_dims_in_3[0].lower()
+    if (var_time_str_3 == 'step') or (var_time_str_3 == 'time'):
+        var_values_in_3 = reshape_var3d(var_values_in_3)
+    var_shape_in_3 = var_values_in_3.shape
+
+    # Check attributes
+    if not (var_units_1 == 'kg kg-1') and not (var_units_1 == 'kg/kg'):
+        log_stream.error(' ===> RelativeHumidity components units are not allowed! Check your data! [MixingRatio]')
+        raise IOError('Data units is not allowed!')
+    if not var_units_2 == 'K':
+        log_stream.error(' ===> RelativeHumidity components units are not allowed! Check your data! [AirTemperature]')
+        raise IOError('Data units is not allowed!')
+    if not (var_units_3 == 'Pa') and not (var_units_3 == 'PA'):
+        log_stream.error(' ===> RelativeHumidity components units are not allowed! Check your data! [AirPressure]')
+        raise IOError('Data units is not allowed!')
+
+    if not (var_step_type == 'instant') and not (var_step_type == 'instantaneous'):
+        log_stream.error(' ===> RelativeHumidity components allowed only in instantaneous format! Check your data!')
+        raise IOError('Data type is not allowed!')
+    if not (var_shape_in_1 == var_shape_in_2) or not (var_shape_in_2 == var_shape_in_3):
+        log_stream.error(' ===> RelativeHumidity dimensions are not the same! Check your data!')
+        raise IOError('Data dimensions are not allowed!')
     else:
-        iIdxEnd = None
+        var_shape_in = list({var_shape_in_1, var_shape_in_2, var_shape_in_3})[0]
 
-    # Check variables types
-    if oVarType[0] != 'accumulated':
-        Exc.getExc(' ---> Error: Rain allowed only in accumulated format! Check your data!', 1, 1)
-    # Check variables units
-    if oVarUnits[0] != 'mm' and oVarUnits[0] != 'm':
-        Exc.getExc(' ---> Error: Rain units is not allowed! Check your data!', 1, 1)
+    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out[:, :, :] = np.nan
+    for var_step in range(0, var_shape_in[2]):
+        var_values_q = var_values_in_1[:, :, var_step]
+        var_values_t = var_values_in_2[:, :, var_step]
+        var_values_p = var_values_in_3[:, :, var_step]
 
-    # Compute results using 2d or 3d format
-    if iVarDim_Rain == 3:
+        var_values_t = var_values_t - 273.15  # air temperature
+        var_values_p = var_values_p / 1000    # air pressure
 
-        # Iterate over field(s)
-        a3dVarData_Rain = oVarData_Rain[:, :, iIdxStart:iIdxEnd]
+        var_values_es = 0.611 * np.exp((17.3 * var_values_t) / (var_values_t + 237.3))
+        var_values_ea = (var_values_p * var_values_q) / 0.622
+        var_values_rh = (var_values_ea / var_values_es) * 100
 
-        iVarDims = a3dVarData_Rain.shape
+        var_values_rh[var_values_rh > 100] = 100
+        var_values_rh[var_values_rh < 0] = 0
 
-        # Compute rain in instantaneous mode and millimeters units
-        oVarData_RainIst = empty((iVarDims[0], iVarDims[1], iVarDims[2] - 1))
-        oVarData_RainIst[:, :, :] = nan
-        for iVarStep in range(1, iVarDims[2]):
-            a2dVarData_Rain_PeriodEnd = a3dVarData_Rain[:, :, iVarStep]
-            a2dVarData_Rain_PeriodStart = a3dVarData_Rain[:, :, iVarStep - 1]
+        var_values_out[:, :, var_step] = var_values_rh
 
-            a2dVarData_Rain_PeriodIst = a2dVarData_Rain_PeriodEnd - a2dVarData_Rain_PeriodStart
+    var_da_in_1 = create_darray_3d(var_values_in_1, var_time, var_geo_x, var_geo_y,
+                                   dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                   dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                   dims_order=['latitude', 'longitude', 'time'])
+    var_da_in_2 = create_darray_3d(var_values_in_2, var_time, var_geo_x, var_geo_y,
+                                   dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                   dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                   dims_order=['latitude', 'longitude', 'time'])
+    var_da_in_3 = create_darray_3d(var_values_in_3, var_time, var_geo_x, var_geo_y,
+                                   dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                   dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                   dims_order=['latitude', 'longitude', 'time'])
+    var_da_out = create_darray_3d(var_values_out, var_time, var_geo_x, var_geo_y,
+                                  dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                  dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                  dims_order=['latitude', 'longitude', 'time'])
 
-            if oVarUnits[0] == 'm':
-                a2dVarData_Rain_PeriodIst = a2dVarData_Rain_PeriodIst / 1000
+    var_dset_out = var_da_in_1.to_dataset(name=var_name_1)
+    var_dset_out[var_name_2] = var_da_in_2
+    var_dset_out[var_name_3] = var_da_in_3
+    var_dset_out[var_name_4] = var_da_out
 
-            oVarData_RainIst[:, :, iVarStep - 1] = a2dVarData_Rain_PeriodIst
-
-    elif iVarDim_Rain == 2:
-
-        # Compute rain in instantaneous mode and millimeters units
-        a2dVarData_Rain = oVarData_Rain
-        if oVarUnits[0] == 'm':
-            a2dVarData_Rain = a2dVarData_Rain / 1000
-        oVarData_RainIst = a2dVarData_Rain
-
-    # Results
-    return oVarData_RainIst
+    return var_dset_out
 
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute temperature field(s)
-def computeAirTemperature(oVarData_T, oVarUnits=None, oVarType=None, iVarIdxStart=None, iVarIdxEnd=None):
+# Method to compute RelativeHumidity
+def computeRH(var_dset, var_name,
+              var_time=None, var_geo_x=None, var_geo_y=None,
+              var_units=None, var_step_type=None):
 
-    # Init results
-    oVarData_TC = None
+    # Set args
+    if var_step_type is None:
+        var_step_type = ['instant']
+    if var_units is None:
+        var_units = ['%']
+    if var_geo_y is None:
+        var_geo_y = ['latitude']
+    if var_geo_x is None:
+        var_geo_x = ['longitude']
+    if var_time is None:
+        var_time = ['valid_time']
 
-    # Set variable units and types
-    if oVarUnits is None:
-        oVarUnits = ['K']
-    if oVarType is None:
-        oVarType = ['istantaneous']
+    # Parse args
+    var_name = list(var_name)[0]
+    var_units = var_units[0]
+    var_step_type = var_step_type[0]
+    var_time = var_time[0]
+    var_geo_x = var_geo_x[0]
+    var_geo_y = var_geo_y[0]
 
-    # Set variable indexes
-    if iVarIdxStart is None:
-        iIdxStart = 0
-    else:
-        iIdxStart = iVarIdxStart
+    # Get values
+    var_da_in = var_dset[var_name]
+    var_values_in = var_da_in.values
+    var_dims_in = var_da_in.dims
 
-    if iVarIdxEnd is None:
-        if hasattr(oVarData_T, '__len__'):
-            iIdxEnd = oVarData_T.__len__()
-        else:
-            iIdxEnd = 0
-    else:
-        iIdxEnd = iVarIdxEnd
+    var_time = var_dset[var_time]
+    var_geo_x = var_dset[var_geo_x]
+    var_geo_y = var_dset[var_geo_y]
 
-    # Get variables dimensions
-    iVarDim_T = oVarData_T.ndim
+    var_time_str = var_dims_in[0].lower()
+    if (var_time_str == 'step') or (var_time_str == 'time'):
+        var_values_in = reshape_var3d(var_values_in)
+    var_shape_in = var_values_in.shape
 
-    # Check variables types
-    if oVarType[0] != 'istantaneous':
-        Exc.getExc(' ---> Error: Temperature allowed only in istantaneous format! Check your data!', 1, 1)
-    # Check variables units
-    if oVarUnits[0] != 'K':
-        Exc.getExc(' ---> Error: Temperature units is not allowed! Check your data!', 1, 1)
+    # Check attributes
+    if not (var_units == '%'):
+        log_stream.error(' ===> Relative Humidity components units are not allowed! Check your data!')
+        raise IOError('Data units is not allowed!')
+    if not (var_step_type == 'instant') and not (var_step_type == 'instantaneous'):
+        log_stream.error(' ===> Relative Humidity components allowed only in instantaneous format! Check your data!')
+        raise IOError('Data type is not allowed!')
 
-    # Compute results using 2d or 3d format
-    if iVarDim_T == 3:
+    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out[:, :, :] = np.nan
+    for var_step in range(0, var_shape_in[2]):
+        var_values_step = var_values_in[:, :, var_step]
 
-        # Iterate over field(s)
-        a3dVarData_T = oVarData_T[:, :, iIdxStart:iIdxEnd]
+        var_idx_up_step = np.where(var_values_step > 100)
+        var_idx_down_step = np.where(var_values_step < 0)
 
-        iVarDims = a3dVarData_T.shape
+        var_values_step[var_idx_up_step[0], var_idx_up_step[1]] = 100
+        var_values_step[var_idx_down_step[0], var_idx_down_step[1]] = 0
 
-        # Compute temperature in C degree
-        oVarData_TC = empty((iVarDims[0], iVarDims[1], iVarDims[2]))
-        oVarData_TC[:, :, :] = nan
-        for iVarStep in range(0, iVarDims[2]):
-            a2dVarData_T = a3dVarData_T[:, :, iVarStep]
+        var_values_out[:, :, var_step] = var_values_step
 
-            a2dVarData_T = a2dVarData_T - 273.15
-            oVarData_TC[:, :, iVarStep] = a2dVarData_T
+    var_da_out = create_darray_3d(var_values_out, var_time, var_geo_x, var_geo_y,
+                                  dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                  dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                  dims_order=['latitude', 'longitude', 'time'])
 
-    elif iVarDim_T == 2:
+    var_dset_out = var_da_out.to_dataset(name=var_name)
 
-        # Compute temperature in C degree
-        oVarData_TC = oVarData_T - 273.15
-
-    # Results
-    return oVarData_TC
-
+    return var_dset_out
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute wind speed field(s)
-def computeWindSpeed(oVarData_U, oVarData_V, oVarUnits=None, oVarType=None, iVarIdxStart=None, iVarIdxEnd=None):
+# Method to compute IncomingRadiation
+def computeIncomingRadiation(var_dset, var_name,
+                             var_time=None, var_geo_x=None, var_geo_y=None,
+                             var_units=None, var_step_type=None,
+                             var_interval_exp='H', var_avg_idx=6):
 
-    # Init results
-    oVarData_WindSpeed = None
+    # Set args
+    if var_step_type is None:
+        var_step_type = ['instant']
+    if var_units is None:
+        var_units = ['W m**-2']
+    if var_geo_y is None:
+        var_geo_y = ['latitude']
+    if var_geo_x is None:
+        var_geo_x = ['longitude']
+    if var_time is None:
+        var_time = ['valid_time']
 
-    # Set variable units and types
-    if oVarUnits is None:
-        oVarUnits = ['m s-1', 'm s-1']
-    if oVarType is None:
-        oVarType = ['istantaneous', 'istantaneous']
+    # Parse args
+    var_name_1 = list(var_name)[0]
+    var_name_2 = list(var_name)[1]
+    var_name_3 = list(var_name)[2]
+    var_units = var_units[0]
+    var_step_type = var_step_type[0]
+    var_time = var_time[0]
+    var_geo_x = var_geo_x[0]
+    var_geo_y = var_geo_y[0]
 
-    if oVarUnits.__len__() == 1:
-        oVarUnits = [oVarUnits[0], oVarUnits[0]]
+    # Get values
+    var_da_in_1 = var_dset[var_name_1]
+    var_values_in_1 = var_da_in_1.values
+    var_dims_in_1 = var_da_in_1.dims
 
-    if oVarType.__len__() == 1:
-        oVarType = [oVarType[0], oVarType[0]]
+    var_da_in_2 = var_dset[var_name_2]
+    var_values_in_2 = var_da_in_2.values
+    var_dims_in_2 = var_da_in_2.dims
 
-    # Set variable indexes
-    if iVarIdxStart is None:
-        iIdxStart = 0
+    var_time = var_dset[var_name_1][var_time]
+    var_geo_x = var_dset[var_name_1][var_geo_x]
+    var_geo_y = var_dset[var_name_1][var_geo_y]
+
+    var_time_str_1 = var_dims_in_1[0].lower()
+    if (var_time_str_1 == 'step') or (var_time_str_1 == 'time'):
+        var_values_in_1 = reshape_var3d(var_values_in_1)
+    var_shape_in_1 = var_values_in_1.shape
+
+    var_time_str_2 = var_dims_in_2[0].lower()
+    if (var_time_str_2 == 'step') or (var_time_str_2 == 'time'):
+        var_values_in_2 = reshape_var3d(var_values_in_2)
+    var_shape_in_2 = var_values_in_2.shape
+
+    # Check attributes
+    if not (var_units == 'W m-2') and not (var_units == 'W m**-2'):
+        log_stream.error(' ===> IncomingRadiation components units are not allowed! Check your data!')
+        raise IOError('Data units is not allowed!')
+    if not (var_step_type == 'avg') and not (var_step_type == 'average'):
+        log_stream.error(' ===> IncomingRadiation components allowed only in average format! Check your data!')
+        raise IOError('Data type is not allowed!')
+    if not var_shape_in_1 == var_shape_in_2:
+        log_stream.error(' ===> IncomingRadiation dimensions are not the same! Check your data!')
+        raise IOError('Data dimensions are not allowed!')
     else:
-        iIdxStart = iVarIdxStart
+        var_shape_in = list({var_shape_in_1, var_shape_in_2})[0]
 
-    if iVarIdxEnd is None:
-        if hasattr(oVarData_U, '__len__') and hasattr(oVarData_U, '__len__'):
-            iIdxEnd = oVarData_U.__len__()
-        else:
-            iIdxEnd = 0
+    var_interval_cmp = pd.Timedelta((var_time[1] - var_time[0]).values)
+    if var_interval_cmp.resolution == var_interval_exp:
+
+        idx_start = np.arange(0, var_shape_in[2], var_avg_idx).tolist()
+        idx_end = np.arange(6, var_shape_in[2] + var_avg_idx, var_avg_idx).tolist()
+
     else:
-        iIdxEnd = iVarIdxEnd
-
-    # Get variables dimensions
-    iVarDim_U = oVarData_U.ndim
-    iVarDim_V = oVarData_V.ndim
-
-    # Check variables types
-    if oVarType[0] != 'istantaneous' or oVarType[1] != 'istantaneous':
-        Exc.getExc(' ---> Error: WindU and WindV allowed only in istantaneous format! Check your data!', 1, 1)
-    # Check variables units
-    if oVarUnits[0] != 'm s-1' or oVarUnits[1] != 'm s-1':
-        Exc.getExc(' ---> Error: WindU or WindV units are not allowed! Check your data!', 1, 1)
-    # Check variables dimensions
-    if iVarDim_U != iVarDim_V:
-        Exc.getExc(' ---> Error: WindU or WindV dimensions are different! Check your data!', 1, 1)
-
-    # Compute results using 2d or 3d format
-    if iVarDim_U == 3 and iVarDim_V == 3:
-
-        # Iterate over field(s)
-        a3dVarData_U = oVarData_U[:, :, iIdxStart:iIdxEnd]
-        a3dVarData_V = oVarData_V[:, :, iIdxStart:iIdxEnd]
-
-        iVarDims = a3dVarData_U.shape
-
-        # Compute wind speed
-        oVarData_WindSpeed = empty((iVarDims[0], iVarDims[1], iVarDims[2]))
-        oVarData_WindSpeed[:, :, :] = nan
-        for iVarStep in range(0, iVarDims[2]):
-
-            a2dVarData_U = a3dVarData_U[:, :, iVarStep]
-            a2dVarData_V = a3dVarData_V[:, :, iVarStep]
-
-            a2dVarData_WindSpeed = sqrt(a2dVarData_U ** 2 + a2dVarData_V ** 2)
-            oVarData_WindSpeed[:, :, iVarStep] = a2dVarData_WindSpeed
-
-    elif iVarDim_U == 2 and iVarDim_V == 2:
-
-        # Compute wind speed
-        oVarData_WindSpeed = sqrt(oVarData_U ** 2 + oVarData_V ** 2)
-
-    # Results
-    return oVarData_WindSpeed
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
-# Method to compute incoming radiation field(s)
-def computeIncomingRadiation(oVarData_SW, oVarUnits=None, oVarType=None, iVarIdxStart=None, iVarIdxEnd=None):
-
-    # Init results
-    oVarData_IncomingRadiation = None
-
-    # Set variable units and types
-    if oVarUnits is None:
-        oVarUnits = ['W m-2']
-    if oVarType is None:
-        oVarType = ['istantaneous']
-
-    # Set variable indexes
-    if iVarIdxStart is None:
-        iIdxStart = 0
-    else:
-        iIdxStart = iVarIdxStart
-
-    if iVarIdxEnd is None:
-        if hasattr(oVarData_SW, '__len__'):
-            iIdxEnd = oVarData_SW.__len__()
-        else:
-            iIdxEnd = 0
-    else:
-        iIdxEnd = iVarIdxEnd
-
-    # Get variables dimensions
-    iVarDim_SW = oVarData_SW.ndim
-
-    # Check variables types
-    if oVarType[0] != 'istantaneous':
-        Exc.getExc(' ---> Error: ShortWaveRadiation allowed only in istantaneous format! Check your data!', 1, 1)
-    # Check variables units
-    if oVarUnits[0] != 'W m-2':
-        Exc.getExc(' ---> Error: ShortWaveRadiation units is not allowed! Check your data!', 1, 1)
-
-    # Compute results using 2d or 3d format
-    if iVarDim_SW == 3:
-        # Iterate over field(s)
-        a3dVarData_SW = oVarData_SW[:, :, iIdxStart:iIdxEnd]
-
-        iVarDims = a3dVarData_SW.shape
-
-        # Compute incoming radiation
-        oVarData_IncomingRadiation = empty((iVarDims[0], iVarDims[1], iVarDims[2]))
-        oVarData_IncomingRadiation[:, :, :] = nan
-        for iVarStep in range(0, iVarDims[2]):
-            a2dVarData_SW = a3dVarData_SW[:, :, iVarStep]
-            oVarData_IncomingRadiation[:, :, iVarStep] = a2dVarData_SW
-
-    elif iVarDim_SW == 2:
-
-        # Compute incoming radiation in W m-2
-        oVarData_IncomingRadiation = oVarData_SW
-
-    # Results
-    return oVarData_IncomingRadiation
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
-# Method to compute air pressure field(s)
-def computeAirPressure(oVarData_P, oVarUnits=None, oVarType=None, iVarIdxStart=None, iVarIdxEnd=None):
-
-    # Init results
-    oVarData_SurfacePressure = None
-
-    # Set variable units and types
-    if oVarUnits is None:
-        oVarUnits = ['Pa']
-    if oVarType is None:
-        oVarType = ['istantaneous']
-
-    # Set variable indexes
-    if iVarIdxStart is None:
-        iIdxStart = 0
-    else:
-        iIdxStart = iVarIdxStart
-
-    if iVarIdxEnd is None:
-        if hasattr(oVarData_P, '__len__'):
-            iIdxEnd = oVarData_P.__len__()
-        else:
-            iIdxEnd = 0
-    else:
-        iIdxEnd = iVarIdxEnd
-
-    # Get variables dimensions
-    iVarDim_P = oVarData_P.ndim
-
-    # Check variables types
-    if oVarType[0] != 'istantaneous':
-        Exc.getExc(' ---> Error: SurfacePressure allowed only in istantaneous format! Check your data!', 1, 1)
-    # Check variables units
-    if oVarUnits[0] != 'Pa':
-        Exc.getExc(' ---> Error: SurfacePressure units is not allowed! Check your data!', 1, 1)
-
-    # Compute results using 2d or 3d format
-    if iVarDim_P == 3:
-        # Iterate over field(s)
-        a3dVarData_P = oVarData_P[:, :, iIdxStart:iIdxEnd]
-
-        iVarDims = a3dVarData_P.shape
-
-        # Compute surface pressure in kPa
-        oVarData_SurfacePressure = empty((iVarDims[0], iVarDims[1], iVarDims[2]))
-        oVarData_SurfacePressure[:, :, :] = nan
-        for iVarStep in range(0, iVarDims[2]):
-            a2dVarData_P = a3dVarData_P[:, :, iVarStep]
-
-            # Convert from Pa to kPa
-            a2dVarData_P = a2dVarData_P / 1000
-            oVarData_SurfacePressure[:, :, iVarStep] = a2dVarData_P
-
-    elif iVarDim_P == 2:
-
-        # Compute surface pressure in kPa
-        oVarData_SurfacePressure = oVarData_P / 1000
-
-    # Results
-    return oVarData_SurfacePressure
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
-# Method to compute relative humidity field(s)
-def computeRelativeHumidity(oVarData_Q, oVarData_T, oVarData_P, oVarUnits=None, oVarType=None,
-                            iVarIdxStart=None, iVarIdxEnd=None):
-
-    # Init results
-    oVarData_RelativeHumidity = None
-
-    # Set variable units and types
-    if oVarUnits is None:
-        oVarUnits = ['kg kg-1', 'K', 'Pa']    # Pa (1 kPa equal 1000 Pa)
-    if oVarType is None:
-        oVarType = ['istantaneous', 'istantaneous', 'istantaneous']
-    pass
-
-    if oVarType.__len__() == 1:
-        oVarType = [oVarType[0], oVarType[0], oVarType[0]]
-
-    # Set variable indexes
-    if iVarIdxStart is None:
-        iIdxStart = 0
-    else:
-        iIdxStart = iVarIdxStart
-
-    if iVarIdxEnd is None:
-        if hasattr(oVarData_Q, '__len__') and hasattr(oVarData_T, '__len__') and hasattr(oVarData_P, '__len__'):
-            iIdxEnd = oVarData_Q.__len__()
-        else:
-            iIdxEnd = 0
-    else:
-        iIdxEnd = iVarIdxEnd
-
-    # Get variables dimensions
-    iVarDim_Q = oVarData_Q.ndim
-    iVarDim_T = oVarData_T.ndim
-    iVarDim_P = oVarData_P.ndim
-
-    # Check variables types
-    if oVarType[0] != 'istantaneous' or oVarType[1] != 'istantaneous' or oVarType[2] != 'istantaneous':
-        Exc.getExc(' ---> Error: MixingRatio, Temperature or Pressure allowed only in istantaneous format!'
-                   ' Check your data!', 1, 1)
-    # Check variables units
-    if oVarUnits[0] != 'kg kg-1' or oVarUnits[1] != 'K' or oVarUnits[2] != 'Pa':
-        Exc.getExc(' ---> Warning: MixingRatio, Temperature or Pressure units are not allowed! Check your data!', 2, 1)
-    # Check variables dimensions
-    if iVarDim_Q != iVarDim_T or iVarDim_Q != iVarDim_P or iVarDim_T != iVarDim_P:
-        Exc.getExc(' ---> Error: MixingRatio, Temperature or Pressure dimensions are different! Check your data!', 1, 1)
-
-    # Compute results using 2d or 3d format
-    if iVarDim_Q == 3 and iVarDim_T == 3 and iVarDim_P == 3:
-
-        # Iterate over field(s)
-        a3dVarData_Q = oVarData_Q[:, :, iIdxStart:iIdxEnd]
-        a3dVarData_T = oVarData_T[:, :, iIdxStart:iIdxEnd]
-        a3dVarData_P = oVarData_P[:, :, iIdxStart:iIdxEnd]
-
-        iVarDims = a3dVarData_Q.shape
-
-        # Compute relative humidity
-        oVarData_RelativeHumidity = empty((iVarDims[0], iVarDims[1], iVarDims[2]))
-        oVarData_RelativeHumidity[:, :, :] = nan
-        for iVarStep in range(0, iVarDims[2]):
-            a2dVarData_Q = a3dVarData_Q[:, :, iVarStep]
-            a2dVarData_T = a3dVarData_T[:, :, iVarStep]
-            a2dVarData_P = a3dVarData_P[:, :, iVarStep]
-
-            a2dVarData_T = a2dVarData_T - 273.15
-            a2dVarData_P = a2dVarData_P / 1000
-
-            a2dVarData_ES = 0.611 * exp((17.3 * a2dVarData_T) / (a2dVarData_T + 237.3))
-            a2dVarData_EA = (a2dVarData_P * a2dVarData_Q) / 0.622
-            a2dVarData_RelativeHumidity = (a2dVarData_EA / a2dVarData_ES) * 100
-
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                a2iVarData_IndexUp = where(a2dVarData_RelativeHumidity > 100)
-                a2iVarData_IndexDown = where(a2dVarData_RelativeHumidity < 0)
-
-            a2dVarData_RelativeHumidity[a2iVarData_IndexUp[0], a2iVarData_IndexUp[1]] = 100
-            a2dVarData_RelativeHumidity[a2iVarData_IndexDown[0], a2iVarData_IndexDown[1]] = 0
-
-            oVarData_RelativeHumidity[:, :, iVarStep] = a2dVarData_RelativeHumidity
-
-    elif iVarDim_Q == 2 and iVarDim_T == 2 and iVarDim_P == 2:
-
-        # Compute relative humidity
-        a2dVarData_T = oVarData_T - 273.15
-        a2dVarData_P = oVarData_P / 1000
-        a2dVarData_Q = oVarData_Q
-
-        a2dVarData_ES = 0.611 * exp((17.3 * a2dVarData_T) / (a2dVarData_T + 237.3))
-        a2dVarData_EA = (a2dVarData_P * a2dVarData_Q) / 0.622
-        a2dVarData_RelativeHumidity = (a2dVarData_EA / a2dVarData_ES) * 100
-
-        a2iVarData_IndexUp = where(a2dVarData_RelativeHumidity > 100)
-        a2iVarData_IndexDown = where(a2dVarData_RelativeHumidity < 0)
-
-        a2dVarData_RelativeHumidity[a2iVarData_IndexUp[0], a2iVarData_IndexUp[1]] = 100
-        a2dVarData_RelativeHumidity[a2iVarData_IndexDown[0], a2iVarData_IndexDown[1]] = 0
-
-        oVarData_RelativeHumidity = a2dVarData_RelativeHumidity
-
-    # Results
-    return oVarData_RelativeHumidity
+        log_stream.error(' ===> IncomingRadiation step resolution is not allowed! Check your data!')
+        raise NotImplemented('Step resolution is not allowed!')
+
+    ts_values_out_1 = np.zeros([var_shape_in[2]])
+    ts_values_out_1[:] = np.nan
+    var_values_out_1 = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out_1[:, :, :] = np.nan
+    ts_values_out_2 = np.zeros([var_shape_in[2]])
+    ts_values_out_2[:] = np.nan
+    var_values_out_2 = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out_2[:, :, :] = np.nan
+    for idx_start_tmp, idx_end_tmp in zip(idx_start, idx_end):
+
+        var_values_tmp_1 = var_values_in_1[:, :, idx_start_tmp:idx_end_tmp]
+        var_values_tmp_2 = var_values_in_2[:, :, idx_start_tmp:idx_end_tmp]
+
+        var_values_cmp_1 = None
+        var_values_cmp_2 = None
+
+        ts_values_partial_1 = np.zeros([var_avg_idx])
+        ts_values_partial_1[:] = np.nan
+        var_values_partial_1 = np.zeros([var_shape_in[0], var_shape_in[1], var_avg_idx])
+        var_values_partial_1[:, :, :] = np.nan
+        ts_values_partial_2 = np.zeros([var_avg_idx])
+        ts_values_partial_2[:] = np.nan
+        var_values_partial_2 = np.zeros([var_shape_in[0], var_shape_in[1], var_avg_idx])
+        var_values_partial_2[:, :, :] = np.nan
+        for i_tmp, i_avg_idx in enumerate(range(0, var_avg_idx)):
+
+            i_tmp_end = i_tmp
+            i_tmp_start = i_tmp + 1
+
+            var_values_select_1 = var_values_tmp_1[:, :, i_avg_idx]
+            var_values_select_2 = var_values_tmp_2[:, :, i_avg_idx]
+
+            if var_values_cmp_1 is None:
+                var_values_cmp_1 = var_values_select_1
+                var_values_spool_1 = var_values_select_1
+            else:
+                var_values_cmp_1 = i_tmp_start * var_values_select_1 - i_tmp_end * var_values_spool_1
+                var_values_spool_1 = var_values_select_1
+
+            if var_values_cmp_2 is None:
+                var_values_cmp_2 = var_values_select_2
+                var_values_spool_2 = var_values_select_2
+            else:
+                var_values_cmp_2 = i_tmp_start * var_values_select_2 - i_tmp_end * var_values_spool_2
+                var_values_spool_2 = var_values_select_2
+
+            var_values_partial_1[:, :, i_tmp] = var_values_cmp_1
+            ts_values_partial_1[i_tmp] = np.nanmean(var_values_cmp_1)
+            var_values_partial_2[:, :, i_tmp] = var_values_cmp_2
+            ts_values_partial_2[i_tmp] = np.nanmean(var_values_cmp_2)
+
+        ts_values_out_1[idx_start_tmp:idx_end_tmp] = ts_values_partial_1
+        var_values_out_1[:, :, idx_start_tmp:idx_end_tmp] = var_values_partial_1
+        ts_values_out_2[idx_start_tmp:idx_end_tmp] = ts_values_partial_2
+        var_values_out_2[:, :, idx_start_tmp:idx_end_tmp] = var_values_partial_2
+
+    ts_values_out = np.zeros([var_shape_in[2]])
+    ts_values_out[:] = np.nan
+    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+    var_values_out[:, :, :] = np.nan
+    for var_step in range(0, var_shape_in[2]):
+        var_values_step_1 = var_values_out_1[:, :, var_step]
+        # var_values_step_2 = var_values_out_2[:, :, var_step]
+        var_values_out[:, :, var_step] = var_values_step_1  # + var_values_step_2
+
+        ts_values_out[var_step] = np.nanmean(var_values_out[:, :, var_step])
+
+    var_da_out_1 = create_darray_3d(var_values_out_1, var_time, var_geo_x, var_geo_y,
+                                    dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                    dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                    dims_order=['latitude', 'longitude', 'time'])
+    var_da_out_2 = create_darray_3d(var_values_out_2, var_time, var_geo_x, var_geo_y,
+                                    dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                    dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                    dims_order=['latitude', 'longitude', 'time'])
+    var_da_out = create_darray_3d(var_values_out, var_time, var_geo_x, var_geo_y,
+                                  dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
+                                  dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
+                                  dims_order=['latitude', 'longitude', 'time'])
+
+    var_dset_out = var_da_out_1.to_dataset(name=var_name_1)
+    var_dset_out[var_name_2] = var_da_out_2
+    var_dset_out[var_name_3] = var_da_out
+
+    return var_dset_out
 
 # -------------------------------------------------------------------------------------
