@@ -1,7 +1,7 @@
 """
 Library Features:
 
-Name:          cpl_data_variables_wrf
+Name:          cpl_data_variables_gsmap
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
 Date:          '20200302'
 Version:       '1.0.0'
@@ -13,11 +13,11 @@ import inspect
 
 import numpy as np
 
-import src.hyde.dataset.nwp.wrf.lib_wrf_time as var_fx_time
-import src.hyde.dataset.nwp.wrf.lib_wrf_variables as var_fx_archive
+import src.hyde.dataset.satellite.gsmap.lib_gsmap_time as var_fx_time
+import src.hyde.dataset.satellite.gsmap.lib_gsmap_variables as var_fx_archive
 
-from src.hyde.algorithm.io.nwp.wrf.lib_wrf_io_generic import create_darray_2d, create_darray_3d
-from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_name, time_units, time_format, time_calendar
+from src.hyde.algorithm.io.satellite.gsmap.lib_gsmap_io_generic import create_darray_2d, create_darray_3d
+from src.hyde.algorithm.settings.satellite.gsmap.lib_gsmap_args import logger_name, time_units, time_format, time_calendar
 
 # Logging
 log_stream = logging.getLogger(logger_name)
@@ -148,11 +148,12 @@ class DataVariables:
             time_scale = int(time_size_out / time_size_in)
         elif time_size_out == time_size_in:
             time_scale = 1
-        else:
-            log_stream.error(' ==> Time scale definition not implemented!')
-            raise NotImplementedError('Time scale definition not implemented yet!')
+        elif time_size_out < time_size_in:
+            log_stream.warning(' ==> Time shape of data > Time expected shape of outcome')
+            time_scale = 1
+            time_range_out = time_range_in
 
-        return time_scale
+        return time_scale, time_range_in, time_range_out
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -261,7 +262,7 @@ class DataVariables:
 
     # -------------------------------------------------------------------------------------
     # Method to configure data
-    def configure_data(self, var_dset_raw, var_time_period_raw, var_time_period_expected):
+    def configure_data(self, var_dset_raw, var_time_period_raw, var_time_period_expected, var_interp='nearest'):
 
         # Get variable(s) name
         var_name_raw = self.var_dset_name
@@ -274,26 +275,35 @@ class DataVariables:
             # Get data array
             var_da_step = var_dset_raw[var_name_step]
 
+            # Scale time
+            var_time_scale, time_range_raw, time_range_out = self.__time_scaling(
+                var_time_period_raw, var_time_period_expected)
+
             # Get variable, data, time and attributes of expected data
-            var_data_expected = np.zeros([var_da_step.shape[0], var_da_step.shape[1], var_time_period_expected.shape[0]])
+            var_data_expected = np.zeros([var_da_step.shape[0], var_da_step.shape[1], time_range_out.shape[0]])
             var_data_expected[:, :, :] = np.nan
-            var_da_expected = create_darray_3d(var_data_expected, var_time_period_expected,
+            var_da_expected = create_darray_3d(var_data_expected, time_range_out,
                                                self.var_dset_geo_x, self.var_dset_geo_y,
                                                dim_key_time='time', dim_key_x='longitude', dim_key_y='latitude',
                                                dim_name_x='longitude', dim_name_y='latitude', dim_name_time='time',
                                                dims_order=['latitude', 'longitude', 'time'])
-
-            # Scale time
-            var_time_scale = self.__time_scaling(var_time_period_raw, var_time_period_expected)
 
             # Combine raw and expected data arrays
             var_da_unfilled = var_da_expected.combine_first(var_da_step)
 
             # Scale variable according with type and time scales
             var_da_scaled = self.__var_scaling(var_da_unfilled, var_step_type_step, var_time_scale)
+
             # Perform interpolation and masking of datasets
-            var_da_interp = var_da_scaled.interp(latitude=self.domain_geo_y[:, 0], longitude=self.domain_geo_x[0, :],
-                                                 method='nearest')
+            if var_interp == 'nearest':
+                var_da_interp = var_da_scaled.interp(
+                    latitude=self.domain_geo_y[:, 0], longitude=self.domain_geo_x[0, :],
+                    method='nearest')
+            else:
+                # Ending info for undefined function
+                log_stream.error(' ===> Interpolation method not available')
+                raise NotImplemented('Interpolation method not implemented yet')
+
             var_da_masked = var_da_interp.where(self.domain_da != -9999)
 
             var_dset_masked = var_da_masked.to_dataset(name=var_name_step)

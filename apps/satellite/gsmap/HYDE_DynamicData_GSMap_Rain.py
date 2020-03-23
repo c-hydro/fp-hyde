@@ -1,20 +1,16 @@
 """
-Hyde Processing Tool - NWP WRF
+Hyde Processing Tool - GSMap Rain
 
-__date__ = '20200317'
-__version__ = '1.2.0'
+__date__ = '20200319'
+__version__ = '1.0.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 HYDE_DynamicData_NWP_WRF.py -settings_file configuration.json -time YYYYMMDDHHMM
+python3 HYDE_DynamicData_GSMap_Rain.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
-20200317 (1.2.0) --> Refactoring using classes and super methods
-20191018 (1.1.1) --> Manage issue(s) in input definition of "time" variable
-20190916 (1.1.0) --> Refactoring for HyDE package in Python3
-20180713 (1.0.0) --> Beta release for flood-proofs monitoring system and new codes for Python 3
-20130730 (0.0.1) --> Starting version released for drihm2us project
+20200319 (1.0.0) --> Beta release for HyDE package
 """
 # -------------------------------------------------------------------------------------
 
@@ -25,12 +21,12 @@ import argparse
 
 from src.common.log.lib_logging import setLoggingFile
 
-from src.hyde.algorithm.settings.satellite.wrf.lib_wrf_args import logger_formatter, logger_handle, logger_name
-from src.hyde.driver.configuration.nwp.wrf.drv_configuration_time_wrf import DataTime
-from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_geo import DataGeo
+from src.hyde.algorithm.settings.satellite.gsmap.lib_gsmap_args import logger_formatter, logger_handle, logger_name
+from src.hyde.driver.configuration.satellite.gsmap.drv_configuration_time_gsmap import DataTime
+from src.hyde.driver.dataset.satellite.gsmap.drv_data_gsmap_geo import DataGeo
 
 from src.hyde.driver.configuration.generic.drv_configuration_algorithm import DataAlgorithm
-from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_base import DataProductTime, DataProductBuilder
+from src.hyde.driver.dataset.satellite.gsmap.drv_data_gsmap_base import DataProductTime, DataProductBuilder
 # -------------------------------------------------------------------------------------
 
 
@@ -65,9 +61,9 @@ def main():
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
     project_name = 'HYDE'
-    alg_version = '1.2.0'
+    alg_version = '1.0.0'
     alg_type = 'DataDynamic'
-    alg_name = 'NWP WRF Processing Tool'
+    alg_name = 'GSMap Rain Processing Tool'
     # Time algorithm information
     time_start = time.time()
     # -------------------------------------------------------------------------------------
@@ -137,13 +133,14 @@ def main():
             time_range=data_dynamic_time.time_range,
             variable_info_in=data_algorithm_settings['variables']['source'],
             variable_info_out=data_algorithm_settings['variables']['outcome'],
+            variable_interp_method=data_algorithm_settings['algorithm']['ancillary']['datasets_interpolation_method'],
             data_domain=data_algorithm_settings['algorithm']['ancillary']['domain'],
             data_geo=data_geo,
             template=data_algorithm_settings['data']['dynamic']['template'],
             parameters=data_algorithm_settings['algorithm']['parameters'],
-            file_ancillary_in=data_algorithm_path['nwp_source_ancillary'],
-            file_ancillary_processing=data_algorithm_path['nwp_processing_ancillary'],
-            file_ancillary_out=data_algorithm_path['nwp_outcome_ancillary'],
+            file_ancillary_in=data_algorithm_path['satellite_source_ancillary'],
+            file_ancillary_processing=data_algorithm_path['satellite_processing_ancillary'],
+            file_ancillary_out=data_algorithm_path['satellite_outcome_ancillary'],
             file_data=data_algorithm_path,
             file_ancillary_in_updating=data_algorithm_flags['cleaning_dynamic_ancillary_source'],
             file_ancillary_processing_updating=data_algorithm_flags['cleaning_dynamic_ancillary_processing'],
@@ -153,6 +150,7 @@ def main():
             file_out_write_engine=data_algorithm_settings['algorithm']['ancillary']['write_engine'],
             file_out_mode_zipping=data_algorithm_flags['zipping_dynamic_product'],
             file_out_ext_zipping=data_algorithm_settings['algorithm']['ancillary']['zip_format'],
+            file_out_priority=data_algorithm_settings['algorithm']['ancillary']['datasets_priority'],
         )
         log_stream.info(' --> Initialize product driver ... DONE')
 

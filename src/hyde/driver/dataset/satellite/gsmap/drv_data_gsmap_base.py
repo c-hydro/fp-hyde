@@ -1,9 +1,9 @@
 """
 Library Features:
 
-Name:          drv_model_wrf_base
+Name:          drv_model_gsmap_base
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20200302'
+Date:          '20200319'
 Version:       '1.0.0'
 """
 #################################################################################
@@ -12,18 +12,16 @@ import logging
 import os
 import re
 
-import numpy as np
 import pandas as pd
 
-from itertools import compress
 from copy import deepcopy
 
 from src.common.utils.lib_utils_op_system import removeEmptyFolders
 
-from src.hyde.algorithm.utils.nwp.wrf.lib_wrf_generic import fill_tags2string, flat_dictionary
-from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_name, time_units, time_format, time_calendar
-from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_io import DataReader, DataWriter
-from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_exec import DataComposer
+from src.hyde.algorithm.utils.satellite.gsmap.lib_gsmap_generic import fill_tags2string, flat_dictionary
+from src.hyde.algorithm.settings.satellite.gsmap.lib_gsmap_args import logger_name, time_units, time_format, time_calendar
+from src.hyde.driver.dataset.satellite.gsmap.drv_data_gsmap_io import DataReader, DataWriter
+from src.hyde.driver.dataset.satellite.gsmap.drv_data_gsmap_exec import DataComposer
 
 # Logging
 log_stream = logging.getLogger(logger_name)
@@ -128,23 +126,24 @@ class DataProductBuilder:
     # Method to initialize class
     def __init__(self, time_run, time_range,
                  variable_info_in, variable_info_out, data_domain, data_geo, template, parameters,
+                 variable_interp_method='nearest',
                  file_ancillary_in=None,
-                 file_ancillary_processing=None, file_ancillary_analyzing=None, file_ancillary_out=None,
+                 file_ancillary_processing=None, file_ancillary_out=None,
                  file_data=None,
                  file_ancillary_in_updating=True,
                  file_ancillary_processing_updating=True,
                  file_ancillary_out_updating=True,
                  file_ancillary_tmp_cleaning=False,
                  file_out_updating=None, file_out_mode_zipping=False, file_out_ext_zipping='.gz',
-                 file_out_write_engine='netcdf4'):
+                 file_out_write_engine='netcdf4', file_out_priority=None):
 
         # Info
         log_stream.info(' ---> TimeStep: ' + str(time_run))
 
         # Generic information
         self.time_run = time_run
-        self.time_range = time_range
-        self.time_period = int(self.time_range.shape[0])
+        self.time_range_default = time_range
+        self.time_period = int(self.time_range_default.shape[0])
 
         self.file_data = file_data
 
@@ -155,18 +154,20 @@ class DataProductBuilder:
         self.data_tags_template = template
         self.data_parameters = parameters
 
+        self.var_tag_interp = variable_interp_method
+
         self.var_tag_geo_terrain = 'terrain'
         self.var_tag_geo_x = 'geo_x'
         self.var_tag_geo_y = 'geo_y'
         self.var_tag_time = 'time'
 
-        self.file_tag_coord_geo_x = 'XLONG'
-        self.file_tag_coord_geo_y = 'XLAT'
-        self.file_tag_coord_time = 'Time'
+        self.file_tag_coord_geo_x = 'lon'
+        self.file_tag_coord_geo_y = 'lat'
+        self.file_tag_coord_time = 'time'
 
-        self.file_tag_dim_geo_x = 'west_east'
-        self.file_tag_dim_geo_y = 'south_north'
-        self.file_tag_dim_time = 'Time'
+        self.file_tag_dim_geo_x = 'lon'
+        self.file_tag_dim_geo_y = 'lat'
+        self.file_tag_dim_time = 'time'
 
         var_info_in = []
         var_pvt_in = []
@@ -217,14 +218,19 @@ class DataProductBuilder:
             file_data_out[var_key_out] = file_data_list
 
         # Data input file
+        path_availability = []
         self.path_name_in = {}
         self.file_name_in = {}
         self.folder_name_in = {}
+        self.time_range_in = {}
+        self.datetimeidx_range_in = {}
         for file_key_step, file_path_step in file_data_in.items():
 
             folder_name_list = []
             file_name_list = []
             path_name_list = []
+            time_range_list = []
+
             for time_step in time_range:
 
                 data_tags_in_values = {'datetime_source': time_step, 'runtime_source': time_step,
@@ -239,59 +245,72 @@ class DataProductBuilder:
                         folder_name_fill = None
                         path_name_fill = None
 
-                    path_name_list.append(path_name_fill)
-                    folder_name_list.append(folder_name_fill)
-                    file_name_list.append(file_name_fill)
+                    if not os.path.exists(path_name_fill):
+                        log_stream.warning(' ===> File does not exist [' + path_name_fill + ']')
+                        path_availability.append(False)
+                    else:
+                        path_name_list.append(path_name_fill)
+                        folder_name_list.append(folder_name_fill)
+                        file_name_list.append(file_name_fill)
+                        time_range_list.append(time_step)
+                        path_availability.append(True)
+
+            path_true_count = path_availability.count(True)
+            path_false_count = path_availability.count(False)
+
+            if path_true_count > 0:
+                path_true_perc = path_availability.__len__() / path_true_count
+            else:
+                path_true_perc = 0.0
+
+            if path_true_count < path_false_count:
+                log_stream.warning(' ===> File(s) available for ' + file_key_step + ' are ' + str(path_true_perc))
 
             self.path_name_in[file_key_step] = path_name_list
             self.file_name_in[file_key_step] = file_name_list
             self.folder_name_in[file_key_step] = folder_name_list
+            self.time_range_in[file_key_step] = time_range_list
+            self.datetimeidx_range_in[file_key_step] = pd.DatetimeIndex(time_range_list)
 
-        path_availability = []
-        for folder_name_list, path_name_list in zip(self.folder_name_in.values(), self.path_name_in.values()):
-            for folder_name_step, path_name_step in zip(folder_name_list, path_name_list):
-                if folder_name_step is not None:
-                    if not os.path.exists(path_name_step):
-                        log_stream.warning(' ===> File does not exist [' + path_name_step + ']')
-                        path_availability.append(False)
-                        raise FileNotFoundError(' Path does not exist [' + folder_name_step + ']')
-                    else:
-                        path_availability.append(True)
-                else:
-                    path_availability.append(True)
-
-        self.file_availability = all(i is True for i in path_availability)
+        self.file_availability = any(i is True for i in path_availability)
 
         # Data output
         self.path_name_out = {}
         self.file_name_out = {}
         self.folder_name_out = {}
+        self.time_range_out = {}
         for file_key_step, file_path_step in file_data_out.items():
 
-            data_tags_template = deepcopy(self.data_tags_template)
-            data_tags_template.pop('ensemble', None)
-            data_tags_out_values = {'datetime_outcome': self.time_run, 'runtime_source': self.time_run,
-                                    'sub_path_time_outcome': self.time_run, 'domain': self.data_domain}
+            time_range = self.time_range_default
 
             folder_name_list = []
             file_name_list = []
             path_name_list = []
-            for path_name_raw in file_path_step:
-                if path_name_raw is not None:
-                    path_name_fill = fill_tags2string(path_name_raw, self.data_tags_template, data_tags_out_values)
-                    folder_name_fill, file_name_fill = os.path.split(path_name_fill)
-                else:
-                    file_name_fill = None
-                    folder_name_fill = None
-                    path_name_fill = None
+            time_range_list = []
+            for time_step in time_range:
+                data_tags_template = deepcopy(self.data_tags_template)
+                data_tags_template.pop('ensemble', None)
+                data_tags_out_values = {'datetime_outcome': time_step, 'runtime_source': time_step,
+                                        'sub_path_time_outcome': time_step, 'domain': self.data_domain}
 
-                folder_name_list.append(folder_name_fill)
-                file_name_list.append(file_name_fill)
-                path_name_list.append(path_name_fill)
+                for path_name_raw in file_path_step:
+                    if path_name_raw is not None:
+                        path_name_fill = fill_tags2string(path_name_raw, self.data_tags_template, data_tags_out_values)
+                        folder_name_fill, file_name_fill = os.path.split(path_name_fill)
+                    else:
+                        file_name_fill = None
+                        folder_name_fill = None
+                        path_name_fill = None
+
+                    folder_name_list.append(folder_name_fill)
+                    file_name_list.append(file_name_fill)
+                    path_name_list.append(path_name_fill)
+                    time_range_list.append(time_step)
 
             self.file_name_out[file_key_step] = file_name_list
             self.folder_name_out[file_key_step] = folder_name_list
             self.path_name_out[file_key_step] = path_name_list
+            self.time_range_out[file_key_step] = time_range_list
 
         for folder_name_list in list(self.folder_name_out.values()):
             for folder_name_step in folder_name_list:
@@ -364,8 +383,8 @@ class DataProductBuilder:
         self.var_info_redux_in, self.var_attrs_redux_in = flat_dictionary(variable_info_in)
         self.var_info_redux_out, self.var_attrs_redux_out = flat_dictionary(variable_info_out)
 
-        # Check file availability (one at least)
-        if self.path_availability:
+        # Check on data availability
+        if self.file_availability:
 
             # Driver to read data
             self.driver_data_reader = DataReader(
@@ -381,9 +400,9 @@ class DataProductBuilder:
 
             # Driver to compose data
             self.driver_data_composer = DataComposer(
-                var_info=self.var_info_redux_in, var_geo=self.data_geo, var_time=self.time_range,
+                var_info=self.var_info_redux_in, var_geo=self.data_geo, var_time=self.datetimeidx_range_in,
                 folder_tmp=self.folder_ancillary_processing, file_tmp=self.file_ancillary_processing,
-                var_tag_geo_terrain=self.var_tag_geo_terrain,
+                var_tag_geo_terrain=self.var_tag_geo_terrain, var_tag_interp=self.var_tag_interp,
                 var_tag_geo_x=self.var_tag_geo_x, var_tag_geo_y=self.var_tag_geo_y, var_tag_time=self.var_tag_time,
                 file_tag_coord_geo_x=self.file_tag_coord_geo_x, file_tag_coord_geo_y=self.file_tag_coord_geo_y,
                 file_tag_coord_time=self.file_tag_coord_time,
@@ -394,11 +413,11 @@ class DataProductBuilder:
             # Driver to write data
             self.driver_data_writer = DataWriter(
                 var_info=self.var_info_redux_out, var_attrs_list=self.var_attrs_redux_out['attributes'],
-                var_geo=self.data_geo,
+                var_geo=self.data_geo, var_time=self.time_range_out,
                 folder_out=self.folder_name_out, file_out=self.file_name_out, tag_out=vars_file_out,
                 var_tag_geo_terrain=self.var_tag_geo_terrain,
                 var_tag_geo_x=self.var_tag_geo_x, var_tag_geo_y=self.var_tag_geo_y, var_tag_time=self.var_tag_time,
-                dset_write_engine=file_out_write_engine,
+                dset_write_engine=file_out_write_engine, file_priority=file_out_priority,
                 file_compression_mode=file_out_mode_zipping, file_compression_ext=file_out_ext_zipping
             )
 
@@ -413,6 +432,8 @@ class DataProductBuilder:
         self.file_out_ext_zipping = file_out_ext_zipping
 
         self.file_out_write_engine = file_out_write_engine
+
+        self.file_out_priority = file_out_priority
 
     # -------------------------------------------------------------------------------------
 
@@ -451,7 +472,7 @@ class DataProductBuilder:
         # Starting info
         log_stream.info(' ---> Collect datasets ... ')
 
-        time_range = self.time_range
+        time_range = self.time_range_default
 
         # Check data availability
         if self.file_availability:
@@ -531,29 +552,31 @@ class DataProductBuilder:
         if self.file_availability:
 
             file_link = self.driver_data_writer.link_out
+            file_zip = self.driver_data_writer.link_zip
 
             # Configure updating flag about outcome file(s)
-            for file_key, file_name in file_link.items():
-                if os.path.exists(file_name):
-                    if self.file_out_updating:
-                        os.remove(file_name)
+            for file_key, file_list in file_link.items():
+                for file_name in file_list:
+                    if os.path.exists(file_name):
+                        if self.file_out_updating:
+                            os.remove(file_name)
+                        else:
+                            self.file_out_updating = True
+                            break
                     else:
                         self.file_out_updating = True
-                        break
-                else:
-                    self.file_out_updating = True
 
             # Organize and save datasets in a common netcdf format
             if self.file_out_updating:
                 data_obj_out = self.driver_data_writer.organize_obj(data_obj_in)
                 file_name_out, file_status_out = self.driver_data_writer.dump_obj(data_obj_out)
 
-                for file_status, (file_key, file_name) in zip(file_status_out, file_link.items()):
+                for file_status, file_name in zip(file_status_out, file_name_out):
                     if not file_status:
                         # Warning info
                         log_stream.warning(' ---> Save datasets ... FAILED. File ' + file_name + ' not saved!')
 
-                self.driver_data_writer.zip_obj(file_status_out)
+                self.driver_data_writer.zip_obj()
 
                 # Ending info
                 log_stream.info(' ---> Save datasets ... DONE')

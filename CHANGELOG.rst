@@ -4,6 +4,9 @@ Changelog
 
 Version 1.9.4 [2020-03-19]
 **************************
+APP: **HYDE_DynamicData_GSMap_Rain.py**
+		- Release for Hyde package
+
 APP: **HYDE_DynamicData_NWP_GFS_025.py**
 		- Release for Hyde package
 

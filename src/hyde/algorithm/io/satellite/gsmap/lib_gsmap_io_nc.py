@@ -6,7 +6,7 @@ import re
 import xarray as xr
 import pandas as pd
 
-from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_name
+from src.hyde.algorithm.settings.satellite.gsmap.lib_gsmap_args import logger_name
 
 # Logging
 log_stream = logging.getLogger(logger_name)
@@ -17,8 +17,8 @@ log_stream = logging.getLogger(logger_name)
 
 
 # -------------------------------------------------------------------------------------
-# Method to read data for wrf
-def read_data_wrf(file_name, var_name=None,
+# Method to read data for gsmap
+def read_data_gsmap(file_name, var_name=None,
                   tag_coord_time='time', tag_coord_geo_x='lon', tag_coord_geo_y='lat',
                   tag_dim_time='time', tag_dim_geo_x='lon', tag_dim_geo_y='lat'):
 
@@ -39,31 +39,13 @@ def read_data_wrf(file_name, var_name=None,
     var_list_all = list(dst.variables)
     var_list_data = list(dst.data_vars)
 
-    reg_exp_time = re.compile(".*" + tag_coord_time)
-    match_str_time = list(filter(reg_exp_time.match, var_list_data))
-
     # Get time, geo x and geo y
     log_stream.info(' ---> Get time, geo_x and geo_y data ... ')
     if tag_coord_time in var_list_all:
         da_time = dst[tag_coord_time]
     else:
-
-        log_stream.info(' ---> Time dimension name is not in the variables list of grib file. '
-                        'Searching for regular expression with similar names')
-        if match_str_time.__len__() > 0:
-            for match_str_step in match_str_time:
-                log_stream.info(' ---> Searching time values using another dim name: ' + match_str_step + ' ...')
-                if match_str_step in var_list_all:
-                    da_time = dst[match_str_step]
-                    log_stream.info(' ---> Searching time values using another dim name: ' + match_str_step +
-                                    ' ... DONE')
-                    break
-                else:
-                    log_stream.warning(' ===> Searching time values using another dim name: ' + match_str_step +
-                                       ' ... FAILED')
-        else:
-            log_stream.error(' ===> Time dimension name is not in the variables list of grib file')
-            raise IOError(' ===> Check the time dimension!')
+        log_stream.error(' ===> Time dimension name is not in the variables list of grib file')
+        raise IOError(' ===> Check the time dimension!')
 
     if tag_coord_geo_x in var_list_all:
         da_geo_x_tmp = dst[tag_coord_geo_x]
@@ -93,10 +75,9 @@ def read_data_wrf(file_name, var_name=None,
             log_stream.warning(' ===> Variable name ' + var_step + ' is not available in the datasets')
 
     time_period = []
-    for time_byte in da_time.values:
-        time_str = time_byte.decode("utf-8")
-        time_period.append(time_str)
-    datetime_idx = pd.to_datetime(time_period, format='%Y-%m-%d_%H:%M:%S')
+    for time_step in da_time.values:
+        time_period.append(time_step)
+    datetime_idx = pd.to_datetime(time_period, format='%Y-%m-%dT%H:%M:%S')
     datetime_idx = datetime_idx.round('H')
 
     log_stream.info(' ---> Get time, geo_x and geo_y data ... DONE')
@@ -105,13 +86,11 @@ def read_data_wrf(file_name, var_name=None,
     da_var = []
     for var_list_step in var_list_select:
         log_stream.info(' --->  Get ' + var_list_step + ' data ... ')
+
         da_step = dst[var_list_step]
-
-        if tag_coord_time not in list(da_step.coords):
-            da_step = da_step.squeeze(tag_dim_time)
-            da_step = da_step.expand_dims({tag_dim_time: datetime_idx})
-
+        da_step.coords[tag_coord_time] = datetime_idx
         da_var.append(da_step)
+
         log_stream.info(' --->  Get ' + var_list_step + ' data ... DONE')
 
     # Ending info

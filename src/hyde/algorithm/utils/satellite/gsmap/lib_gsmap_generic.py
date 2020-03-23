@@ -1,7 +1,7 @@
 """
 Library Features:
 
-Name:          lib_wrf_generic
+Name:          lib_gsmap_generic
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
 Date:          '20200310'
 Version:       '1.0.1'
@@ -13,7 +13,7 @@ import logging
 from copy import deepcopy
 from datetime import datetime
 
-from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_name
+from src.hyde.algorithm.settings.satellite.gsmap.lib_gsmap_args import logger_name
 
 # Logging
 log_stream = logging.getLogger(logger_name)
