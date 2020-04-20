@@ -2,12 +2,12 @@
   "algorithm":{
     "flags": {
       "cleaning_static_data": true,
-      "cleaning_dynamic_ancillary_source": false,
-      "cleaning_dynamic_ancillary_processing": true,
+      "cleaning_dynamic_ancillary_source": true,
+      "cleaning_dynamic_ancillary_processing": false,
       "cleaning_dynamic_ancillary_outcome": true,
       "cleaning_dynamic_product": true,
       "cleaning_dynamic_tmp": false,
-      "zipping_dynamic_product": false
+      "zipping_dynamic_product": true
     },
     "ancillary": {
       "domain" : "marche",
@@ -28,42 +28,42 @@
     "static": {
       "land": {
         "terrain_data": {
-          "filename": "marche.dem.txt",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/gridded/"
+          "filename": "{string_domain}.dem.txt",
+          "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "grid_data": {
-          "filename": "grid_wrf.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lexis/ancillary/"
+          "filename": "{string_domain}_grid_wrf.workspace",
+          "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "geo_data": {
-          "filename": "geo_wrf.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lexis/ancillary/"
+          "filename": "{string_domain}_geo_wrf.workspace",
+          "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         }
       },
       "colormap": {
         "rain_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/colormap/"
+          "folder" : "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "air_temperature_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/colormap/"
+          "folder" : "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "wind_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/colormap/"
+          "folder" : "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "incoming_radiation_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/colormap/"
+          "folder" : "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "air_pressure_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/colormap/"
+          "folder" : "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "relative_humidity_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/wrf/lexis/colormap/"
+          "folder" : "/home/fp/fp_mount/datasets_hyde/static/"
         }
       }
     },
@@ -79,7 +79,7 @@
         "sub_path_time_outcome": "%Y/%m/%d"
       },
       "time": {
-        "time_forecast_period": 48,
+        "time_forecast_period": 24,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
@@ -89,49 +89,49 @@
         "_comment": "W99C95.nc -- ww3.$yyyy$mm$ddT$HHZ.nc - wrfout_d01_2018-07-10_01:00:00_PLEV_BIL.nc",
         "air_temperature_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
         },
         "rain_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
         },
         "relative_humidity_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
         },
         "incoming_radiation_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
         },
         "wind_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
         }
       },
       "ancillary": {
         "nwp_source_ancillary": {
           "filename": "wrf_{datetime_ancillary}_{domain}_source.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/wrf/{sub_path_time_ancillary}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/ancillary/{sub_path_time_ancillary}"
         },
         "nwp_processing_ancillary": {
           "filename": "wrf_{datetime_ancillary}_{domain}_processing.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/wrf/{sub_path_time_ancillary}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/ancillary/{sub_path_time_ancillary}"
         },
         "nwp_outcome_ancillary": {
           "filename": "wrf_{datetime_ancillary}_{domain}_outcome.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/wrf/{sub_path_time_ancillary}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/ancillary/{sub_path_time_ancillary}"
         }
       },
       "outcome": {
         "nwp_outcome_data": {
           "filename": "wrf_{datetime_outcome}_{domain}.nc",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/wrf/{sub_path_time_outcome}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/processed/{sub_path_time_outcome}"
         }
       }
     },
     "log": {
-        "filename": "hyde_dynamicdata_nwp_wrf_local_log.txt",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/wrf/"
+        "filename": "hyde_dynamicdata_nwp_wrf_docker_log.txt",
+        "folder": "/home/fp/fp_logs/wrf/"
       },
     "library": {
       "filename": "",
@@ -143,10 +143,10 @@
     }
   },
   "time": {
-    "time_now": "2020-03-17 00:00",
+    "time_now": null,
     "time_period": 0,
-    "time_frequency": "D",
-    "time_rounding": "D"
+    "time_frequency": "6H",
+    "time_rounding": "6H"
   },
   "variables": {
     "source": {

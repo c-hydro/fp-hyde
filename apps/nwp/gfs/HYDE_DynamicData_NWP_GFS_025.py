@@ -193,7 +193,6 @@ def main():
     log_stream.info('End Program - Time elapsed: ' + str(time_elapsed) + ' seconds')
     # -------------------------------------------------------------------------------------
 
-
 # ----------------------------------------------------------------------------
 # Call script from external library
 if __name__ == "__main__":

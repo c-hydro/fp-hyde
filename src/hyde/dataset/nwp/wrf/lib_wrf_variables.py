@@ -564,7 +564,7 @@ def computeIncomingRadiation(var_dset, var_name,
         var_shape_in = list({var_shape_in_1, var_shape_in_2})[0]
 
     var_interval_cmp = pd.Timedelta((var_time[1] - var_time[0]).values)
-    if var_interval_cmp.resolution == var_interval_exp:
+    if var_interval_cmp.resolution_string == var_interval_exp:
 
         idx_start = np.arange(0, var_shape_in[2], var_avg_idx).tolist()
         idx_end = np.arange(6, var_shape_in[2] + var_avg_idx, var_avg_idx).tolist()

@@ -365,7 +365,7 @@ class DataProductBuilder:
         self.var_info_redux_out, self.var_attrs_redux_out = flat_dictionary(variable_info_out)
 
         # Check file availability (one at least)
-        if self.path_availability:
+        if self.file_availability:
 
             # Driver to read data
             self.driver_data_reader = DataReader(

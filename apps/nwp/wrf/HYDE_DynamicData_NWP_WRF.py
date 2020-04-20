@@ -25,7 +25,7 @@ import argparse
 
 from src.common.log.lib_logging import setLoggingFile
 
-from src.hyde.algorithm.settings.satellite.wrf.lib_wrf_args import logger_formatter, logger_handle, logger_name
+from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_formatter, logger_handle, logger_name
 from src.hyde.driver.configuration.nwp.wrf.drv_configuration_time_wrf import DataTime
 from src.hyde.driver.dataset.nwp.wrf.drv_data_wrf_geo import DataGeo
 
