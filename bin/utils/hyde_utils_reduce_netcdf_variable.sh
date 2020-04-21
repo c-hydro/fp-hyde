@@ -8,12 +8,12 @@ script_date='2020/04/20'
 
 # Time Information
 date_start="2020-03-19 18:00"
-date_end="2020-03-20 00:00"
+date_end="2020-03-21 18:00"
 
 # Path(s) information
 source_folder_name_raw="/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_03_19_1800/"
 source_file_name_raw="auxhist23_d03_%YYYY-%MM-%DD_%HH:00:00"
-dest_folder_name_raw="/home/fabio/Desktop/Workspace/PyCharm_Workspace/fp-docker-ws/data/dynamic_data/nwp/wrf/lexis/%YYYY/%MM/%DD/"
+dest_folder_name_raw="/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/selected/%YYYY/%MM/%DD/"
 dest_file_name_raw="auxhist23_d03_%YYYY-%MM-%DD_%HH:00:00"
 
 # Variable(s)

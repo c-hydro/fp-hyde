@@ -89,43 +89,43 @@
         "_comment": "W99C95.nc -- ww3.$yyyy$mm$ddT$HHZ.nc - wrfout_d01_2018-07-10_01:00:00_PLEV_BIL.nc",
         "air_temperature_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/"
         },
         "rain_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/"
         },
         "relative_humidity_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/"
         },
         "incoming_radiation_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/"
         },
         "wind_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/raw/{sub_path_time_source}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/"
         }
       },
       "ancillary": {
         "nwp_source_ancillary": {
           "filename": "wrf_{datetime_ancillary}_{domain}_source.workspace",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/ancillary/{sub_path_time_ancillary}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         },
         "nwp_processing_ancillary": {
           "filename": "wrf_{datetime_ancillary}_{domain}_processing.workspace",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/ancillary/{sub_path_time_ancillary}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         },
         "nwp_outcome_ancillary": {
           "filename": "wrf_{datetime_ancillary}_{domain}_outcome.workspace",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/ancillary/{sub_path_time_ancillary}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         }
       },
       "outcome": {
         "nwp_outcome_data": {
           "filename": "wrf_{datetime_outcome}_{domain}.nc",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/for/wrf/processed/{sub_path_time_outcome}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/{sub_path_time_outcome}"
         }
       }
     },
