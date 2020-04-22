@@ -16,21 +16,21 @@ from os.path import exists
 from copy import deepcopy
 from numpy import full
 
-from fp.utils.lib_utils_op_string import defineString
-from fp.utils.lib_utils_op_list import mergeList
-from fp.utils.lib_utils_apps_file import handleFileData, selectFileDriver, zipFileData
-from fp.utils.lib_utils_apps_time import getTimeFrom, getTimeTo, getTimeSteps
+from src.common.utils.lib_utils_op_string import defineString
+from src.common.utils.lib_utils_op_list import mergeList
+from src.common.utils.lib_utils_apps_file import handleFileData, selectFileDriver, zipFileData
+from src.common.utils.lib_utils_apps_time import getTimeFrom, getTimeTo, getTimeSteps
 
-from fp.default.lib_default_args import sZipExt as sZipExt_Default
-from fp.default.lib_default_args import sTimeFormat as sTimeFormat_Default
-from fp.default.lib_default_args import sTimeCalendar as sTimeCalendar_Default
-from fp.default.lib_default_args import sTimeUnits as sTimeUnits_Default
-from fp.default.lib_default_conventions import oVarConventions as oVarConventions_Default
-from fp.default.lib_default_conventions import oFileConventions as oFileConventions_Default
+from src.common.default.lib_default_args import sZipExt as sZipExt_Default
+from src.common.default.lib_default_args import sTimeFormat as sTimeFormat_Default
+from src.common.default.lib_default_args import sTimeCalendar as sTimeCalendar_Default
+from src.common.default.lib_default_args import sTimeUnits as sTimeUnits_Default
+from src.common.default.lib_default_conventions import oVarConventions as oVarConventions_Default
+from src.common.default.lib_default_conventions import oFileConventions as oFileConventions_Default
 
-from fp.default.lib_default_args import sLoggerName
+from src.common.default.lib_default_args import sLoggerName
 
-from fp.driver.configuration.drv_configuration_debug import Exc
+from src.common.driver.configuration.drv_configuration_debug import Exc
 
 # Logging
 oLogStream = logging.getLogger(sLoggerName)
@@ -41,7 +41,7 @@ oLogStream = logging.getLogger(sLoggerName)
 
 # -------------------------------------------------------------------------------------
 # Algorithm definition(s)
-oVarKey_Ancillary = ['longitude', 'latitude', 'crs', 'time', 'attributes', 'dimensions']
+oVarKey_Ancillary = ['longitude', 'latitude', 'crs', 'time', 'attributes', 'dimensions', 'terrain']
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
@@ -209,6 +209,11 @@ class DataProductFinalizer:
             else:
                 Exc.getExc(' ---> WARNING: data longitude not found! Use grid reference', 2, 1)
                 a2dVarGeoY = oDataGeo.a2dGeoY
+            # Get data terrain
+            if 'terrain' in oVarData:
+                oVarData.pop('terrain')
+            else:
+                Exc.getExc(' ---> WARNING: data terrain not found!', 2, 1)
             # -------------------------------------------------------------------------------------
 
             # -------------------------------------------------------------------------------------
@@ -260,8 +265,24 @@ class DataProductFinalizer:
                     # Write geo system information
                     oFileDriver.oFileLibrary.writeGeoSystem(oFileData, oFileCRS)
                     # Write X, Y, time, nsim, ntime and nens
-                    oFileDriver.oFileLibrary.writeDims(oFileData, 'X', oFileDims['X']['size'])
-                    oFileDriver.oFileLibrary.writeDims(oFileData, 'Y', oFileDims['Y']['size'])
+                    if 'west_east' in oFileDims:
+                        oDimsX = oFileDims['west_east']
+                        oDimsX['name'] = 'X'
+                    elif 'X' in oFileDims:
+                        oDimsX = oFileDims['X']
+                    else:
+                        pass
+
+                    if 'south_north' in oFileDims:
+                        oDimsY = oFileDims['south_north']
+                        oDimsY['name'] = 'Y'
+                    elif 'X' in oFileDims:
+                        oDimsY = oFileDims['Y']
+                    else:
+                        pass
+
+                    oFileDriver.oFileLibrary.writeDims(oFileData, 'X', oDimsX['size'])
+                    oFileDriver.oFileLibrary.writeDims(oFileData, 'Y', oDimsY['size'])
                     oFileDriver.oFileLibrary.writeDims(oFileData, 'time', 1)
                     oFileDriver.oFileLibrary.writeDims(oFileData, 'nsim', 1)
                     oFileDriver.oFileLibrary.writeDims(oFileData, 'ntime', 2)
@@ -282,8 +303,8 @@ class DataProductFinalizer:
                     sVarFormatX = oVarConventions_Default[sVarNameX]['Format']
                     oFileDriver.oFileLibrary.write2DVar(oFileData, sVarNameX,
                                                         a2VarDataX, oVarAttrsX, sVarFormatX,
-                                                        sVarDimY=oFileDims['Y']['name'],
-                                                        sVarDimX=oFileDims['X']['name'])
+                                                        sVarDimY=oDimsY['name'],
+                                                        sVarDimX=oDimsX['name'])
                     # Write latitude information
                     sVarNameY = 'latitude'
                     a2VarDataY = a2dVarGeoY
@@ -291,8 +312,8 @@ class DataProductFinalizer:
                     sVarFormatY = oVarConventions_Default[sVarNameY]['Format']
                     oFileDriver.oFileLibrary.write2DVar(oFileData, sVarNameY,
                                                         a2VarDataY, oVarAttrsY, sVarFormatY,
-                                                        sVarDimY=oFileDims['Y']['name'],
-                                                        sVarDimX=oFileDims['X']['name'])
+                                                        sVarDimY=oDimsY['name'],
+                                                        sVarDimX=oDimsX['name'])
 
                     # Info create file
                     oLogStream.info(' -----> Create file ' + sVarFileName + ' ... OK')
@@ -325,8 +346,8 @@ class DataProductFinalizer:
 
                         # -------------------------------------------------------------------------------------
                         # Get file dimensions
-                        sVarDimX = oFileDims['X']['name']
-                        sVarDimY = oFileDims['Y']['name']
+                        sVarDimX = oDimsX['name']
+                        sVarDimY = oDimsY['name']
                         sVarDimT = oFileDims['time']['name']
 
                         # Get var structure
@@ -499,6 +520,11 @@ class DataProductBuilder:
                                 if sVarName == 'crs':
                                     oVarGeoSystem = oFileDriver.oFileLibrary.getGeoSystem(oFileHandle, sVarName)
                                     oVarWS[sVarName] = oVarGeoSystem
+                                if sVarName == 'terrain':
+                                    a2dVarTerrain = oFileDriver.oFileLibrary.get2DVar(
+                                        oFileHandle, sVarName, bSetAutoMask=False)
+                                    # Store variable information
+                                    oVarWS[sVarName] = a2dVarTerrain
                                 # -------------------------------------------------------------------------------------
 
                             # -------------------------------------------------------------------------------------

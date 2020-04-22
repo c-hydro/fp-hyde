@@ -2,6 +2,7 @@
 Changelog
 =========
 
+
 Version 1.9.4 [2020-03-19]
 **************************
 APP: **HYDE_DynamicData_GSMap_Rain.py**
@@ -30,6 +31,9 @@ BIN: **hyde_downloader_satellite_gsmap.py**
 
 BIN: **hyde_downloader_nwp_gfs.py**
 		- Release for Hyde package
+
+BIN: **hyde_adapter_data_splitting_main.py**
+		- Update code and release for Hyde package
 
 Version 1.9.3 [2019-11-22]
 **************************

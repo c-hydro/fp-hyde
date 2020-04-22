@@ -1,15 +1,16 @@
 """
-FloodProofs Ancillary Tools - DataSplitting
+Hyde Ancillary Tools - DataSplitting
 
-__date__ = '20180717'
-__version__ = '1.0.0'
+__date__ = '20200422'
+__version__ = '1.0.1'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
-__library__ = 'nwp'
+__library__ = 'hyde'
 
 General command line:
-python3 FP_Tools_DataSplitting.py -settingfile configuration_product.json -time YYYYMMDDHHMM
+python3 hyde_adapter_data_splitting_main.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
+20200422 (1.0.1) --> Refactoring for hyde package
 20181010 (1.0.0) --> Beta release for flood-proofs monitoring system
 """
 # -------------------------------------------------------------------------------------
@@ -22,18 +23,18 @@ import argparse
 # Partial library
 from os.path import exists
 
-from fp.log.lib_logging import setLoggingFile
-from fp.utils.lib_utils_op_string import defineString
-from fp.utils.lib_utils_op_dict import removeDictKey
-from fp.utils.lib_utils_file_workspace import savePickle, restorePickle
+from src.common.log.lib_logging import setLoggingFile
+from src.common.utils.lib_utils_op_string import defineString
+from src.common.utils.lib_utils_op_dict import removeDictKey
+from src.common.utils.lib_utils_file_workspace import savePickle, restorePickle
 
-from fp.driver.dataset.generic.drv_data_io_geo import DataGeo
-from fp.driver.configuration.drv_configuration_algorithm import DataAlgorithm
-from fp.driver.configuration.drv_configuration_time import DataTime
-from fp.driver.configuration.drv_configuration_tags import DataTags
-from fp.driver.configuration.drv_configuration_debug import Exc
+from src.hyde.driver.dataset.generic.drv_data_io_geo import DataGeo
+from src.hyde.driver.configuration.generic.drv_configuration_algorithm import DataAlgorithm
+from src.hyde.driver.configuration.generic.drv_configuration_time import DataTime
+from src.hyde.driver.configuration.generic.drv_configuration_tags import DataTags
+from src.common.driver.configuration.drv_configuration_debug import Exc
 
-from fp.driver.dataset.tools.drv_data_io_datasplitting  import DataProductCleaner, \
+from src.hyde.driver.dataset.tools.drv_data_io_datasplitting import DataProductCleaner, \
     DataProductBuilder, DataProductFinalizer
 # -------------------------------------------------------------------------------------
 
@@ -41,7 +42,7 @@ from fp.driver.dataset.tools.drv_data_io_datasplitting  import DataProductCleane
 # Method to get script argument(s)
 def GetArgs():
     oParser = argparse.ArgumentParser()
-    oParser.add_argument('-settingfile', action="store", dest="sSettingFile")
+    oParser.add_argument('-settings_file', action="store", dest="sSettingFile")
     oParser.add_argument('-time', action="store", dest="sTimeArg")
     oParserValue = oParser.parse_args()
 
@@ -50,7 +51,7 @@ def GetArgs():
     if oParserValue.sSettingFile:
         sSettingsFile = oParserValue.sSettingFile
     else:
-        sSettingsFile = 'fp_configuration_datasplitting.json'
+        sSettingsFile = 'configuration.json'
 
     if oParserValue.sTimeArg:
         sTimeArg = oParserValue.sTimeArg

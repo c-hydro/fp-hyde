@@ -235,7 +235,7 @@ def get2DVar(oFileData, sVarName, bSetAutoMask=True):
 
 # ----------------------------------------------------------------------------
 # Method to get 3d variable (using variable name and t-slice if defined)
-def get3DVar(oFileData, sVarName, iVarTSlice=None, bSetAutoMask=True):
+def get3DVar(oFileData, sVarName, iVarTSlice=None, bSetAutoMask=True, bSetTranspose=False):
 
     if not bSetAutoMask:
         Exc.getExc(' =====> WARNING: auto_mask is set to false! (lib_data_io_netcdf)', 2, 1)
@@ -243,21 +243,27 @@ def get3DVar(oFileData, sVarName, iVarTSlice=None, bSetAutoMask=True):
 
     a3dVarName_IN = oFileData.variables[sVarName][:]
 
-    if iVarTSlice is None:
-        oVarName_OUT = np.zeros([a3dVarName_IN.shape[1], a3dVarName_IN.shape[2], a3dVarName_IN.shape[0]])
-        for iT in range(0, a3dVarName_IN.shape[0]):
-            a2dVarName_IN = np.transpose(np.rot90(a3dVarName_IN[iT, :, :], -1))
-            oVarName_OUT[:, :, iT] = a2dVarName_IN
+    if bSetTranspose:
+        if iVarTSlice is None:
+            oVarName_OUT = np.zeros([a3dVarName_IN.shape[1], a3dVarName_IN.shape[2], a3dVarName_IN.shape[0]])
+            for iT in range(0, a3dVarName_IN.shape[0]):
+                a2dVarName_IN = np.transpose(np.rot90(a3dVarName_IN[iT, :, :], -1))
+                oVarName_OUT[:, :, iT] = a2dVarName_IN
 
-            # a2dVarName_IN[a2dVarName_IN < -900] = np.nan
+                # a2dVarName_IN[a2dVarName_IN < -900] = np.nan
 
-            # Debug
-            # plt.figure(1); plt.imshow(a2dVarName_IN); plt.colorbar(); plt.clim(-10,40);
-            # plt.show()
+                # Debug
+                # plt.figure(1); plt.imshow(a2dVarName_IN); plt.colorbar(); plt.clim(-10,40);
+                # plt.show()
+
+        else:
+            oVarName_OUT = np.transpose(np.rot90(a3dVarName_IN[iVarTSlice, :, :], -1))
 
     else:
-        oVarName_OUT = np.transpose(np.rot90(a3dVarName_IN[iVarTSlice, :, :], -1))
-
+        if iVarTSlice is None:
+            oVarName_OUT = a3dVarName_IN
+        else:
+            oVarName_OUT = a3dVarName_IN[:, :, iVarTSlice]
     return oVarName_OUT
 # ----------------------------------------------------------------------------
 

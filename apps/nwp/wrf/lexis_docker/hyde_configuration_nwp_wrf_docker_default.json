@@ -32,11 +32,11 @@
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "grid_data": {
-          "filename": "{string_domain}_grid_wrf.workspace",
+          "filename": "{string_domain}_grid_wrf_runner.workspace",
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "geo_data": {
-          "filename": "{string_domain}_geo_wrf.workspace",
+          "filename": "{string_domain}_geo_wrf_runner.workspace",
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         }
       },
@@ -79,7 +79,7 @@
         "sub_path_time_outcome": "%Y/%m/%d"
       },
       "time": {
-        "time_forecast_period": 24,
+        "time_forecast_period": 36,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
@@ -125,13 +125,13 @@
       "outcome": {
         "nwp_outcome_data": {
           "filename": "wrf_{datetime_outcome}_{domain}.nc",
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/{sub_path_time_outcome}"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/"
         }
       }
     },
     "log": {
-        "filename": "hyde_dynamicdata_nwp_wrf_docker_log.txt",
-        "folder": "/home/fp/fp_logs/wrf/"
+        "filename": "hyde_nwp_wrf_docker_data_dynamic_log.txt",
+        "folder": "/home/fp/fp_logs/"
       },
     "library": {
       "filename": "",
@@ -145,8 +145,8 @@
   "time": {
     "time_now": null,
     "time_period": 0,
-    "time_frequency": "6H",
-    "time_rounding": "6H"
+    "time_frequency": "D",
+    "time_rounding": "D"
   },
   "variables": {
     "source": {
