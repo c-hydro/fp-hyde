@@ -300,7 +300,7 @@ def select_time_steps(info_file, id_start=2, id_end=None, id_period=2):
         id_end = int(info_file[-1].split()[0])
 
     list_vars = []
-    for info_row in info_file:
+    for info_row in info_file[:-1]:
         info_list = info_row.split()
 
         info_id = int(info_list[0])

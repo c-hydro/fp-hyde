@@ -286,7 +286,7 @@ class RFarmData:
         if self.found_data_first:
 
             [file_handle, file_drv, file_open] = handleFileData(self.file_data_first,
-                                                                sFileType=self.file_format_data)
+                                                                file_type=self.file_format_data)
             if file_open:
 
                 if self.file_format_data == 'grib':

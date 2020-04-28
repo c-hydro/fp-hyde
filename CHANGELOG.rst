@@ -6,10 +6,10 @@ Changelog
 Version 1.9.4 [2020-03-19]
 **************************
 APP: **HYDE_DynamicData_GSMap_Rain.py**
-		- Release for Hyde package
+	- Release for Hyde package
 
 APP: **HYDE_DynamicData_NWP_GFS_025.py**
-		- Release for Hyde package
+	- Release for Hyde package
 
 APP: **HYDE_DynamicData_NWP_ECMWF_0100.py**
     - Beta release for HyDE package
@@ -18,22 +18,28 @@ APP: **HYDE_DynamicData_NWP_ECMWF_0100.py**
     		- [2015-09-23] Latest operational version for NWP ECMWF 0125
 
 APP: **HYDE_DynamicData_NWP_WRF.py**
-		- Application refactoring 
+	- Application refactoring 
 
 DRV: **lib_astrorad_core.py**
-		- Beta release for HyDE package for Astronomical Radiation Model
-			- Previous version(s)
-				- [2017-05-23] Refactoring for Python3
-				- [2015-11-03] Beta release
+	- Beta release for HyDE package for Astronomical Radiation Model
+		- Previous version(s)
+			- [2017-05-23] Refactoring for Python3
+			- [2015-11-03] Beta release
 
 BIN: **hyde_downloader_satellite_gsmap.py**
-		- Release for Hyde package
+	- Release for Hyde package
 
 BIN: **hyde_downloader_nwp_gfs.py**
-		- Release for Hyde package
+	- Release for Hyde package
 
 BIN: **hyde_adapter_data_splitting_main.py**
-		- Update code and release for Hyde package
+	- Update code and release for Hyde package
+
+FIX: **hyde_downloader_satellite_gsmap.py**
+	- Request of ftp files list to avoid bad http request(s)
+
+FIX: **HYDE_Model_RFarm.py**
+    - Minor bugs in bash scripts and python scripts
 
 Version 1.9.3 [2019-11-22]
 **************************

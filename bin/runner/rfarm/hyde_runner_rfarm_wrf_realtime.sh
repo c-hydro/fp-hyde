@@ -66,7 +66,7 @@ fi
 echo " ==================================================================================="
 echo " ==> "$script_name" (Version: "$script_version" Release_Date: "$script_date")"
 echo " ==> START ..."
-echo " ==> COMMAND LINE: " python3 $script_file -settingsfile $setting_file -time $time_now [time_system $time_system]
+echo " ==> COMMAND LINE: " python3 $script_file -settings_file $setting_file -time $time_now [time_system $time_system]
 # ----------------------------------------------------------------------------------------	
 
 # ----------------------------------------------------------------------------------------	
@@ -217,7 +217,7 @@ if $file_check; then
 		
 		#-----------------------------------------------------------------------------------------
 		# Run python script (using setting and time)
-		python3 $script_file -settingsfile $setting_file -time $time_run
+		python3 $script_file -settings_file $setting_file -time $time_run
 		#-----------------------------------------------------------------------------------------
         
         #-----------------------------------------------------------------------------------------

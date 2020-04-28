@@ -16,8 +16,8 @@
         "heightAboveGround_2m_temperature",
         "heightAboveGround_2m_relative_humidity",
         "surface_radiation"],
-      "cdo_exec": "/home/fabio/Desktop/Apps/cdo-1.9.6_NC-4.6.0_HDF-1.8.17_ECCODES-2.12.5/bin/cdo",
-      "cdo_deps": ["/home/fabio/Desktop/Library/eccodes-2.12.5/lib/"]
+      "cdo_exec": "/home/fabio/Desktop/Apps/cdo-1.9.6_nc-4.6.0_hdf-1.8.17_eccodes-2.16.0/bin/cdo",
+      "cdo_deps": ["/home/fabio/Desktop/Library/eccodes-2.16.0/lib/"]
     },
     "general": {
       "title": "NWP GFS 0.25 degree",

@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - SATELLITE GSMAP
 
-__date__ = '20200313'
-__version__ = '1.0.0'
+__date__ = '20200427'
+__version__ = '1.0.1'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -13,9 +13,10 @@ __author__ =
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_satellite_gsmap.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
+python3 hyde_downloader_satellite_gsmap.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
+20200427 (1.0.1) --> Add list of remote files using folder name to avoid bad request of un-existing files
 20200313 (1.0.0) --> Beta release
 """
 # -------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ import gzip
 import numpy as np
 import pandas as pd
 
+import ftputil
 from ftplib import FTP
 from copy import deepcopy
 from cdo import Cdo
@@ -69,8 +71,13 @@ class FTPDriver:
         self.ftp_handle = FTP(self.ftp_host)
         self.ftp_handle.login(username, password)
 
+        self.ftp_utils = ftputil.host.FTPHost(self.ftp_host, username, password)
+
         self.ftp_file_downloaded = []
         self.ftp_file_error = []
+
+        self.ftp_file_available = []
+        self.ftp_folder_check = []
 
     def download_file(self, data_list):
 
@@ -78,25 +85,34 @@ class FTPDriver:
         ftp_file = data_list[1]
         dst_file = data_list[2]
 
+        if ftp_folder not in self.ftp_folder_check:
+            self.ftp_file_available = self.ftp_utils.listdir(ftp_folder)
+            self.ftp_folder_check.append(ftp_folder)
+
         logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... ')
-        logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... ')
 
-        try:
-            self.ftp_handle.cwd(ftp_folder)  # got to ftp dataset dir
-            self.ftp_handle.retrbinary("RETR " + ftp_file, open(dst_file, 'wb').write)
+        if ftp_file in self.ftp_file_available:
+            logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... ')
+            try:
+                self.ftp_handle.cwd(ftp_folder)  # got to ftp dataset dir
+                self.ftp_handle.retrbinary("RETR " + ftp_file, open(dst_file, 'wb').write)
 
-            os.popen("chmod g+rxX " + dst_file).readline()
+                os.popen("chmod g+rxX " + dst_file).readline()
 
-            self.ftp_file_downloaded.append([ftp_folder, ftp_file])
+                self.ftp_file_downloaded.append([ftp_folder, ftp_file])
 
-            logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... DONE')
-            logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... DONE')
+                logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... DONE')
+                logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... DONE')
 
-        except ConnectionError:
-            self.ftp_file_error.append([ftp_folder, ftp_file])
+            except ConnectionError:
+                self.ftp_file_error.append([ftp_folder, ftp_file])
 
-            logging.warning(' :: FTP request for downloading: ' + ftp_file + ' ... FAILED')
-            logging.warning(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... FAILED')
+                logging.warning(' :: FTP request for downloading: ' + ftp_file + ' ... FAILED')
+                logging.warning(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... FAILED')
+
+        else:
+            logging.info(' :: FTP request for downloading: ' + ftp_file +
+                         ' ... SKIPPED. File not available in folder ' + ftp_folder)
 
     def close(self):
         self.ftp_handle.quit()
@@ -933,7 +949,7 @@ def set_data_time(time_step, time_settings):
 # Method to check time validity
 def check_time_limit(time_alg, time_name='time_step', time_limit_period='2D'):
     time_day = pd.Timestamp.today()
-    time_limit_upper = time_day.floor('D')
+    time_limit_upper = time_day.floor('H')
     time_limit_lower = pd.date_range(end=time_limit_upper, periods=2, freq=time_limit_period)[0]
 
     if time_alg < time_limit_lower:

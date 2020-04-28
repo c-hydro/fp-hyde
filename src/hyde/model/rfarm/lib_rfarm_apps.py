@@ -134,9 +134,9 @@ def agg_xyt(zi, nax, nay, nat):
     nx, ny, nt = zi.shape
     if nay==nax and nat==nt:
         sf = nx/nax
-        xa = np.squeeze(np.nanmean(np.reshape(zi, (sf, int(nx*ny*nt/sf)),
+        xa = np.squeeze(np.nanmean(np.reshape(zi, (int(sf), int(nx*ny*nt/sf)),
                                               order='F'), 0))
-        xz = np.reshape(np.nanmean(np.reshape(xa.T, (int(nx/sf), sf, int(ny/sf), nt),
+        xz = np.reshape(np.nanmean(np.reshape(xa.T, (int(nx/sf), int(sf), int(ny/sf), nt),
                                               order='F'), 1), (nax,nay,nt),
                          order='F')
     else:
