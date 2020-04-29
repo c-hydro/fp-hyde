@@ -2,10 +2,10 @@
   "algorithm":{
     "flags": {
       "downloading_mp": true,
-      "cleaning_dynamic_data_ancillary": false,
-      "cleaning_dynamic_data_global": false,
+      "cleaning_dynamic_data_ancillary": true,
+      "cleaning_dynamic_data_global": true,
       "cleaning_dynamic_data_domain": true,
-      "cleaning_dynamic_data_tmp": false
+      "cleaning_dynamic_data_tmp": true
     },
     "ancillary": {
       "domain" : "guyana",

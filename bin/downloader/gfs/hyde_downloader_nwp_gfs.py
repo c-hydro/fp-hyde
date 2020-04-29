@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25
 
-__date__ = '20200313'
-__version__ = '1.5.0'
+__date__ = '20200429'
+__version__ = '1.6.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -15,6 +15,7 @@ General command line:
 python3 hyde_downloader_nwp_gfs.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20200429 (1.6.0) --> Add checking url request(s)
 20200313 (1.5.0) --> Add filtering of time-steps for accumulated variables (tp)
 20200312 (1.4.0) --> Add shifting of longitudes from [0,360] to [-180,180];
                      change file output format from grib2 to nc for allowing to store negative longitudes in outcomes
@@ -37,6 +38,9 @@ import tempfile
 import numpy as np
 import pandas as pd
 
+from urllib.request import Request, urlopen
+from urllib.error import URLError
+
 from copy import deepcopy
 from cdo import Cdo
 from multiprocessing import Pool, cpu_count
@@ -49,8 +53,8 @@ from argparse import ArgumentParser
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS'
-alg_version = '1.5.0'
-alg_release = '2020-03-13'
+alg_version = '1.6.0'
+alg_release = '2020-04-29'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -133,31 +137,38 @@ def main():
             type_data=data_settings['algorithm']['ancillary']['type'],
             flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_domain'])
 
+        # Check source url(s) existence
+        url_check = check_url_source(data_source, process_n=data_settings['algorithm']['ancillary']['process_mp'])
+
         # Retrieve and save data (in sequential or multiprocessing mode)
-        if data_settings['algorithm']['flags']['downloading_mp']:
-            retrieve_data_source_mp(
-                data_source, data_ancillary,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'],
-                process_n=data_settings['algorithm']['ancillary']['process_mp'],
-            )
+        if url_check:
+            if data_settings['algorithm']['flags']['downloading_mp']:
+                retrieve_data_source_mp(
+                    data_source, data_ancillary,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'],
+                    process_n=data_settings['algorithm']['ancillary']['process_mp'],
+                )
+            else:
+                retrieve_data_source_seq(
+                    data_source, data_ancillary,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'])
+
+            # Merge and mask data ancillary to data outcome
+            arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
+                                 data_bbox=data_settings['data']['static']['bounding_box'],
+                                 cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
+                                 cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'])
+
+            # Clean data tmp (such as ancillary and outcome global)
+            clean_data_tmp(
+                data_ancillary, data_outcome_global,
+                flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
+
+            # Ending info
+            logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... DONE')
         else:
-            retrieve_data_source_seq(
-                data_source, data_ancillary,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'])
-
-        # Merge and mask data ancillary to data outcome
-        arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
-                             data_bbox=data_settings['data']['static']['bounding_box'],
-                             cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
-                             cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'])
-
-        # Clean data tmp (such as ancillary and outcome global)
-        clean_data_tmp(
-            data_ancillary, data_outcome_global,
-            flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
-
-        # Ending info
-        logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... DONE')
+            # Ending info
+            logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... FAILED. Some url(s) are not available.')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -172,6 +183,66 @@ def main():
     logging.info(' ============================================================================ ')
     # -------------------------------------------------------------------------------------
 
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to check source url(s)
+def check_url_source(src_data, src_code_exist=200, process_n=20, process_max=None):
+
+    logging.info(' ----> Checking source url(s) ... ')
+
+    if process_max is None:
+        process_max = cpu_count() - 1
+    if process_n > process_max:
+        logging.warning(' ----> Maximum of recommended processes must be less then ' + str(process_max))
+        logging.warning(' ----> Set number of process from ' + str(process_n) + ' to ' + str(process_max))
+        process_n = process_max
+
+    src_response_list = []
+    src_key_list = []
+    for src_data_key, src_data_list in src_data.items():
+
+        logging.info(' -----> Source ' + src_data_key + ' ... ')
+
+        with Pool(processes=process_n, maxtasksperchild=1) as process_pool:
+            src_response = process_pool.map(request_url, src_data_list, chunksize=1)
+            process_pool.close()
+            process_pool.join()
+            src_response_list.append(src_response)
+
+        src_key_list.append(src_data_key)
+        logging.info(' -----> Source ' + src_data_key + ' ... DONE')
+
+    for src_key_step, src_response_step in zip(src_key_list, src_response_list):
+        if not all(src_code_el == src_code_exist for src_code_el in src_response_step):
+            logging.warning(' ===> Some url(s) for source ' + src_key_step + ' are not available!')
+            logging.info(' ----> Checking source url(s) ... FAILED')
+            return False
+
+    logging.info(' ----> Checking source url(s) ... DONE')
+    return True
+
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to request url
+def request_url(src_url):
+    logging.getLogger('requests').setLevel(logging.CRITICAL)
+    src_request = Request(src_url)
+    try:
+        src_response = urlopen(src_request)
+        return src_response.code
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            logging.warning(' ===> URL is unreachable from server.')
+            logging.warning(' ===> URL: ', src_url[0])
+            return False
+        elif hasattr(e, 'code'):
+            logging.warning(' ===> The server couldn\'t fulfill the request.')
+            logging.warning(' ===> URL: ', src_url[0])
+            return False
 # -------------------------------------------------------------------------------------
 
 
@@ -323,7 +394,7 @@ def select_time_steps(info_file, id_start=2, id_end=None, id_period=2):
 def create_filename_tmp(prefix='gfs_tmp_', suffix='.grib2', folder=None):
 
     if folder is None:
-        folder ='/tmp'
+        folder = '/tmp'
 
     with tempfile.NamedTemporaryFile(dir=folder, prefix=prefix, suffix=suffix, delete=False) as tmp:
         temp_file_name = tmp.name
@@ -415,6 +486,7 @@ def find_data_corrupted(data_list, data_perc_min=5, data_size_min=100000):
 def request_data_source(data_list):
     logging.info(' :: Http request for downloading: ' + data_list[0] + ' ... ')
     logging.info(' :: Outcome data will be dumped in: ' + split(data_list[1])[1] + ' ... ')
+
     try:
         urllib.request.urlretrieve(data_list[0], filename=data_list[1])
         logging.info(' :: Outcome data will be dumped in: ' + split(data_list[1])[1] + ' ... DONE')

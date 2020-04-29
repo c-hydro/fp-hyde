@@ -35,8 +35,11 @@ BIN: **hyde_downloader_nwp_gfs.py**
 BIN: **hyde_adapter_data_splitting_main.py**
 	- Update code and release for Hyde package
 
-FIX: **hyde_downloader_satellite_gsmap.py**
+ADD: **hyde_downloader_satellite_gsmap.py**
 	- Request of ftp files list to avoid bad http request(s)
+
+ADD: **hyde_downloader_nwp_gfs.py**
+	- Request of url(s) list to avoid bad http request(s)
 
 FIX: **HYDE_Model_RFarm.py**
     - Minor bugs in bash scripts and python scripts
