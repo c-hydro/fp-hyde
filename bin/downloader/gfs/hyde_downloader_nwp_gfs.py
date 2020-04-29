@@ -715,9 +715,9 @@ def set_data_time(time_step, time_settings):
 
 # -------------------------------------------------------------------------------------
 # Method to check time validity
-def check_time_limit(time_alg, time_name='time_step', time_limit_period='9D'):
+def check_time_limit(time_alg, time_name='time_step', time_limit_period='9D', time_round='D'):
     time_day = pd.Timestamp.today()
-    time_limit_upper = time_day.floor('D')
+    time_limit_upper = time_day.floor(time_round)
     time_limit_lower = pd.date_range(end=time_limit_upper, periods=2, freq=time_limit_period)[0]
 
     if time_alg < time_limit_lower:
@@ -740,6 +740,10 @@ def set_run_time(time_alg, time_settings):
     time_round = time_settings['time_rounding']
     time_period = time_settings['time_period']
 
+    if time_period < 1:
+        time_period = 1
+        logging.warning(' ===> TimePeriod must be greater then zero! TimePeriod set to 1.')
+
     if time_alg and time_set:
         time_now = time_alg
     elif time_alg is None and time_set:
@@ -759,10 +763,12 @@ def set_run_time(time_alg, time_settings):
         logging.warning(' ===> TimePeriod must be greater then 0. TimePeriod is set automatically to 1')
         time_range = pd.DatetimeIndex([time_now_round], freq=time_freq)
 
-    check_time_limit(time_now_round, time_name='time_now')
-    check_time_limit(time_range[0], time_name='time_run_from')
-    check_time_limit(time_range[1], time_name='time_run_to')
-
+    check_time_limit(time_now_round, time_name='time_now', time_round=time_round)
+    check_time_limit(time_range[0], time_name='time_run_from', time_round='H')
+    if time_period > 1:
+        check_time_limit(time_range[1], time_name='time_run_to', time_round='H')
+    else:
+        check_time_limit(time_range[0], time_name='time_run_to', time_round='H')
     return time_now_round, time_range
 
 # -------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
     "flags": {
       "downloading_mp": true,
       "cleaning_dynamic_data_ancillary": false,
-      "cleaning_dynamic_data_global": true,
+      "cleaning_dynamic_data_global": false,
       "cleaning_dynamic_data_domain": true,
       "cleaning_dynamic_data_tmp": false
     },
@@ -177,7 +177,7 @@
   },
   "time": {
     "time_now": null,
-    "time_period": 3,
+    "time_period": 1,
     "time_frequency": "6H",
     "time_rounding": "6H"
   }
