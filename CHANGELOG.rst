@@ -2,6 +2,19 @@
 Changelog
 =========
 
+Version 1.9.5 [2020-05-10]
+**************************
+BIN: **hyde_downloader_satellite_smap.py**
+	- Release for Hyde package
+
+BIN: **hyde_downloader_satellite_persiann_monthly.py**
+	- Release for Hyde package
+
+FIX: **hyde_downloader_satellite_gsmap.py**
+	- Fix a major problem in multiprocessing downloader
+
+FIX: **HYDE_Model_RFarm.py**
+	- Fix the incorrect slope in time estimation
 
 Version 1.9.4 [2020-03-19]
 **************************

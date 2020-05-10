@@ -23,7 +23,7 @@
       "title": "NWP GFS 0.25 degree",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.5.0 [20200313]",
+      "history": "1.6.0 [20200429]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Downloading tool developed by CIMA Research Foundation"
     },

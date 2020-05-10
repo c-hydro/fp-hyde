@@ -1,8 +1,8 @@
 {
   "algorithm":{
     "flags": {
-      "downloading_mp": false,
-      "cleaning_dynamic_data_source": false,
+      "downloading_mp": true,
+      "cleaning_dynamic_data_source": true,
       "cleaning_dynamic_data_ctl": true,
       "cleaning_dynamic_data_ancillary": true,
       "cleaning_dynamic_data_global": true,
@@ -11,7 +11,7 @@
     },
     "ancillary": {
       "domain" : "guyana",
-      "process_mp": 20,
+      "process_mp": 2,
       "type": [
         "gsmap_gauge_now",
         "gsmap_riken_nowcast"

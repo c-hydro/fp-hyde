@@ -20,6 +20,7 @@ if 'nanmean' not in dir(np):
     import scipy.stats
     np.nanmean = scipy.stats.nanmean
 
+
 def fft3d(z):
     '''Calcola i parametri di slope'''
     
@@ -30,10 +31,10 @@ def fft3d(z):
     zf0 = zf
 
     ns_int = int(ns / 2)
-
     zf[ns_int, :, :] = zf0[ns_int, :, :]/2
     zf[:, ns_int, :] = zf0[:, ns_int, :]/2
-    zf[:, :, ns_int] = zf0[:, :, ns_int]/2
+    nt_int = int(nt / 2)
+    zf[:, :, nt_int] = zf0[:, :, nt_int]/2
 
     fs = np.reshape(np.sum(zf,2), (ns,ns), order='F')
     ft = np.reshape(np.sum(np.sum(zf, 0), 0), (nt,1), order='F')
@@ -96,6 +97,7 @@ def fft3d(z):
 
     return fx, fy, ft
 
+
 def fitallslopes(fx, fy, ft, xr, tr):
     '''
     '''    
@@ -113,6 +115,7 @@ def fitallslopes(fx, fy, ft, xr, tr):
     #print(' -----> Slopes: sx=%f sy=%f st=%f'%(sx, sy, st))
     return sx, sy, st
 
+
 def fitslope(fx, ii):
     '''
     '''
@@ -124,6 +127,7 @@ def fitslope(fx, ii):
         s[i] = ss[0]
 
     return s
+
 
 def agg_xyt(zi, nax, nay, nat):
 
@@ -176,7 +180,6 @@ def initmetagauss(sx,st,ns,nt):
     kx = np.tile(kx, (1, 1, nt))
     kx = kx**2 + kx.transpose((1, 0, 2))**2
     kx[0,0,:]=0.000001
-
 
     kt = np.concatenate((np.arange(0, nt/2+1), np.arange(-nt/2+1, 0))).T
     kt = kt.reshape((nt,1)).dot(np.ones((1,ns)))

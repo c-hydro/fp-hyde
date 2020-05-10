@@ -1,0 +1,151 @@
+{
+  "algorithm":{
+    "flags": {
+      "downloading_mp": false,
+      "cleaning_dynamic_data_source": false,
+      "cleaning_dynamic_data_ctl": true,
+      "cleaning_dynamic_data_ancillary": true,
+      "cleaning_dynamic_data_global": true,
+      "cleaning_dynamic_data_domain": true,
+      "cleaning_dynamic_data_tmp": true
+    },
+    "ancillary": {
+      "domain" : "bolivia",
+      "process_mp": 20,
+      "type": "persiannCDR",
+      "cdo_exec": "/home/andrea/fp_apps_system/cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/cdo",
+      "cdo_deps": ["/home/andrea/fp_apps_system/cdo/eccodes2.17.0/lib/"]
+    },
+    "general": {
+      "title": "Satellite Persiann-CDR",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.0.0 [20200313]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Downloading tool developed by CIMA Research Foundation"
+    },
+    "template": {
+      "domain": "string_domain",
+      "ftp_datetime_persiann": "%y%m",
+      "source_sub_path_time_persiann": "%Y/%m/",
+      "source_datetime_persiann": "%y%m",
+      "ancillary_sub_path_time": "%Y/%m/",
+      "ancillary_datetime": "%Y%m",
+      "outcome_sub_path_time": "%Y/%m",
+      "outcome_datetime": "%Y%m",
+      "run_datetime": "%Y%m",
+      "run_lon_right": "string_lr",
+      "run_lon_left": "string_lf",
+      "run_lat_bottom" : "string_lb",
+      "run_lat_top": "string_lt"
+    }
+  },
+  "data": {
+    "static": {
+      "bounding_box": {
+        "lon_right": -65,
+        "lon_left": -55,
+        "lat_bottom": 0,
+        "lat_top": 10
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_forecast_period": 0,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 1,
+        "time_observed_frequency": "M",
+        "time_rounding": "M"
+      },
+      "ftp": {
+        "ftp_root": [
+          "ftp://persiann.eng.uci.edu"
+        ],
+        "ftp_folder": [
+          "/CHRSdata/PERSIANN-CDR/mthly/"
+        ],
+        "ftp_file" : [
+          "aB1_m{ftp_datetime_persiann}.bin.gz"
+          ]
+      },
+      "source": {
+        "filename": [
+          "aB1_m{source_datetime_persiann}.bin.gz"
+        ],
+        "folder": [
+          "/home/andrea/Desktop/test/source/persiannCDR/{source_sub_path_time_persiann}"
+        ]
+      },
+      "ancillary": {
+        "global" : {
+          "filename": [
+            "persiann_{ancillary_datetime}.bin.gz"
+          ],
+            "folder": [
+              "/home/andrea/Desktop/test/ancillary/persiannCDR/{ancillary_sub_path_time}"
+            ]
+        },
+        "ctl" : {
+          "filename": [
+            "persiann_{ancillary_datetime}.ctl"
+          ],
+          "folder": [
+            "/home/andrea/Desktop/test/ancillary/persiannCDR/{ancillary_sub_path_time}"
+          ],
+          "template" : [
+            {
+              "line_01":  "* GrADS control file for Persiann-CDR",
+              "line_02":  "DSET   {dset}",
+              "line_03":  "TITLE  Persiann-CDR (1 month)",
+              "line_04":  "OPTIONS YREV LITTLE_ENDIAN TEMPLATE",
+              "line_05":  "UNDEF  -9999",
+              "line_06":  "XDEF   1440 LINEAR 0.125 0.25",
+              "line_07":  "YDEF   480 LINEAR -59.875 0.25",
+              "line_08":  "ZDEF     01 LEVELS 1",
+              "line_09":  "TDEF   1 LINEAR {tdef} 1hr",
+              "line_10":  "VARS    1",
+              "line_11":  "precip  0 99 Monthly rainfall [mm]",
+              "line_12":  "ENDVARS"
+            }
+          ]
+        }
+      },
+      "outcome": {
+        "global": {
+          "filename": [
+            "persiannCDR_{outcome_datetime}.nc"
+          ],
+          "folder": [
+            "/home/andrea/Desktop/test/outcome/persiannCDR/{outcome_sub_path_time}"
+          ]
+        },
+        "domain" : {
+          "filename": [
+            "{domain}_persiannCDR_{outcome_datetime}.nc"
+          ],
+          "folder": [
+            "/home/andrea/Desktop/test/outcome/persiannCDR/{outcome_sub_path_time}"
+          ]
+        }
+      }
+    },
+    "log": {
+        "filename": "hyde_downloader_satellite_persiannCDR_log.txt",
+        "folder": "/home/andrea/Desktop/test/log/persiannCDR/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_period": 12,
+    "time_frequency": "M",
+    "time_rounding": "M"
+  }
+}
