@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 """
-HyDE Downloading Tool - SATELLITE SMAP NSIDC Data Download Script
+HyDE Downloading Tool - SATELLITE SMAP (modified and extended NSIDC Data Download Script)
 
-__date__ = '20200504'
-__version__ = '1.0.0'
+__date__ = '20200511'
+__version__ = '1.0.1'
 __author__ =
-        'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
-        'Alessandro Masoero (alessandro.masoero@cimafoundation.org',
-        'Laura Poletti (laura.poletti@cimafoundation.org',
+        'Andrea Libertino (andrea.libertino@cimafoundation.org',
+
 __library__ = 'HyDE'
 
 If you wish, you may store your Earthdata username/password in a .netrc
@@ -21,6 +20,7 @@ General command line:
 python3 hyde_downloader_satellite_smap.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
+20200511 (1.0.1) --> Add multiprocessing mode and cleaning procedure(s) for ancillary and source file(s)
 20200504 (1.0.0) --> Beta release
 """
 
@@ -40,6 +40,7 @@ import sys
 import pandas as pd
 import numpy as np
 
+from multiprocessing import Pool, cpu_count
 from contextlib import contextmanager
 from argparse import ArgumentParser
 from copy import deepcopy
@@ -110,6 +111,7 @@ def build_version_query_params(version):
     return query_params
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Method to build query url
 def build_cmr_query_url(short_name, version, time_start, time_end,
@@ -130,14 +132,104 @@ def build_cmr_query_url(short_name, version, time_start, time_end,
 
 
 # -------------------------------------------------------------------------------------
-# Method to download url(s)
-def cmr_download(urls, dests):
+# Method to execute url request
+def cmr_request(data_list):
+
+    src_data = data_list[0]
+    dest_data = data_list[1]
+    credentials = data_list[2]
+
+    file_name = os.path.split(dest_data)[1]
+
+    logging.info(' -----> Downloading ' + src_data + ' :: ' + file_name + ' ... ')
+
+    if not os.path.exists(dest_data):
+        try:
+            req = Request(src_data)
+            if credentials:
+                req.add_header('Authorization', 'Basic {0}'.format(credentials))
+            opener = build_opener(HTTPCookieProcessor())
+            data = opener.open(req).read()
+            open(dest_data, 'wb').write(data)
+
+            logging.info(' -----> Downloading ' + src_data + ' :: ' + file_name + ' ... DONE')
+
+        except HTTPError as e:
+            logging.info(' -----> Downloading ' + src_data + ' :: ' + file_name + ' ... FAILED')
+            logging.error(' ===> HTTP error {0}, {1}'.format(e.code, e.reason))
+
+        except URLError as e:
+            logging.info(' -----> Downloading ' + src_data + ' :: ' + file_name + ' ... FAILED')
+            logging.error(' ===> URL error: {0}'.format(e.reason))
+        except IOError:
+            raise
+        except KeyboardInterrupt:
+            quit()
+    else:
+        logging.info(' -----> Downloading ' + src_data + ' :: ' + file_name + ' ... SKIPPED. PREVIOUSLY DONE')
+
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to download url(s) in multiprocessing mode
+def cmr_download_mp(urls, dests, process_n=4, process_max=None):
+
+    if not urls:
+        return
+
+    if process_max is None:
+        process_max = cpu_count() - 1
+    if process_n > process_max:
+        logging.warning(' ===> Maximum of recommended processes must be less then ' + str(process_max))
+        logging.warning(' ===> Set number of process from ' + str(process_n) + ' to ' + str(process_max))
+        process_n = process_max
+
+    url_count = len(urls)
+    logging.info(' ----> Transferring {0} files in multiprocessing mode ... '.format(url_count))
+    credentials = None
+
+    dest_file_list = list(dests.values())
+
+    logging.info(' -----> Preparing files ... ')
+    request_list = []
+    for index, (url, dest_file) in enumerate(zip(urls, dest_file_list), start=1):
+        path_name, file_name = os.path.split(dest_file)
+        make_folder(path_name)
+
+        if not credentials and urlparse(url).scheme == 'https':
+            credentials = get_credentials(url)
+
+        if not os.path.exists(dest_file):
+            request_list.append([url, dest_file, credentials])
+
+    logging.info(' -----> Preparing files ... DONE')
+
+    logging.info(' -----> Pooling requests ... ')
+    response_list = []
+    if request_list:
+        with Pool(processes=process_n, maxtasksperchild=1) as process_pool:
+            src_response = process_pool.map(cmr_request, request_list, chunksize=1)
+            process_pool.close()
+            process_pool.join()
+            response_list.append(src_response)
+        logging.info(' -----> Pooling requests ... DONE')
+    else:
+        logging.info(' -----> Pooling requests ... SKIPPED. PREVIOUSLY DONE')
+
+    logging.info(' ----> Transferring {0} files in multiprocessing mode ... DONE'.format(url_count))
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to download url(s) in sequential mode
+def cmr_download_seq(urls, dests):
 
     if not urls:
         return
 
     url_count = len(urls)
-    logging.info(' ----> Downloading {0} files ... '.format(url_count))
+    logging.info(' ----> Transferring {0} files in sequential mode ... '.format(url_count))
     credentials = None
 
     dest_file_list = list(dests.values())
@@ -149,42 +241,15 @@ def cmr_download(urls, dests):
         logging.info(' -----> {0}/{1}: {2} ... '.format(str(index).zfill(len(str(url_count))), url_count, file_name))
 
         if not os.path.exists(dest_file):
-
             if not credentials and urlparse(url).scheme == 'https':
                 credentials = get_credentials(url)
-
-            try:
-                # In Python 3 we could eliminate the opener and just do 2 lines:
-                # resp = requests.get(url, auth=(username, password))
-                # open(filename, 'wb').write(resp.content)
-                req = Request(url)
-                if credentials:
-                    req.add_header('Authorization', 'Basic {0}'.format(credentials))
-                opener = build_opener(HTTPCookieProcessor())
-                data = opener.open(req).read()
-                open(dest_file, 'wb').write(data)
-
-                logging.info(
-                    ' -----> {0}/{1}: {2} ... DONE'.format(str(index).zfill(len(str(url_count))), url_count, file_name))
-
-            except HTTPError as e:
-                logging.info(
-                    ' -----> {0}/{1}: {2} ... FAILED'.format(str(index).zfill(len(str(url_count))), url_count, file_name))
-                logging.error(' ===> HTTP error {0}, {1}'.format(e.code, e.reason))
-            except URLError as e:
-                logging.info(
-                    ' -----> {0}/{1}: {2} ... FAILED'.format(str(index).zfill(len(str(url_count))), url_count, file_name))
-                logging.error(' ===> URL error: {0}'.format(e.reason))
-            except IOError:
-                raise
-            except KeyboardInterrupt:
-                quit()
+            cmr_request([url, dest_file, credentials])
         else:
             logging.info(
                 ' -----> {0}/{1}: {2} ... SKIPPED. PREVIOUSLY DONE'.format(str(index).zfill(len(str(url_count))),
                                                                            url_count, file_name))
 
-    logging.info(' ----> Downloading {0} files ... DONE'.format(url_count))
+    logging.info(' ----> Transferring {0} files in sequential mode ... DONE'.format(url_count))
 # -------------------------------------------------------------------------------------
 
 
@@ -353,7 +418,6 @@ def main():
                                                                            urs_url_list, cmr_page_size_list,
                                                                            url_filename_search_list, cmr_file_url_list,
                                                                            polygon_list, filename_filter_list)):
-
             # Retrieve url(s)
             if not url_filename_search_step:
                 url_filename_search_step = cmr_search(
@@ -369,7 +433,8 @@ def main():
                 variable_obj=template_vars_data_list,
                 root_obj=template_root_list,
                 ancillary_obj=data_settings['algorithm']['ancillary'],
-                template_obj=data_settings['algorithm']['template'])
+                template_obj=data_settings['algorithm']['template'],
+                flag_cleaning_source=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'])
 
             # Prepare ancillary filename(s)
             filename_obj_ancillary_global, filename_obj_ancillary_domain = set_data_ancillary(
@@ -377,17 +442,25 @@ def main():
                 file_obj=data_settings['data']['dynamic']['ancillary'],
                 variable_obj=template_vars_data_list,
                 ancillary_obj=data_settings['algorithm']['ancillary'],
-                template_obj=data_settings['algorithm']['template'])
+                template_obj=data_settings['algorithm']['template'],
+                flag_cleaning_ancillary_global=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary_global'],
+                flag_cleaning_ancillary_domain=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary_domain'])
 
             # Prepare outcome filename(s)
-            filename_obj_outcome = set_data_outcome(time_stamp, file_id,
+            filename_obj_outcome = set_data_outcome(
+                time_stamp, file_id,
                 file_obj=data_settings['data']['dynamic']['outcome'],
                 variable_obj=template_vars_data_list,
                 ancillary_obj=data_settings['algorithm']['ancillary'],
-                template_obj=data_settings['algorithm']['template'])
+                template_obj=data_settings['algorithm']['template'],
+                flag_cleaning_outcome=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary_global'])
 
             # Download file(s)
-            cmr_download(filename_list_url, filename_obj_source)
+            if data_settings['algorithm']['flags']['downloading_mp']:
+                cmr_download_mp(filename_list_url, filename_obj_source,
+                                process_n=data_settings['algorithm']['ancillary']['process_mp'])
+            else:
+                cmr_download_seq(filename_list_url, filename_obj_source)
             
             # Process file(s)
             process_cmr(filename_obj_source, fileroot_obj_source,
@@ -396,6 +469,11 @@ def main():
                         geo_proj, geo_geotrans, geo_data,
                         geo_wide, geo_high, geo_min_x, geo_max_y, geo_max_x, geo_min_y,
                         geo_mask_idx, template_vars_data_list)
+
+            # Clean files source and ancillary (if needed)
+            clean_data_tmp(filename_obj_source, filename_obj_ancillary_global, filename_obj_ancillary_domain,
+                           flag_cleaning_source=data_settings['algorithm']['flags']['cleaning_dynamic_source'],
+                           flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
 
         # Ending info
         logging.info(' ---> TIME STEP: ' + str(time_run_step) + ' ... DONE')
@@ -414,6 +492,27 @@ def main():
     logging.info(' ============================================================================ ')
     # -------------------------------------------------------------------------------------
 
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to clean tmp data such as ancillary or global (if domain is set)
+def clean_data_tmp(filename_obj_source, filename_obj_ancillary_global, filename_obj_ancillary_domain,
+                   flag_cleaning_source=False, flag_cleaning_tmp=False):
+    if flag_cleaning_source:
+        for data_key, data_value in filename_obj_source.items():
+            for data_step in data_value:
+                if os.path.exists(data_step):
+                    os.remove(data_step)
+    if flag_cleaning_tmp:
+        for data_key, data_value in filename_obj_ancillary_global.items():
+            for data_step in data_value:
+                if os.path.exists(data_step):
+                    os.remove(data_step)
+        for data_key, data_value in filename_obj_ancillary_domain.items():
+            for data_step in data_value:
+                if os.path.exists(data_step):
+                    os.remove(data_step)
 # -------------------------------------------------------------------------------------
 
 
@@ -480,7 +579,7 @@ def process_cmr(filename_obj_source, fileroot_obj_source,
 # -------------------------------------------------------------------------------------
 # Method to create data outcome list
 def set_data_outcome(time_stamp_list, file_id, variable_obj=None, file_obj=None,
-                       ancillary_obj=None, template_obj=None):
+                       ancillary_obj=None, template_obj=None, flag_cleaning_outcome=False):
 
     folder_raw = file_obj['folder'][file_id]
     filename_raw = file_obj['filename'][file_id]
@@ -504,6 +603,10 @@ def set_data_outcome(time_stamp_list, file_id, variable_obj=None, file_obj=None,
             filename_step = fill_tags2string(filename_raw, template_obj, template_values)
             path_step = os.path.join(folder_step, filename_step)
 
+            if flag_cleaning_outcome:
+                if os.path.exists(path_step):
+                    os.remove(path_step)
+
             var_list.append(path_step)
 
         filename_list[time_stamp] = var_list
@@ -515,7 +618,8 @@ def set_data_outcome(time_stamp_list, file_id, variable_obj=None, file_obj=None,
 # -------------------------------------------------------------------------------------
 # Method to create data ancillary list
 def set_data_ancillary(time_stamp_list, file_id, variable_obj=None, file_obj=None,
-                       ancillary_obj=None, template_obj=None):
+                       ancillary_obj=None, template_obj=None,
+                       flag_cleaning_ancillary_global=False, flag_cleaning_ancillary_domain=False):
 
     folder_global_raw = file_obj['global']['folder'][file_id]
     filename_global_raw = file_obj['global']['filename'][file_id]
@@ -547,6 +651,13 @@ def set_data_ancillary(time_stamp_list, file_id, variable_obj=None, file_obj=Non
             filename_domain_step = fill_tags2string(filename_domain_raw, template_obj, template_values)
             path_domain_step = os.path.join(folder_domain_step, filename_domain_step)
 
+            if flag_cleaning_ancillary_global:
+                if os.path.exists(path_global_step):
+                    os.remove(path_global_step)
+            if flag_cleaning_ancillary_domain:
+                if os.path.exists(path_domain_step):
+                    os.remove(path_domain_step)
+
             var_global_list.append(path_global_step)
             var_domain_list.append(path_domain_step)
 
@@ -561,7 +672,7 @@ def set_data_ancillary(time_stamp_list, file_id, variable_obj=None, file_obj=Non
 # Method to create data source list
 def set_data_source(file_id, filename_url,
                     file_obj=None, variable_obj=None, root_obj=None, ancillary_obj=None, template_obj=None,
-                    filename_suffix='.h5'):
+                    filename_suffix='.h5', flag_cleaning_source=False):
 
     if not isinstance(filename_url, list):
         filename_url = [filename_url]
@@ -594,6 +705,10 @@ def set_data_source(file_id, filename_url,
             filename_step = fill_tags2string(filename_raw, template_obj, template_values)
 
             path_step = os.path.join(folder_step, filename_step)
+
+            if flag_cleaning_source:
+                if os.path.exists(path_step):
+                    os.remove(path_step)
 
             time_stamp_list.append(time_stamp)
             filename_list_url.append(filename_url_step)
