@@ -1,27 +1,28 @@
 {
   "algorithm":{
     "flags": {
-      "downloading_mp": true,
+      "downloading_mp": false,
       "cleaning_dynamic_data_source": false,
-      "cleaning_dynamic_data_ancillary_global": true,
-      "cleaning_dynamic_data_ancillary_domain": true,
-      "cleaning_dynamic_data_outcome": true,
-      "cleaning_dynamic_data_tmp": true
+      "cleaning_dynamic_data_ancillary_global": false,
+      "cleaning_dynamic_data_ancillary_domain": false,
+      "cleaning_dynamic_data_outcome": false,
+      "cleaning_dynamic_data_tmp": false
     },
     "ancillary": {
       "domain" : "bolivia",
-      "process_mp": 20
+      "process_mp": 4
     },
     "general": {
       "title": "Satellite SMAP",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.0.1 [20200511]",
+      "history": "1.0.2 [20200511]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Downloading tool developed by CIMA Research Foundation"
     },
     "template": {
       "var_name": "string_variable",
+      "group_name": "string_group",
       "file_name": "string_filename",
       "domain": "string_domain",
       "source_sub_path_time": "%Y/%m/%d/",
@@ -39,8 +40,13 @@
     "template_root": ["HDF5:{file_name}://Geophysical_Data/{var_name}"],
     "template_vars_data": [
       ["sm_rootzone", "sm_rootzone_wetness",
-        "land_evapotranspiration_flux", "land_fraction_snow_covered",
-        "snow_depth", "snow_mass"]
+        "land_evapotranspiration_flux",
+        "land_fraction_snow_covered", "snow_depth", "snow_mass"]
+    ],
+    "template_group_data": [
+      ["soil_moisture", "soil_moisture",
+        "evapotranspiration",
+        "snow", "snow", "snow"]
     ]
   },
   "data": {
@@ -91,7 +97,7 @@
       },
       "outcome": {
         "filename": ["smap_{outcome_datetime}_{var_name}_{domain}.tiff"],
-        "folder": ["/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/satellite_smap/{outcome_sub_path_time}"]
+        "folder": ["/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/satellite_smap/{group_name}/{outcome_sub_path_time}"]
       }
     },
     "log": {
@@ -109,7 +115,7 @@
   },
   "time": {
     "time_now": null,
-    "time_period": 1,
+    "time_period": 24,
     "time_frequency": "D",
     "time_rounding": "3H"
   }

@@ -3,7 +3,7 @@
 HyDE Downloading Tool - SATELLITE SMAP (modified and extended NSIDC Data Download Script)
 
 __date__ = '20200511'
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __author__ =
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -20,7 +20,8 @@ General command line:
 python3 hyde_downloader_satellite_smap.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
-20200511 (1.0.1) --> Add multiprocessing mode and cleaning procedure(s) for ancillary and source file(s)
+20200511 (1.0.2) --> Fix bugs 
+20200510 (1.0.1) --> Add multiprocessing mode and cleaning procedure(s) for ancillary and source file(s)
 20200504 (1.0.0) --> Beta release
 """
 
@@ -55,8 +56,8 @@ from urllib.error import HTTPError, URLError
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - SATELLITE SMAP'
-alg_version = '1.0.0'
-alg_release = '2020-05-04'
+alg_version = '1.0.2'
+alg_release = '2020-05-11'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -395,7 +396,7 @@ def main():
     logging.info(' --> TIME RUN: ' + str(time_run))
 
     # Iterate over time steps
-    for time_run_step in time_run_range:
+    for time_run_step in time_run_range[1:]:
 
         # Starting info
         logging.info(' ---> TIME STEP: ' + str(time_run_step) + ' ... ')
@@ -404,7 +405,7 @@ def main():
         time_range, time_start, time_end = set_data_time(time_run_step, data_settings['data']['dynamic']['time'])
 
         # Collect product information
-        short_name_list, version_list, template_root_list, template_vars_data_list, \
+        short_name_list, version_list, template_root_list, template_vars_data_list, template_group_data_list, \
             bounding_box, cmr_url_list, urs_url_list, cmr_page_size_list, \
             url_filename_search_list, cmr_file_url_list, \
             polygon_list, filename_filter_list = collect_product_info(
@@ -451,6 +452,7 @@ def main():
                 time_stamp, file_id,
                 file_obj=data_settings['data']['dynamic']['outcome'],
                 variable_obj=template_vars_data_list,
+                group_obj=template_group_data_list,
                 ancillary_obj=data_settings['algorithm']['ancillary'],
                 template_obj=data_settings['algorithm']['template'],
                 flag_cleaning_outcome=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary_global'])
@@ -472,7 +474,7 @@ def main():
 
             # Clean files source and ancillary (if needed)
             clean_data_tmp(filename_obj_source, filename_obj_ancillary_global, filename_obj_ancillary_domain,
-                           flag_cleaning_source=data_settings['algorithm']['flags']['cleaning_dynamic_source'],
+                           flag_cleaning_source=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'],
                            flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
 
         # Ending info
@@ -525,11 +527,14 @@ def process_cmr(filename_obj_source, fileroot_obj_source,
                 geo_wide, geo_high, geo_min_x, geo_max_y, geo_max_x, geo_min_y,
                 geo_mask_idx, template_vars_data_list):
 
+    filename_n = filename_obj_source.__len__()
+    template_vars_data_obj = template_vars_data_list * filename_n
+
     for (fn_source_time, fp_source), fr_source_list, fp_anc_global_list, fp_anc_domain_list, \
         fp_outcome_list, var_list in zip(
             filename_obj_source.items(), fileroot_obj_source.values(),
             filename_obj_ancillary_global.values(), filename_obj_ancillary_domain.values(),
-            filename_obj_outcome.values(), template_vars_data_list):
+            filename_obj_outcome.values(), template_vars_data_obj):
 
         ff_source, fn_source = os.path.split(fp_source)
         logging.info(' ----> Process file: ' + fn_source + ' ... ')
@@ -549,6 +554,7 @@ def process_cmr(filename_obj_source, fileroot_obj_source,
             make_folder(ff_outcome_step)
 
             # Translate global data from hdf5 to tiff in epsg:6933 modified
+            logging.info(' ------> Translating and reproiecting ... ')
             gdal.Translate(fp_anc_global_step, fr_source_step,
                            outputSRS="+proj=cea +lon_0=0 +lat_ts=30 +ellps=WGS84 +units=m",
                            format='GTiff', outputBounds=[-17367530.45, 7314540.76, 17367530.45, -7314540.76],
@@ -556,17 +562,22 @@ def process_cmr(filename_obj_source, fileroot_obj_source,
             # Reproject from global tiff file in epsg:6933 modified to domain tiff file in epsg:4326
             reproject_file_tiff(fp_anc_global_step, fp_anc_domain_step,
                                 geo_wide, geo_high, geo_geotrans, geo_proj)
-            # Read domain tiff file in epsg:4326
-            smap_domain_dset, smap_domain_proj, smap_domain_geotrans, smap_domain_data = read_file_tiff(fp_anc_domain_step)
+            logging.info(' ------> Translating and reproiecting ... DONE')
 
+            # Read domain tiff file in epsg:4326
+            logging.info(' ------> Masking over domain ... ')
+            smap_domain_dset, smap_domain_proj, smap_domain_geotrans, smap_domain_data = read_file_tiff(fp_anc_domain_step)
             # Mask domain tiff file in epsg:4326
             smap_domain_dims = smap_domain_data.shape
             smap_domain_masked_1d = deepcopy(smap_domain_data.ravel())
             smap_domain_masked_1d[geo_mask_idx] = np.nan
             smap_domain_masked_2d = np.reshape(smap_domain_masked_1d, [smap_domain_dims[0], smap_domain_dims[1]])
+            logging.info(' ------> Masking over domain ... DONE')
 
             # Write domain tiff file in epsg:4326
+            logging.info(' ------> Saving ' + fp_outcome_step + ' ... ')
             write_file_tiff(fp_outcome_step, smap_domain_masked_2d, geo_wide, geo_high, geo_geotrans, geo_proj)
+            logging.info(' ------> Saving ' + fp_outcome_step + ' ... DONE')
 
             # Info
             logging.info(' -----> Process variable: ' + var_step + ' ... DONE')
@@ -578,12 +589,13 @@ def process_cmr(filename_obj_source, fileroot_obj_source,
 
 # -------------------------------------------------------------------------------------
 # Method to create data outcome list
-def set_data_outcome(time_stamp_list, file_id, variable_obj=None, file_obj=None,
+def set_data_outcome(time_stamp_list, file_id, variable_obj=None, group_obj=None, file_obj=None,
                        ancillary_obj=None, template_obj=None, flag_cleaning_outcome=False):
 
     folder_raw = file_obj['folder'][file_id]
     filename_raw = file_obj['filename'][file_id]
 
+    group_list = group_obj[file_id]
     variable_list = variable_obj[file_id]
     domain = ancillary_obj['domain']
 
@@ -591,11 +603,12 @@ def set_data_outcome(time_stamp_list, file_id, variable_obj=None, file_obj=None,
     for time_stamp in time_stamp_list:
 
         var_list = []
-        for variable in variable_list:
+        for variable, group in zip(variable_list, group_list):
 
             time_step = time_stamp.to_pydatetime()
             template_values = {"domain": domain,
                                "var_name": variable,
+                               "group_name": group,
                                "outcome_sub_path_time": time_step,
                                "outcome_datetime": time_step}
 
@@ -788,6 +801,7 @@ def collect_product_info(info_product=None, info_bbox=None, info_url=None):
     pr_version = info_product['version']
     pr_template_root = info_product['template_root']
     pr_template_vars_data = info_product['template_vars_data']
+    pr_template_group_data = info_product['template_group_data']
 
     pr_bbox_lon_right = info_bbox['lon_right']
     pr_bbox_lon_left = info_bbox['lon_left']
@@ -806,7 +820,7 @@ def collect_product_info(info_product=None, info_bbox=None, info_url=None):
     pr_bbox_tmp = [str(pr_bbox_lon_right), str(pr_bbox_lat_bottom), str(pr_bbox_lon_left), str(pr_bbox_lat_top)]
     pr_bbox_ref = ','.join(pr_bbox_tmp)
 
-    return pr_short_name, pr_version, pr_template_root, pr_template_vars_data,\
+    return pr_short_name, pr_version, pr_template_root, pr_template_vars_data, pr_template_group_data, \
         pr_bbox_ref, \
         pr_cmr_url, pr_urs_url, pr_cmr_page_size, pr_url_list, pr_cmr_file_url, pr_polygon, pr_filename_filter
 
