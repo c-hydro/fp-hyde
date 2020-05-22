@@ -2,8 +2,14 @@
 Changelog
 =========
 
-Version 1.9.5 [2020-05-10]
+Version 1.9.5 [2020-05-22]
 **************************
+APP: **HYDE_DynamicData_DroughtIndex_SSPI.py**
+	- Release for Hyde package
+
+APP: **HYDE_DynamicData_DroughtIndex_SWDI.py**
+	- Release for Hyde package
+
 BIN: **hyde_downloader_satellite_smap.py**
 	- Release for Hyde package
 

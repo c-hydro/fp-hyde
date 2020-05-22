@@ -13,7 +13,7 @@
       "process_mp": 4
     },
     "general": {
-      "title": "Satellite SMAP",
+      "title": "Satellite SMAP - Downloading tool",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
       "history": "1.0.2 [20200511]",
