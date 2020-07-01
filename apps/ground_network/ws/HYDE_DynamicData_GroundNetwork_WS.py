@@ -10,6 +10,7 @@ General command line:
 python3 HYDE_DynamicData_GroundNetwork_WS.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
+20200625 (2.5.1) --> Update code(s) for LEXIS project
 20180914 (2.5.0) --> Beta release for HyDE library
 20150925 (2.0.7) --> Latest release used in operational chain(s)
 20150325 (2.0.0) --> Release 2.0
@@ -70,7 +71,7 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
-    sProgramVersion = '2.5.0'
+    sProgramVersion = '2.5.1'
     sProjectName = 'HyDE'
     sAlgType = 'DataDynamic'
     sAlgName = 'GROUND NETWORK PROCESSING TOOL WS'

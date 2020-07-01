@@ -6,7 +6,7 @@
       "cleaning_dynamic_data_ancillary_global": false,
       "cleaning_dynamic_data_ancillary_domain": false,
       "cleaning_dynamic_data_outcome": false,
-      "cleaning_dynamic_data_tmp": false
+      "cleaning_dynamic_data_tmp": true
     },
     "ancillary": {
       "domain" : "bolivia",

@@ -9,7 +9,6 @@ Version:       '2.0.7'
 #######################################################################################
 # Library
 import logging
-import execnet
 import os
 import time
 import subprocess
@@ -36,24 +35,6 @@ def makeProcess(file):
     chmod(file, mode)
 # -------------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------------------
-# Method to wrap process with different python interpreter
-def wrapProcess(Module, Function, ArgumentList, Version='2.7'):
-
-    gw = execnet.makegateway("popen//python=python%s" % Version)
-    channel = gw.remote_exec("""
-        from %s import %s as the_function
-        channel.send(the_function(*channel.receive()))
-    """ % (Module, Function))
-
-    try:
-        channel.send(ArgumentList)
-    except BaseException:
-        print('ciao')
-
-    return channel.receive()
-
-# -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
 # Method to check process

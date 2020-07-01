@@ -55,7 +55,8 @@ class DriverData:
 
         self.time_run, n_steps, hour_steps, mins_steps = self.select_time_step()
 
-        self.time_period, self.time_first, self.time_last = self.select_time_period(n_steps, hour_steps, mins_steps)
+        self.time_period, self.time_first, self.time_last, self.time_save = self.select_time_period(n_steps, hour_steps,
+                                                                                                    mins_steps)
 
         self.n_threshold = 0.9
         self.file_src = self.search_filename()
@@ -149,7 +150,9 @@ class DriverData:
 
             time_range_dict[self.month_n_tag.format(month_ref)] = time_range
 
-        return time_range_dict, time_first, time_last
+        time_save = time_to
+
+        return time_range_dict, time_first, time_last, time_save
 
     def search_filename(self):
 
@@ -275,7 +278,10 @@ class DriverData:
                 values_ref = list(ws_obj[self.month_n_tag.format(month_n_id)].values())[0]
                 values_ref = np.float32(values_ref)
 
-                template_values = {"month_reference": str(month_ref), "month_period": str(month_n_id)}
+                month_n_id_str = '{:02d}'.format(month_n_id)
+                month_ref_str = '{:02d}'.format(month_ref)
+
+                template_values = {"month_reference": month_ref_str, "month_period": month_n_id_str}
 
                 folder_name_stats_def = fill_tags2string(folder_name_stats_raw, self.template_tags, template_values)
                 file_name_stats_def = fill_tags2string(file_name_stats_raw, self.template_tags, template_values)
@@ -320,7 +326,7 @@ class DriverData:
 
         logging.info(' ---> Writing results ... ')
 
-        time_dump = self.time_last.ceil('D')
+        time_dump = self.time_save
 
         folder_name_dest_raw = self.folder_name_dest
         file_name_dest_raw = self.file_name_dest
@@ -328,14 +334,19 @@ class DriverData:
         data_high, data_wide = self.data_geo[self.geo_values_tag].values.shape
         var_name = self.drought_index_tag
 
+        month_data = None
         for month_ref, time_data, var_data in zip(self.month_n_ref, time_obj.values(), analysis_obj.values()):
 
-            month_data = time_data.month
+            if month_data is None:
+                month_data = time_data.month
+
+            month_data_str = '{:02d}'.format(month_data)
+            month_ref_str = '{:02d}'.format(month_ref)
 
             metadata_list = [{'description_field': var_name}]
             analysis_list = [var_data]
 
-            template_values = {"month_reference": str(month_data), "month_period": str(month_ref),
+            template_values = {"month_reference": month_data_str, "month_period": month_ref_str,
                                "outcome_sub_path_time": time_dump, "outcome_datetime": time_dump}
 
             folder_name_dest_def = fill_tags2string(folder_name_dest_raw, self.template_tags, template_values)

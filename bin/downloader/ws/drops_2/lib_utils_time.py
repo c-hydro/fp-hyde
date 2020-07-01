@@ -1,6 +1,9 @@
 # -------------------------------------------------------------------------------------
 # Libraries
 import logging
+
+import pandas as pd
+
 from datetime import date
 # -------------------------------------------------------------------------------------
 
@@ -28,11 +31,8 @@ def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:$M
 
     logging.info(' ---> Set time run ... DONE')
 
-    time_exec = deepcopy(time_run)
-
     time_tmp = pd.Timestamp(time_run)
     time_run = time_tmp.floor(time_rounding)
-    time_exec = pd.Timestamp(time_exec)
 
     if time_period > 0:
         time_range = pd.date_range(end=time_run, periods=time_period, freq=time_frequency)
@@ -43,5 +43,5 @@ def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:$M
     if time_reverse:
         time_range = time_range[::-1]
 
-    return time_run, time_exec, time_range
+    return time_run, time_range
 # -------------------------------------------------------------------------------------

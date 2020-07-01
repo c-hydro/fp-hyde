@@ -111,6 +111,11 @@ class Drv_Data_IO:
             sFileType = 'shp'
             self.oFileWorkspace = FileShape(sFilePath, sFileName, sFileType, sFileMode)
 
+        elif sFileName.endswith('json'):
+
+            sFileType = 'json'
+            self.oFileWorkspace = FileShape(sFilePath, sFileName, sFileType, sFileMode)
+
         else:
             sFileType = 'unknown'
             self.oFileWorkspace = FileUnknown(sFilePath, sFileName, sFileType, sFileMode)
@@ -384,6 +389,39 @@ class FileCSV:
     # Method to set library I/O function(s)
     def setFileLibIO(self):
         import src.common.io.lib_data_io_csv as file_library
+        self.oFileLibrary = file_library
+
+    # --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# Class to manage json file
+class FileJSON:
+
+    # --------------------------------------------------------------------------------
+    # Class variables
+    oFileLibrary = None
+    # --------------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------------
+    # Class init
+    def __init__(self, sFilePath, sFileName, sFileType, sFileMode):
+        # Common variable(s)
+        self.sFilePath = sFilePath
+        self.sFileName = sFileName
+        self.sFileType = sFileType
+        self.sFileMode = sFileMode
+
+        # Set library IO
+        self.setFileLibIO()
+
+    # --------------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------------
+    # Method to set library I/O function(s)
+    def setFileLibIO(self):
+        import src.common.io.lib_data_io_shapefile as file_library
         self.oFileLibrary = file_library
 
     # --------------------------------------------------------------------------------

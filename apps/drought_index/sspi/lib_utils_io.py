@@ -60,7 +60,6 @@ def write_file_tif(file_name, file_data, file_wide, file_high, file_geotrans, fi
 # Method to read file tif
 def read_file_tif(file_name, file_bands=1):
 
-
     file_handle = rasterio.open(file_name)
     file_proj = file_handle.crs.wkt
     file_geotrans = file_handle.transform

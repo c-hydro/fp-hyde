@@ -1,0 +1,124 @@
+{
+  "flags": {
+    "update_static_data": false,
+    "update_dynamic_data_source": false,
+    "update_dynamic_data_destination": false
+  },
+  "ancillary": {
+    "domain": "italy"
+  },
+  "template": {
+    "domain_name": "string_domain",
+    "source_var_name": "string_var_source",
+    "destination_var_name": "string_var_destination",
+    "source_registry_datetime": "%Y%m%d%H%M",
+    "source_registry_sub_path_time": "%Y/%m/%d/",
+    "source_datasets_datetime": "%Y%m%d%H%M",
+    "source_datasets_sub_path_time": "%Y/%m/%d/",
+    "destination_datetime": "%Y%m%d%H%M",
+    "destination_sub_path_time": "%Y/%m/%d/"
+  },
+  "time": {
+    "time_now": null,
+    "time_period": 5,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "data":{
+    "static": {
+      "land": {
+        "folder_name": "/home/fp/fp_mount/datasets_hyde/static/",
+        "file_name": "marche.dem.txt"
+      }
+    },
+    "dynamic": {
+      "source": {
+        "registry": {
+          "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic/obs/raw/",
+          "file_name": "anag-{source_var_name}.json"
+        },
+        "datasets": {
+          "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic/obs/raw/",
+          "file_name": "{source_var_name}.json"
+        }
+      },
+      "destination": {
+        "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic/obs/processed/",
+        "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
+        "fields": ["longitude", "latitude", "data", "time_start", "time_end", "units", "name", "altitude", "code"]
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/fp/fp_logs/",
+    "file_name": "hyde_downloader_drops_ws_log.txt",
+    "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+  },
+  "variable": {
+    "rain": {
+      "download": true,
+      "name": "Rain",
+      "sensor": "Raingauge",
+      "units": "mm",
+      "tag": "PLUVIOMETRO",
+      "scale_factor": 1
+    },
+    "air_temperature": {
+      "download": true,
+      "name": "AirTemperature",
+      "sensor": "Thermometer",
+      "units": "C",
+      "tag": "TERMOMETRO",
+      "scale_factor": 1
+    },
+    "radiation": {
+      "download": false,
+      "name": "IncomingRadiation",
+      "sensor": "RadiationSensor",
+      "units": "W/m^2",
+      "tag": "RADIOMETRO",
+      "scale_factor": 1
+    },
+    "relative_humidity": {
+      "download": false,
+      "name": "RelativeHumidity",
+      "sensor": "Hygrometer",
+      "units": "%",
+      "tag": "IGROMETRO",
+      "scale_factor": 1
+    },
+    "wind_speed": {
+      "download": false,
+      "name": "Wind",
+      "sensor": "WindSensor",
+      "units": "m/s",
+      "tag": "ANEMOMETRO",
+      "scale_factor": 1
+    },
+    "wind_direction": {
+      "download": false,
+      "name": "WindDirection",
+      "sensor": "WindDirection",
+      "units": "degree",
+      "tag": null,
+      "scale_factor": 1
+    },
+    "snow_height": {
+      "download": false,
+      "name": "SnowHeight",
+      "sensor": "Snowgauge",
+      "units": "cm",
+      "tag": null,
+      "scale_factor": 1
+    },
+    "air_pressure": {
+      "download": false,
+      "name": "AirPressure",
+      "sensor": "Barometer",
+      "units": "",
+      "tag": null,
+      "scale_factor": 1
+    }
+  },
+  "drops_info": {}
+}

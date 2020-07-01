@@ -26,11 +26,11 @@
       "statistics_sub_path_time": "%Y/%m/%d/",
       "statistics_datetime": "%Y%m%dT%H%M",
       "source_sub_path_time": "%Y/%m/%d/",
-      "source_datetime": "%Y%m%dT%H%M00",
-      "ancillary_sub_path_time": "%Y/%m/",
-      "ancillary_datetime": "%Y%m",
+      "source_datetime": "%Y%m%dT%H%M",
+      "ancillary_sub_path_time": "%Y/%m/%d/",
+      "ancillary_datetime": "%Y%m%d%H%M",
       "outcome_sub_path_time": "%Y/%m/%d/",
-      "outcome_datetime": "%Y%m%d%H%M",
+      "outcome_datetime": "%Y%m",
       "run_datetime": "%Y%m%d"
     }
   },
@@ -38,14 +38,14 @@
     "static": {
       "source": {
         "geo_wilting_point": {
-          "folder": ["/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/gridded/"],
+          "folder": ["/home/sequia/drought/code/support_geofiles/"],
           "filename": ["SMAP_L4_SM_lmc_00000000T000000_Vv4030_001.h5"],
           "tree": ["://Land-Model-Constants_Data/clsm_wp"]
         },
         "geo_field_capacity": {
           "folder": [
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/gridded/",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/gridded/"
+            "/home/sequia/drought/code/support_geofiles/",
+            "/home/sequia/drought/code/support_geofiles/"
             ],
           "filename": [
             "SMAP_L4_SM_lmc_00000000T000000_Vv4030_001.h5",
@@ -57,17 +57,17 @@
           ]
         },
         "geo_ref": {
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/gridded/",
+          "folder": "/home/sequia/drought/code/support_geofiles/",
           "filename": "Ecoregions_1_24.tif"
         }
       },
       "outcome": {
         "geo_wilting_point": {
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/gridded/",
+          "folder": "/home/sequia/drought/code/support_geofiles/",
           "filename": "geo_wilting_point.tif"
         },
         "geo_field_capacity": {
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/gridded/",
+          "folder": "/home/sequia/drought/code/support_geofiles/",
           "filename": "geo_field_capacity.tif"
         }
       }
@@ -75,15 +75,15 @@
     "statistics": {
       "source": {
         "filename": "SMAP_L4_SM_gph_{statistics_datetime}_Vv4030_001_sm_rootzone.tif",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/satellite_smap/soil_moisture/"
+        "folder": "/home/sequia/drought/data/SMAP/processed/soil_moisture/"
       },
       "ancillary": {
         "filename": "swdi_statistics.workspace",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/satellite_smap/soil_moisture/"
+        "folder": "/home/sequia/drought/ancillary/SWDI/statistics/"
       },
       "outcome": {
-        "filename": "SWDI-statistics-{month_period}months-Month{month_reference}.tif",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/satellite_smap/ancillary/soil_moisture/"
+        "filename": "Statistics-SWDI-{month_period}months-Month{month_reference}.tif",
+        "folder": "/home/sequia/drought/statistics/SWDI/"
       }
     },
     "dynamic": {
@@ -98,20 +98,20 @@
       },
       "source": {
         "filename": "SMAP_L4_SM_gph_{source_datetime}_Vv4030_001_sm_rootzone.tif",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/satellite_smap/soil_moisture/{source_sub_path_time}"
+        "folder": "/home/sequia/drought/data/SMAP/processed/soil_moisture/{source_sub_path_time}"
       },
       "ancillary": {
         "filename": "SMAP-SM-{month_period}months-{ancillary_datetime}.tif",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/satellite_smap/soil_moisture/SM-Monthly-Files/{month_period}months-files/"
+        "folder": "/home/sequia/drought/products/SWDI/SM-Monthly-Files/{month_period}months-files/"
       },
       "outcome": {
-        "filename": "SWDI-index-{month_period}months-Month{month_reference}.tif",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/satellite_smap/soil_moisture/{outcome_sub_path_time}"
+        "filename": "SWDI-{month_period}months-Month{month_reference}-{outcome_datetime}.tif",
+        "folder": "/home/sequia/drought/products/SWDI/{outcome_sub_path_time}"
       }
     },
     "log": {
-        "filename": "hyde_datadynamic_drought_index_sspi_log_local.txt",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/satellite_smap/"
+        "filename": "hyde_datadynamic_drought_index_swdi_log_realtime.txt",
+        "folder": "/home/sequia/drought/log/"
       },
     "library": {
       "filename": "",

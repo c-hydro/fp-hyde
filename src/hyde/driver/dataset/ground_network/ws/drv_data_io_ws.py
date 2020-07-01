@@ -1063,7 +1063,7 @@ class DataProductBuilder:
 
                             # -------------------------------------------------------------------------------------
                             # Get data
-                            [oFileHandle, oFileDriver, bFileOpen] = handleFileData(sVarFileName, bFileTemp=False)
+                            [oFileHandle, oFileDriver, bFileOpen] = handleFileData(sVarFileName, file_tmp=False)
                             oVarAttribute = self.oVarData[sVarKey]
                             # -------------------------------------------------------------------------------------
 

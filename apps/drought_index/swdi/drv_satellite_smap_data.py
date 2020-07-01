@@ -17,8 +17,8 @@ class DriverData:
 
     def __init__(self, time_run, src_dict, dest_dict, stats_dict,
                  template_tags, time_frequency='3H', time_offset=0,
-                 data_geo=None, data_proj=None, data_transform=None, file_ancillary='nrt_db.pickle',
-                 flag_cleaning_result=False):
+                 data_geo=None, data_proj=None, data_transform=None, ancillary_dict=None,
+                 flag_cleaning_ancillary=False, flag_cleaning_result=False):
 
         self.time_run = pd.Timestamp(time_run)
 
@@ -33,6 +33,9 @@ class DriverData:
 
         self.folder_name_stats = stats_dict[self.tag_folder]
         self.file_name_stats = stats_dict[self.tag_filename]
+
+        self.folder_name_ancillary = ancillary_dict[self.tag_folder]
+        self.file_name_ancillary = ancillary_dict[self.tag_filename]
 
         self.time_frequency = time_frequency
         self.time_offset = time_offset
@@ -55,7 +58,8 @@ class DriverData:
 
         self.time_run, n_steps, hour_steps, mins_steps = self.select_time_step()
 
-        self.time_period, self.time_first, self.time_last = self.select_time_period(n_steps, hour_steps, mins_steps)
+        self.time_period, self.time_first, self.time_last, self.time_save = self.select_time_period(n_steps, hour_steps,
+                                                                                                    mins_steps)
 
         self.n_threshold = 0.9
         self.file_src = self.search_filename()
@@ -69,7 +73,7 @@ class DriverData:
         self.data_proj = data_proj
         self.data_transform = data_transform
 
-        self.file_ancillary = file_ancillary
+        self.flag_cleaning_ancillary = flag_cleaning_ancillary
         self.flag_cleaning_result = flag_cleaning_result
 
     def select_time_step(self, hour_ref=1, mins_ref=30):
@@ -149,7 +153,9 @@ class DriverData:
 
             time_range_dict[self.month_n_tag.format(month_ref)] = time_range
 
-        return time_range_dict, time_first, time_last
+        time_save = time_to
+
+        return time_range_dict, time_first, time_last, time_save
 
     def search_filename(self):
 
@@ -191,6 +197,12 @@ class DriverData:
         logging.info(' ---> Reading data ... ')
         data_geo = self.data_geo[self.geo_values_tag].values
         mask_geo = np.float32(self.data_geo[self.geo_mask_tag].values)
+        data_high, data_wide = self.data_geo[self.geo_values_tag].values.shape
+
+        folder_name_ancillary_raw = self.folder_name_ancillary
+        file_name_ancillary_raw = self.file_name_ancillary
+
+        time_save = self.time_save
 
         mask_geo[mask_geo == 0] = np.nan
         if self.file_src:
@@ -221,8 +233,8 @@ class DriverData:
                     else:
                         logging.warning(' ===> Open ' + file_name_step + ' FAILED. File does not exist')
 
-                file_year_avg = np.unique(pd.DatetimeIndex(file_time_list).year.values)[0]
-                file_month_avg = np.unique(pd.DatetimeIndex(file_time_list).month.values)[0]
+                file_year_avg = np.unique(pd.DatetimeIndex(file_time_list).year.values)[-1]
+                file_month_avg = np.unique(pd.DatetimeIndex(file_time_list).month.values)[-1]
                 file_time_avg = pd.Timestamp(year=file_year_avg, month=file_month_avg, day=1).strftime('%Y-%m')
 
                 with warnings.catch_warnings():
@@ -232,6 +244,37 @@ class DriverData:
                 data_obj[file_time_avg] = file_data_avg
 
                 ws_obj[file_month] = data_obj
+
+                # Ancillary file
+                month_ref = int(re.findall(r'\d+', file_month)[0])
+                month_ref = '{:01d}'.format(month_ref)
+
+                time_save_string = time_save.strftime('%Y-%m')
+
+                template_values = {"ancillary_datetime": time_save_string, "ancillary_sub_path_time": time_save_string,
+                                   "month_period": month_ref}
+                folder_name_ancillary_def = fill_tags2string(
+                    folder_name_ancillary_raw, self.template_tags, template_values)
+                file_name_ancillary_def = fill_tags2string(file_name_ancillary_raw, self.template_tags, template_values)
+                file_path_ancillary_def = os.path.join(folder_name_ancillary_def, file_name_ancillary_def)
+
+                logging.info(' ----> Dumping ' + month_ref + ' monthly soil moisture data ... ')
+                data_list = [file_data_avg]
+                metadata_list = [{'description_field': 'soil_moisture_avg'}]
+
+                if os.path.exists(file_path_ancillary_def):
+                    os.remove(file_path_ancillary_def)
+
+                if not os.path.exists(file_path_ancillary_def):
+                    make_folder(folder_name_ancillary_def)
+                    write_file_tif(file_path_ancillary_def, data_list,
+                                   data_wide, data_high, self.data_transform, self.data_proj,
+                                   file_metadata=metadata_list)
+                logging.info(' ----> Dumping ' + month_ref + ' monthly soil moisture data ... DONE')
+
+                if self.flag_cleaning_ancillary:
+                    if os.path.exists(file_path_ancillary_def):
+                        os.remove(file_path_ancillary_def)
 
             logging.info(' ---> Reading data ... DONE')
 
@@ -267,7 +310,10 @@ class DriverData:
                 values_ref = list(ws_obj[self.month_n_tag.format(month_n_id)].values())[0]
                 values_ref = np.float32(values_ref)
 
-                template_values = {"month_reference": str(month_ref), "month_period": str(month_n_id)}
+                month_n_id_str = '{:02d}'.format(month_n_id)
+                month_ref_str = '{:02d}'.format(month_ref)
+
+                template_values = {"month_reference": month_ref_str, "month_period": month_n_id_str}
 
                 folder_name_stats_def = fill_tags2string(folder_name_stats_raw, self.template_tags, template_values)
                 file_name_stats_def = fill_tags2string(file_name_stats_raw, self.template_tags, template_values)
@@ -304,7 +350,7 @@ class DriverData:
 
         logging.info(' ---> Writing results ... ')
 
-        time_dump = self.time_last.ceil('D')
+        time_dump = self.time_save
 
         folder_name_dest_raw = self.folder_name_dest
         file_name_dest_raw = self.file_name_dest
@@ -312,14 +358,19 @@ class DriverData:
         data_high, data_wide = self.data_geo[self.geo_values_tag].values.shape
         var_name = self.drought_index_tag
 
+        month_data = None
         for month_ref, time_data, var_data in zip(self.month_n_ref, time_obj.values(), analysis_obj.values()):
 
-            month_data = time_data.month
+            if month_data is None:
+                month_data = time_data.month
+
+            month_data_str = '{:02d}'.format(month_data)
+            month_ref_str = '{:02d}'.format(month_ref)
 
             metadata_list = [{'description_field': var_name}]
             analysis_list = [var_data]
 
-            template_values = {"month_reference": str(month_data), "month_period": str(month_ref),
+            template_values = {"month_reference": month_data_str, "month_period": month_ref_str,
                                "outcome_sub_path_time": time_dump, "outcome_datetime": time_dump}
 
             folder_name_dest_def = fill_tags2string(folder_name_dest_raw, self.template_tags, template_values)

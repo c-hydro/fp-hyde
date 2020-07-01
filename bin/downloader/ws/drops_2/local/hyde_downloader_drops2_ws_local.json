@@ -1,0 +1,121 @@
+{
+  "flags": {
+    "update_static_data": false,
+    "update_dynamic_data_source": false,
+    "update_dynamic_data_destination": false
+  },
+  "ancillary": {
+    "domain": "marche"
+  },
+  "template": {
+    "domain_name": "string_domain",
+    "source_var_name": "string_var_source",
+    "destination_var_name": "string_var_destination",
+    "source_registry_datetime": "%Y%m%d%H%M",
+    "source_registry_sub_path_time": "%Y/%m/%d/",
+    "source_datasets_datetime": "%Y%m%d%H%M",
+    "source_datasets_sub_path_time": "%Y/%m/%d/",
+    "destination_datetime": "%Y%m%d%H%M",
+    "destination_sub_path_time": "%Y/%m/%d/"
+  },
+  "time": {
+    "time_now": "202006170000",
+    "time_period": 48,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "data":{
+    "static": {
+      "land": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ws/gridded/",
+        "file_name": "marche.dem.txt"
+      }
+    },
+    "dynamic": {
+      "source": {
+        "registry": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ws_lexis/registry/",
+          "file_name": "{source_var_name}.json"
+        },
+        "datasets": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ws_lexis/data/",
+          "file_name": "{source_var_name}.json"
+        }
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ws/{destination_sub_path_time}",
+        "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
+        "fields": ["longitude", "latitude", "data", "time_start", "time_end", "unit", "name", "altitude", "code"]
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/ws/",
+    "file_name": "hyde_downloader_drops_ws_log.txt",
+    "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+  },
+  "variable": {
+    "rain": {
+      "download": true,
+      "name": "Rain",
+      "sensor": "Raingauge",
+      "units": "mm",
+      "tag": "PLUVIOMETRO",
+      "scale_factor": 1
+    },
+    "air_temperature": {
+      "download": true,
+      "name": "AirTemperature",
+      "sensor": "Thermometer",
+      "units": "C",
+      "tag": "TERMOMETRO",
+      "scale_factor": 1
+    },
+    "radiation": {
+      "download": false,
+      "name": "IncomingRadiation",
+      "sensor": "RadiationSensor",
+      "units": "W/m^2",
+      "tag": "RADIOMETRO",
+      "scale_factor": 1
+    },
+    "relative_humidity": {
+      "download": false,
+      "name": "RelativeHumidity",
+      "sensor": "Hygrometer",
+      "units": "%",
+      "tag": "IGROMETRO",
+      "scale_factor": 1
+    },
+    "wind_speed": {
+      "download": false,
+      "name": "Wind",
+      "sensor": "WindSensor",
+      "units": "m/s",
+      "tag": "ANEMOMETRO",
+      "scale_factor": 0.2778
+    },
+    "wind_direction": {
+      "download": false,
+      "name": "WindDirection",
+      "sensor": "WindDirection",
+      "units": "degree",
+      "tag": null
+    },
+    "snow_height": {
+      "download": false,
+      "name": "SnowHeight",
+      "sensor": "Snowgauge",
+      "units": "cm",
+      "tag": null
+    },
+    "air_pressure": {
+      "download": false,
+      "name": "AirPressure",
+      "sensor": "Barometer",
+      "units": "",
+      "tag": null
+    }
+  },
+  "drops_info": {}
+}

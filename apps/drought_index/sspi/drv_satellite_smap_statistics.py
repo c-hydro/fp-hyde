@@ -293,7 +293,10 @@ class DriverStatistics:
                     dataset_list.append(dataset_tmp)
                     metadata_list.append({'description_field': var_step})
 
-                template_values = {"month_reference": str(step_month_id), "month_period": str(ref_month_id)}
+                step_month_id_str = '{:02d}'.format(step_month_id)
+                ref_month_id_str = '{:02d}'.format(ref_month_id)
+
+                template_values = {"month_reference": step_month_id_str, "month_period": ref_month_id_str}
 
                 folder_name_dest_def = fill_tags2string(folder_name_dest_raw, self.template_tags, template_values)
                 file_name_dest_def = fill_tags2string(file_name_dest_raw, self.template_tags, template_values)

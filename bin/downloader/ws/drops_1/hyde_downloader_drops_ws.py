@@ -9,7 +9,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_drops_ws.py -settings_file configuration.json
+python3 hyde_downloader_drops2_ws.py -settings_file configuration.json
 
 NOTE:
 Debugging on pycharm-community.2017.2

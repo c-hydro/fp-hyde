@@ -195,6 +195,9 @@ def cmr_download_mp(urls, dests, process_n=4, process_max=None):
     logging.info(' -----> Preparing files ... ')
     request_list = []
     for index, (url, dest_file) in enumerate(zip(urls, dest_file_list), start=1):
+
+        if isinstance(dest_file, list):
+            dest_file = dest_file[0]
         path_name, file_name = os.path.split(dest_file)
         make_folder(path_name)
 
@@ -233,9 +236,13 @@ def cmr_download_seq(urls, dests):
     logging.info(' ----> Transferring {0} files in sequential mode ... '.format(url_count))
     credentials = None
 
-    dest_file_list = list(dests.values())
+    dest_file_list = dests.values()
 
     for index, (url, dest_file) in enumerate(zip(urls, dest_file_list), start=1):
+
+        if isinstance(dest_file, list):
+            dest_file = dest_file[0]
+
         path_name, file_name = os.path.split(dest_file)
         make_folder(path_name)
 
@@ -503,6 +510,8 @@ def clean_data_tmp(filename_obj_source, filename_obj_ancillary_global, filename_
                    flag_cleaning_source=False, flag_cleaning_tmp=False):
     if flag_cleaning_source:
         for data_key, data_value in filename_obj_source.items():
+            if not isinstance(data_value, list):
+                data_value = list(data_value)
             for data_step in data_value:
                 if os.path.exists(data_step):
                     os.remove(data_step)
@@ -536,7 +545,9 @@ def process_cmr(filename_obj_source, fileroot_obj_source,
             filename_obj_ancillary_global.values(), filename_obj_ancillary_domain.values(),
             filename_obj_outcome.values(), template_vars_data_obj):
 
-        ff_source, fn_source = os.path.split(fp_source)
+        if isinstance(fp_source, list):
+            fp_source = fp_source[0]
+        ff_source, fn_source = os.path.split(fp_source[0])
         logging.info(' ----> Process file: ' + fn_source + ' ... ')
 
         for fr_source_step, fp_anc_global_step, fp_anc_domain_step, fp_outcome_step, var_step in zip(
@@ -727,7 +738,7 @@ def set_data_source(file_id, filename_url,
             filename_list_url.append(filename_url_step)
 
             if time_step not in list(filename_obj_source.keys()):
-                filename_obj_source[time_step] = path_step
+                filename_obj_source[time_step] = [path_step]
             else:
                 logging.error(' ===> Time is always set in source obj')
                 raise NotImplementedError('Merge filename(s) is not implemented yet')
