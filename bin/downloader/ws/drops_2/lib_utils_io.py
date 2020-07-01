@@ -24,7 +24,7 @@ def write_file_csv(file_name, data_frame,
 # -------------------------------------------------------------------------------------
 # Method to read json file
 def read_file_json(file_name):
-    with open(file_name) as file_handle:
+    with open(file_name, 'r', encoding="utf-8") as file_handle:
         file_data = json.load(file_handle)
     return file_data
 # -------------------------------------------------------------------------------------
