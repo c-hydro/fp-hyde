@@ -79,7 +79,7 @@
         "sub_path_time_outcome": "%Y/%m/%d"
       },
       "time": {
-        "time_forecast_period": 36,
+        "time_forecast_period": 24,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
