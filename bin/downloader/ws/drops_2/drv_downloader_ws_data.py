@@ -275,13 +275,16 @@ class DriverData:
         logging.info(' ----> Organize datasets ... DONE')
 
     @staticmethod
-    def get_file_registry(file_name):
+    def get_file_registry(file_name,
+                          sensor_id_key='id',
+                          sensor_name_key='name', sensor_mu_key='mu',
+                          sensor_lon_key='lon', sensor_lat_key='lat'):
 
         file_handle = read_file_json(file_name)
 
-        index = [s['id'] for s in file_handle]
-        data = [(s['stationName'], s['sensorMU']) for s in file_handle]
-        geometry = [Point((s['lon'], s['lat'])) for s in file_handle]
+        index = [s[sensor_id_key] for s in file_handle]
+        data = [(s[sensor_name_key], s[sensor_mu_key]) for s in file_handle]
+        geometry = [Point((s[sensor_lon_key], s[sensor_lat_key])) for s in file_handle]
         df_registry = gpd.GeoDataFrame(data, index=index, columns=['name', 'mu'], geometry=geometry)
         df_registry.index.name = 'id'
 

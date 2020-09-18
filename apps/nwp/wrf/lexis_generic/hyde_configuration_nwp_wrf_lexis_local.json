@@ -89,23 +89,23 @@
         "_comment": "W99C95.nc -- ww3.$yyyy$mm$ddT$HHZ.nc - wrfout_d01_2018-07-10_01:00:00_PLEV_BIL.nc",
         "air_temperature_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_03_19_1800/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_06_17_0000/"
         },
         "rain_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_03_19_1800/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_06_17_0000"
         },
         "relative_humidity_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_03_19_1800/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_06_17_0000/"
         },
         "incoming_radiation_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_03_19_1800/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_06_17_0000/"
         },
         "wind_source_data": {
           "filename": "auxhist23_d03_{datetime_source}",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_03_19_1800/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/wrf/lexis/2020_06_17_0000/"
         }
       },
       "ancillary": {
@@ -143,7 +143,7 @@
     }
   },
   "time": {
-    "time_now": "2020-03-19 20:00",
+    "time_now": "2020-06-17 00:00",
     "time_period": 0,
     "time_frequency": "6H",
     "time_rounding": "6H"
