@@ -276,15 +276,32 @@ class DriverData:
 
     @staticmethod
     def get_file_registry(file_name,
-                          sensor_id_key='id',
-                          sensor_name_key='name', sensor_mu_key='mu',
-                          sensor_lon_key='lon', sensor_lat_key='lat'):
+                          sensor_id_key=None, sensor_name_key=None, sensor_mu_key=None,
+                          sensor_lon_key=None, sensor_lat_key=None):
+
+        if sensor_id_key is None:
+            sensor_id_key = ['id']
+        if sensor_lat_key is None:
+            sensor_lat_key = ['lat']
+        if sensor_lon_key is None:
+            sensor_lon_key = ['lon']
+        if sensor_name_key is None:
+            sensor_name_key = ['stationName', 'name']
+        if sensor_mu_key is None:
+            sensor_mu_key = ['sensorMU', 'mu']
 
         file_handle = read_file_json(file_name)
+        file_keys = list(file_handle[0].keys())
 
-        index = [s[sensor_id_key] for s in file_handle]
-        data = [(s[sensor_name_key], s[sensor_mu_key]) for s in file_handle]
-        geometry = [Point((s[sensor_lon_key], s[sensor_lat_key])) for s in file_handle]
+        sensor_id_select = [key_step for key_step in sensor_id_key if key_step in file_keys][0]
+        sensor_lat_select = [key_step for key_step in sensor_lat_key if key_step in file_keys][0]
+        sensor_lon_select = [key_step for key_step in sensor_lon_key if key_step in file_keys][0]
+        sensor_name_select = [key_step for key_step in sensor_name_key if key_step in file_keys][0]
+        sensor_mu_select = [key_step for key_step in sensor_mu_key if key_step in file_keys][0]
+
+        index = [s[sensor_id_select] for s in file_handle]
+        data = [(s[sensor_name_select], s[sensor_mu_select]) for s in file_handle]
+        geometry = [Point((s[sensor_lon_select], s[sensor_lat_select])) for s in file_handle]
         df_registry = gpd.GeoDataFrame(data, index=index, columns=['name', 'mu'], geometry=geometry)
         df_registry.index.name = 'id'
 

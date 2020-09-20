@@ -27,23 +27,23 @@
   "data":{
     "static": {
       "land": {
-        "folder_name": "/home/fp/fp_mount/datasets_hyde/static/",
-        "file_name": "marche.dem.txt"
+        "folder_name": "/home/fp/fp_mount/datasets_hyde/static_data/land/liguria/",
+        "file_name": "liguria.dem.txt"
       }
     },
     "dynamic": {
       "source": {
         "registry": {
-          "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic/obs/raw/",
+          "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic_data/raw/",
           "file_name": "anag-{source_var_name}.json"
         },
         "datasets": {
-          "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic/obs/raw/",
+          "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic_data/raw/",
           "file_name": "{source_var_name}.json"
         }
       },
       "destination": {
-        "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic/obs/processed/",
+        "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic_data/processed/",
         "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
         "fields": ["longitude", "latitude", "data", "time_start", "time_end", "units", "name", "altitude", "code"]
       }

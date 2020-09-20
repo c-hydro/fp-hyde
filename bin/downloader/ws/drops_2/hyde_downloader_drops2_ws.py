@@ -9,7 +9,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_drops2_ws.py -settings_file configuration.json
+python3 hyde_downloader_drops2_ws.py -settings_file configuration.json -time 2020-06-17 11:43
 
 Rename interface connection (if needed) to etho0:
 https://pete.akeo.ie/2016/05/help-i-lost-all-networking-on-my.html
