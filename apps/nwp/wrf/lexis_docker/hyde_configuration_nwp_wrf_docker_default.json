@@ -10,7 +10,7 @@
       "zipping_dynamic_product": true
     },
     "ancillary": {
-      "domain" : "marche",
+      "domain" : null,
       "write_engine": "netcdf4",
       "zip_format": ".gz"
     },
@@ -28,15 +28,15 @@
     "static": {
       "land": {
         "terrain_data": {
-          "filename": "{string_domain}.dem.txt",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "grid_data": {
-          "filename": "{string_domain}_grid_wrf_runner.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "geo_data": {
-          "filename": "{string_domain}_geo_wrf_runner.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         }
       },
@@ -79,7 +79,7 @@
         "sub_path_time_outcome": "%Y/%m/%d"
       },
       "time": {
-        "time_forecast_period": 24,
+        "time_forecast_period": null,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
@@ -110,27 +110,27 @@
       },
       "ancillary": {
         "nwp_source_ancillary": {
-          "filename": "wrf_{datetime_ancillary}_{domain}_source.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         },
         "nwp_processing_ancillary": {
-          "filename": "wrf_{datetime_ancillary}_{domain}_processing.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         },
         "nwp_outcome_ancillary": {
-          "filename": "wrf_{datetime_ancillary}_{domain}_outcome.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         }
       },
       "outcome": {
         "nwp_outcome_data": {
-          "filename": "wrf_{datetime_outcome}_{domain}.nc",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/"
         }
       }
     },
     "log": {
-        "filename": "hyde_nwp_wrf_docker_data_dynamic_log.txt",
+        "filename": null,
         "folder": "/home/fp/fp_logs/"
       },
     "library": {

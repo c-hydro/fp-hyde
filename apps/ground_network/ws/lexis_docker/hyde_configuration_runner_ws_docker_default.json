@@ -30,38 +30,38 @@
   "data": {
     "static": {
       "grid_ref": {
-        "filename": "grid_ws.workspace",
+        "filename": null,
         "folder": "/home/fp/fp_mount/datasets_hyde/static/"
       },
       "land": {
         "land_ref": {
-          "filename": "marche.dem.txt",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "land_ancillary": {
-          "filename": "geo_ws.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         }
       },
       "predictor": {
         "aspect_data":{
-          "filename": "marche.aspect.txt",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "slope_data":{
-          "filename": "marche.slope.txt",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "hillshade_data":{
-          "filename": "marche.hillshade.txt",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "roughness_data":{
-          "filename": "marche.roughness.txt",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         },
         "predictor_ancillary":{
-          "filename": "predictor_ws.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/static/"
         }
       },
@@ -100,7 +100,7 @@
       "time": {
         "time_forecast_step": 0,
         "time_forecast_delta": 0,
-        "time_observed_step": 5,
+        "time_observed_step": null,
         "time_observed_delta": 3600,
         "time_reference_type": {"units": null,
                                 "rounding": null,
@@ -137,23 +137,23 @@
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/"
         },
         "source_ancillary": {
-          "filename": "ws_source_$DOMAIN_$yyyy$mm$dd$HH$MM.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         }
       },
       "outcome": {
         "ws_product": {
-          "filename": "ws.db.$yyyy$mm$dd$HH$MM.nc.gz",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/"
         },
         "outcome_ancillary": {
-          "filename": "ws_outcome_$DOMAIN_$yyyy$mm$dd$HH$MM.workspace",
+          "filename": null,
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
         }
       }
     },
     "log": {
-        "filename": "hyde_runner_ws_log.txt",
+        "filename": null,
         "folder": "/home/fp/fp_logs/",
         "history": true
       },

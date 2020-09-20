@@ -5,7 +5,7 @@
     "update_dynamic_data_destination": false
   },
   "ancillary": {
-    "domain": "italy"
+    "domain": null
   },
   "template": {
     "domain_name": "string_domain",
@@ -20,7 +20,7 @@
   },
   "time": {
     "time_now": null,
-    "time_period": 5,
+    "time_period": null,
     "time_frequency": "H",
     "time_rounding": "H"
   },
@@ -28,7 +28,7 @@
     "static": {
       "land": {
         "folder_name": "/home/fp/fp_mount/datasets_hyde/static/",
-        "file_name": "marche.dem.txt"
+        "file_name": null
       }
     },
     "dynamic": {
@@ -44,7 +44,7 @@
       },
       "destination": {
         "folder_name": "/home/fp/fp_mount/datasets_hyde/dynamic_raw/",
-        "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
+        "file_name": "{destination_var_name}_italy_{destination_datetime}.csv",
         "fields": ["longitude", "latitude", "data", "time_start", "time_end", "units", "name", "altitude", "code"]
       }
     }
