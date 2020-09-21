@@ -188,7 +188,8 @@ class DriverData:
                                 df_dset_select = df_dset.loc[datetime_step]
                             else:
                                 df_dset_select = None
-                                logging.warning(' ===> Datasets are undefined for time ' + str(datetime_step))
+                                logging.warning(' ===> Datasets are undefined for time ' +
+                                                datetime_step[0].strftime('%y-%m-%d %H:%M'))
 
                         if df_dset_select is not None:
                             dict_dset_select = df_dset_select.to_dict()
@@ -293,7 +294,7 @@ class DriverData:
         if sensor_lat_key is None:
             sensor_lat_key = ['lat']
         if sensor_lon_key is None:
-            sensor_lon_key = ['lon']
+            sensor_lon_key = ['lon', 'lng']
         if sensor_name_key is None:
             sensor_name_key = ['stationName', 'name']
         if sensor_mu_key is None:
