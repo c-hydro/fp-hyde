@@ -183,7 +183,12 @@ class DriverData:
                         df_dset_select = None
                         if df_dset is not None:
                             datetime_step = pd.DatetimeIndex([time_step])
-                            df_dset_select = df_dset.loc[datetime_step]
+
+                            if datetime_step in list(df_dset.index):
+                                df_dset_select = df_dset.loc[datetime_step]
+                            else:
+                                df_dset_select = None
+                                logging.warning(' ===> Datasets are undefined for time ' + str(datetime_step))
 
                         if df_dset_select is not None:
                             dict_dset_select = df_dset_select.to_dict()
@@ -260,7 +265,11 @@ class DriverData:
 
                             write_file_csv(file_path_dst_dset, point_df)
 
-                        logging.info(' ------> TimeStep ' + str(time_step) + ' ... DONE')
+                            logging.info(' ------> TimeStep ' + str(time_step) + ' ... DONE')
+
+                        else:
+
+                            logging.info(' ------> TimeStep ' + str(time_step) + ' ... SKIPPED. Datasets is undefined')
 
                     else:
 
@@ -332,6 +341,5 @@ class DriverData:
         logging.info(' ------> Datasets N: ' + str(count_tot) + ' Failed: ' + str(count_failed))
 
         return df_dset.copy()
-
 
 # -------------------------------------------------------------------------------------

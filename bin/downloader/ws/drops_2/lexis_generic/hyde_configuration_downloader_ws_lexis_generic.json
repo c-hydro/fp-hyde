@@ -20,7 +20,7 @@
   },
   "time": {
     "time_now": null,
-    "time_period": 5,
+    "time_period": 1,
     "time_frequency": "H",
     "time_rounding": "H"
   },

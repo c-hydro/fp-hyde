@@ -10,6 +10,9 @@ APP: **HYDE_DynamicData_DroughtIndex_SSPI.py**
 APP: **HYDE_DynamicData_DroughtIndex_SWDI.py**
 	- Release for Hyde package
 
+BIN: **hyde_downloader_drops2_ws.py**
+	- Release for Hyde package
+
 BIN: **hyde_downloader_satellite_smap.py**
 	- Release for Hyde package
 
@@ -21,7 +24,7 @@ FIX: **hyde_downloader_satellite_gsmap.py**
 
 FIX: **HYDE_Model_RFarm.py**
 	- Fix the incorrect slope in time estimation
-
+	
 Version 1.9.4 [2020-03-19]
 **************************
 APP: **HYDE_DynamicData_GSMap_Rain.py**
