@@ -111,15 +111,15 @@
       "ancillary": {
         "nwp_source_ancillary": {
           "filename": null,
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_ancillary/"
         },
         "nwp_processing_ancillary": {
           "filename": null,
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_ancillary/"
         },
         "nwp_outcome_ancillary": {
           "filename": null,
-          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_processed/ancillary/"
+          "folder": "/home/fp/fp_mount/datasets_hyde/dynamic_ancillary/"
         }
       },
       "outcome": {
