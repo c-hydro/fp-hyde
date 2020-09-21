@@ -184,7 +184,9 @@ class DriverData:
                         if df_dset is not None:
                             datetime_step = pd.DatetimeIndex([time_step])
 
-                            if datetime_step in list(df_dset.index):
+                            df_index = df_dset.index
+                            df_index = df_index.tz_localize(None)
+                            if datetime_step in list(df_index):
                                 df_dset_select = df_dset.loc[datetime_step]
                             else:
                                 df_dset_select = None
