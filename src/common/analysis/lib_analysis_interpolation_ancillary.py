@@ -12,7 +12,7 @@ Version:       '1.6.0'
 import logging
 import tempfile
 
-from numpy import unique, where, isnan, delete, min, max, nonzero, savetxt, hstack, empty, reshape
+from numpy import unique, where, isnan, delete, min, max, nonzero, savetxt, hstack, empty, reshape, asarray
 
 from src.common.default.lib_default_args import sLoggerName
 from src.common.driver.configuration.drv_configuration_debug import Exc
@@ -87,6 +87,7 @@ def filterData_ValidRange(a1dData_IN, a1dGeoX_IN=None, a1dGeoY_IN=None, a1dGeoZ_
         a1iIndex_MAXDATA = empty([0])
 
     a1iIndex_VALIDRANGE = unique(hstack((a1iIndex_MINDATA.tolist(), a1iIndex_MAXDATA.tolist())))
+    a1iIndex_VALIDRANGE = asarray(a1iIndex_VALIDRANGE, int)
 
     a1dData_FILTER_VALIDRANGE = delete(a1dData_IN.ravel(), a1iIndex_VALIDRANGE)
     if a1dGeoX_IN is not None:

@@ -25,6 +25,9 @@ FIX: **hyde_downloader_satellite_gsmap.py**
 FIX: **HYDE_Model_RFarm.py**
 	- Fix the incorrect slope in time estimation
 	
+FIX: **HYDE_DynamicData_GroundNetwork_WS.py**
+    - Fix the filtering indexes to apply variable valid range
+	
 Version 1.9.4 [2020-03-19]
 **************************
 APP: **HYDE_DynamicData_GSMap_Rain.py**
