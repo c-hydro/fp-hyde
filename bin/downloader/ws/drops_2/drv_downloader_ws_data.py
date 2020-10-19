@@ -148,6 +148,7 @@ class DriverData:
 
                 file_path_list = zip(file_path_src_registry_list, file_path_src_dset_list, file_path_dst_dset_list)
 
+                file_path_prev_dset = None
                 for time_step, file_path_step in zip(time_range, file_path_list):
 
                     logging.info(' ------> TimeStep ' + str(time_step) + ' ... ')
@@ -175,24 +176,31 @@ class DriverData:
                             if os.path.exists(file_path_src_registry):
                                 gdf_registry = self.get_file_registry(file_path_src_registry)
 
-                        df_dset = None
                         if file_path_src_dset.endswith('.json'):
                             if os.path.exists(file_path_src_dset):
-                                df_dset = self.get_file_dset(file_path_src_dset)
+
+                                if (file_path_prev_dset is None) or (file_path_prev_dset != file_path_src_dset):
+                                    df_dset = self.get_file_dset(file_path_src_dset)
+                                    file_path_prev_dset = file_path_src_dset
+                            else:
+                                df_dset = None
+                        else:
+                            df_dset = None
 
                         df_dset_select = None
                         if df_dset is not None:
                             datetime_step = pd.DatetimeIndex([time_step])
 
+                            datetime_value = datetime_step[0]
+
                             df_index = df_dset.index
                             df_index = df_index.tz_localize(None)
-                            if datetime_step in list(df_index):
-                                df_dset_select = df_dset.loc[datetime_step]
+                            if datetime_value in list(df_index):
+                                df_dset_select = df_dset.loc[datetime_value]
                             else:
                                 df_dset_select = None
                                 logging.warning(' ===> Datasets are undefined for time ' +
                                                 datetime_step[0].strftime('%y-%m-%d %H:%M'))
-
                         if df_dset_select is not None:
                             dict_dset_select = df_dset_select.to_dict()
                             dict_registry = gdf_registry.to_dict()
@@ -219,8 +227,12 @@ class DriverData:
                                     point_unit = dict_mu[point_code]
                                     point_x = point_geometry.x
                                     point_y = point_geometry.y
-                                    point_time = list(point_ws.keys())[0]
-                                    point_value = list(point_ws.values())[0]
+
+                                    if isinstance(point_ws, dict):
+                                        # point_time = list(point_ws.keys())[0]
+                                        point_value = list(point_ws.values())[0]
+                                    else:
+                                        point_value = point_ws
 
                                     point_unit = point_unit.replace('°', '')
 
