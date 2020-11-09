@@ -1,8 +1,8 @@
 {
   "flags": {
     "update_static_data": false,
-    "update_dynamic_data_source": false,
-    "update_dynamic_data_destination": false
+    "update_dynamic_data_source": true,
+    "update_dynamic_data_destination": true
   },
   "ancillary": {
     "domain": "italy"

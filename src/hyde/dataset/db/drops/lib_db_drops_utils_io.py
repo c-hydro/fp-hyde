@@ -11,6 +11,7 @@ Version:       '1.0.1'
 import logging
 #######################################################################################
 
+
 # -------------------------------------------------------------------------------------
 # Method to write dateframe in csv format
 def writeSensorDataFrame(sFileName, oDataFrame, 

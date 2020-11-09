@@ -25,6 +25,7 @@ oLogStream = logging.getLogger(__name__)
 # import matplotlib.pylab as plt
 #######################################################################################
 
+
 # -------------------------------------------------------------------------------------
 # Method to prepare dictionary single or multiple keys (in list format)
 def prepareDictKey(ob_keys, sep_keys=''):
@@ -44,6 +45,7 @@ def prepareDictKey(ob_keys, sep_keys=''):
         return None
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Method to get values into dictionary using single or multiple keys (in list format)
 def lookupDictKey(dic, key, *keys):
@@ -55,6 +57,7 @@ def lookupDictKey(dic, key, *keys):
         Exc.getExc(' =====> WARNING: impossible to get dictionary value using selected keys!', 2, 1)
         return None
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Delete key(s) from dictionary
@@ -72,6 +75,7 @@ def removeDictKey(d, keys):
         Exc.getExc(' =====> WARNING: keys values must be included in a list!', 2, 1)
         return d
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Method to get recursively dictionary value
@@ -95,6 +99,7 @@ def setDictValue(dataDict, mapList, val):
     return dataDict
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Method to update recursively dictionary value
 def updateDictValue(d, tag, value):
@@ -112,6 +117,7 @@ def updateDictValue(d, tag, value):
     return d
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Get dictionary index using a selected key
 def getDictIndex(dictionary=None, keyname=None):
@@ -122,6 +128,7 @@ def getDictIndex(dictionary=None, keyname=None):
         key_index= None
     return key_index
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Get selected index tuple from dictionary
@@ -135,6 +142,7 @@ def getDictTuple(dictionary=None, index=-1):    # considering development using 
     return dict_sel
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Method to get value from dictionary (using a list)
 def getDictValue(dataDict, mapList, pflag=1):
@@ -147,6 +155,7 @@ def getDictValue(dataDict, mapList, pflag=1):
             pass
         return None
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Method to update recursively dictionary value
@@ -198,6 +207,7 @@ def getDictValues(d, key, value=[]):
     return value
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Method to join 2 dictionaries
 def joinDict(oDictA=None, oDictB=None):
@@ -210,6 +220,7 @@ def joinDict(oDictA=None, oDictB=None):
     return oDictAB
 # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 # Method to merge dictionaries
 def mergeDict(d1, d2):
@@ -221,6 +232,7 @@ def mergeDict(d1, d2):
 
     return dd
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Method to check dictionary keys (True or False)

@@ -1,0 +1,139 @@
+{
+  "flags": {
+    "update_static_data": false,
+    "update_dynamic_data_ancillary": false,
+    "update_dynamic_data_destination": true,
+    "clean_tmp_file": true
+  },
+  "info": {
+    "domain": "marche"
+  },
+  "template": {
+    "domain_name": "string_domain",
+    "ancillary_var_name": "string_var_source",
+    "destination_var_name": "string_var_destination",
+    "ancillary_datetime": "%Y%m%d%H%M",
+    "ancillary_sub_path_time": "%Y/%m/%d/",
+    "destination_datetime": "%Y%m%d%H%M",
+    "destination_sub_path_time": "%Y/%m/%d/"
+  },
+  "time": {
+    "time_now": "202006170000",
+    "time_period": 48,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "data":{
+    "static": {
+      "land": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/",
+        "file_name": "marche.dem.txt"
+      }
+    },
+    "dynamic": {
+      "source": {
+        "server_mode": true,
+        "server_ip": "10.6.26.206",
+        "server_name": "SIRMIP",
+        "server_user": null,
+        "server_password": null
+      },
+      "ancillary": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/weather_stations/{ancillary_sub_path_time}",
+        "file_name": "{ancillary_var_name}_{domain_name}_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/weather_stations/{destination_sub_path_time}",
+        "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
+        "fields": ["longitude", "latitude", "data", "time_start", "time_end", "units", "name", "altitude", "code"]
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/weather_stations/",
+    "file_name": "hyde_downloader_odbc_weather_stations_log.txt",
+    "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+  },
+  "variable": {
+    "rain": {
+      "download": true,
+      "name": "Rain",
+      "units": "mm",
+      "tag": "PP",
+      "type": "accumulated",
+      "valid_range": [0, null],
+      "min_count": 3,
+      "scale_factor": 1
+    },
+    "air_temperature": {
+      "download": true,
+      "name": "AirTemperature",
+      "units": "C",
+      "tag": "TA",
+      "type": "instantaneous",
+      "valid_range": [-30, 50],
+      "min_count": 1,
+      "scale_factor": 1
+    },
+    "incoming_radiation": {
+      "download": false,
+      "name": "IncomingRadiation",
+      "units": "W/m^2",
+      "tag": "RG",
+      "type": "instantaneous",
+      "valid_range": [-100, 1500],
+      "min_count": 1,
+      "scale_factor": 1
+    },
+    "relative_humidity": {
+      "download": false,
+      "name": "RelativeHumidity",
+      "units": "%",
+      "tag": "RH",
+      "type": "instantaneous",
+      "valid_range": [0, 100],
+      "min_count": 1,
+      "scale_factor": 1
+    },
+    "wind_speed": {
+      "download": false,
+      "name": "Wind",
+      "units": "m/s",
+      "tag": "VV",
+      "type": "instantaneous",
+      "valid_range": [0, 15],
+      "min_count": 1,
+      "scale_factor": 1
+    },
+    "wind_direction": {
+      "download": false,
+      "name": "WindDirection",
+      "units": "degree",
+      "tag": null,
+      "type": "instantaneous",
+      "valid_range": [0, 360],
+      "min_count": 1,
+      "scale_factor": 1
+    },
+    "snow_height": {
+      "download": false,
+      "name": "SnowHeight",
+      "units": "cm",
+      "tag": "LN",
+      "type": "instantaneous",
+      "valid_range": [0, null],
+      "min_count": 1,
+      "scale_factor": 1
+    },
+    "air_pressure": {
+      "download": false,
+      "name": "AirPressure",
+      "units": "",
+      "tag": "PA",
+      "type": "instantaneous",
+      "valid_range": [90, 107],
+      "min_count": 1,
+      "scale_factor": 1
+    }
+  }
+}
