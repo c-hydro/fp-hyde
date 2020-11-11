@@ -2,8 +2,10 @@
 Changelog
 =========
 
-Version 1.9.6 [2020-10-28]
+Version 1.9.6 [2020-11-02]
 **************************
+APP: **HYDE_DynamicData_GroundNetwork_WS.py**
+    - Refactor of the procedure to create the datasets of observed variables
 BIN: **hyde_downloader_odbc_ws.py**
 	- Release for Hyde package
 
