@@ -7,7 +7,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 HYDE_DynamicData_GroundNetwork_WS.py -settings_file configuration.json -time YYYYMMDDHHMM
+python3 HYDE_DynamicData_GroundNetwork_WS.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version:
 20200625 (2.5.1) --> Update code(s) for LEXIS project

@@ -136,8 +136,6 @@ def initDropsDB(oDrops_Settings=oDrops_Settings_Default):
         raise
         # -------------------------------------------------------------------------------------
 
-
-
     # -------------------------------------------------------------------------------------
     # Return variable(s)
     return oDROPS, oEXPDATA

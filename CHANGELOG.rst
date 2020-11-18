@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 1.9.6 [2020-10-28]
+**************************
+BIN: **hyde_downloader_odbc_ws.py**
+	- Release for Hyde package
+
+
 Version 1.9.5 [2020-05-22]
 **************************
 APP: **HYDE_DynamicData_DroughtIndex_SSPI.py**

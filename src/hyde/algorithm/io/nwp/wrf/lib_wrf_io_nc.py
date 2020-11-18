@@ -48,7 +48,7 @@ def read_data_wrf(file_name, var_name=None,
         da_time = dst[tag_coord_time]
     else:
 
-        log_stream.info(' ---> Time dimension name is not in the variables list of grib file. '
+        log_stream.info(' ---> Time dimension name is not in the variables list of netcdf file. '
                         'Searching for regular expression with similar names')
         if match_str_time.__len__() > 0:
             for match_str_step in match_str_time:
@@ -62,7 +62,7 @@ def read_data_wrf(file_name, var_name=None,
                     log_stream.warning(' ===> Searching time values using another dim name: ' + match_str_step +
                                        ' ... FAILED')
         else:
-            log_stream.error(' ===> Time dimension name is not in the variables list of grib file')
+            log_stream.error(' ===> Time dimension name is not in the variables list of netcdf file')
             raise IOError(' ===> Check the time dimension!')
 
     if tag_coord_geo_x in var_list_all:
@@ -72,7 +72,7 @@ def read_data_wrf(file_name, var_name=None,
         else:
             da_geo_x = da_geo_x_tmp
     else:
-        log_stream.error(' ===> GeoX dimension name is not in the variables list of grib file')
+        log_stream.error(' ===> GeoX dimension name is not in the variables list of netcdf file')
         raise IOError(' ===> Check the GeoX dimension!')
     if tag_coord_geo_y in var_list_all:
         da_geo_y_tmp = dst[tag_coord_geo_y]
@@ -81,7 +81,7 @@ def read_data_wrf(file_name, var_name=None,
         else:
             da_geo_y = da_geo_y_tmp
     else:
-        log_stream.error(' ===> GeoY dimension name is not in the variables list of grib file')
+        log_stream.error(' ===> GeoY dimension name is not in the variables list of netcdf file')
         raise IOError(' ===> Check the GeoY dimension!')
     log_stream.info(' --->  Get time, geo_x and geo_y data ... DONE')
 
