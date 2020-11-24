@@ -6,8 +6,13 @@ Version 1.9.6 [2020-11-02]
 **************************
 APP: **HYDE_DynamicData_GroundNetwork_WS.py**
     - Refactor of the procedure to create the datasets of observed variables
+
 BIN: **hyde_downloader_odbc_ws.py**
 	- Release for Hyde package
+
+FIX: **HYDE_DynamicData_NWP_ECMWF_0100.py**
+    - Fix format of time argument passed by user
+	- Fix the orientation of latitude and values map(s)
 
 
 Version 1.9.5 [2020-05-22]
