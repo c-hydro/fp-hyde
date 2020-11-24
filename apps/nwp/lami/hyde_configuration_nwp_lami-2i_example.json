@@ -19,49 +19,53 @@
     }
   },
   "data": {
+    "tmp": {
+      "filename": null,
+      "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_tmp/nwp/lami-2i/"
+    },
     "static": {
       "grid_ref": {
-        "filename": "grid_lami_2i.workspace",
-        "folder": "/hydro/data/static_data/ancillary/nwp_lami-2i/"
+        "filename": "nwp_lami-2i_grid.workspace",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/nwp/lami-2i/"
       },
       "land": {
         "land_ref": {
           "filename": "marche.dem.txt",
-          "folder": "/hydro/data/static_data/land/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/"
         },
         "land_ancillary": {
-          "filename": "geo_lami_2i.workspace",
-          "folder": "/hydro/data/static_data/ancillary/nwp_lami-2i/"
+          "filename": "nwp_lami-2i_geo.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/nwp/lami-2i/"
         }
       },
       "colormap": {
         "rain_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         },
         "air_temperature_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         },
         "wind_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         },
         "incoming_radiation_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         },
         "albedo_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         },
         "air_pressure_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         },
         "relative_humidity_colormap" : {
           "filename": "",
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/lami_2i/colormap/"
         }
       }
     },
@@ -75,43 +79,43 @@
       "source": {
         "air_temperature_data": {
           "filename": "$yyyy$mm$dd-lami-2i.t00z.T2m",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/lami-2i/"
         },
         "rain_data": {
           "filename": "$yyyy$mm$dd-lami-2i.t00z.PRECI1",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/lami-2i/"
         },
         "relative_humidity_data": {
           "filename": "$yyyy$mm$dd-lami-2i.t00z.RH2m",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/lami-2i/"
         },
         "incoming_radiation_data": {
           "filename": "$yyyy$mm$dd-lami-2i.t00z.SWH",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/lami-2i/"
         },
         "wind_data": {
           "filename": "$yyyy$mm$dd-lami-2i.t00z.VENTO10m",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/lami-2i/"
         },
         "albedo_data": {
           "filename": "$yyyy$mm$dd-lami-2i.t00z.ALB",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/lami-2i//"
         },
         "nwp_ancillary_data_collected": {
-          "filename": "nwp.lami-2i.$yyyy$mm$dd$HH$MM.workspace",
-          "folder": "/hydro/data/dynamic_data/ancillary/nwp/lami-2i/$yyyy/$mm/$dd/"
+          "filename": "nwp_lami-2i_$DOMAIN_$yyyy$mm$dd_$HH$MM.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/nwp/lami-2i/$yyyy/$mm/$dd/"
         }
       },
       "outcome": {
         "nwp_product": {
-          "filename": "nwp.lami-2i.$yyyy$mm$dd$HH$MM.nc.gz",
-          "folder": "/hydro/data/dynamic_data/outcome/nwp/lami-2i/$yyyy/$mm/$dd/"
+          "filename": "nwp_lami-2i_$yyyy$mm$dd$HH$MM_$DOMAIN.nc.gz",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/nwp/lami-2i/$yyyy/$mm/$dd/"
         }
       }
     },
     "log": {
-        "filename": "hyde_dynamicdata_nwp_lami_2i_realtime_log.txt",
-        "folder": "/hydro/log/"
+        "filename": "hyde_dynamicdata_nwp_lami-2i_log.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/nwp/"
       },
     "library": {
       "filename": "",
@@ -225,7 +229,7 @@
       "air_temperature_data":{
         "id": {
           "var_type": ["var3d", "istantaneous"],
-          "var_name": "AirTemperature",
+          "var_name": "Air_Temperature",
           "var_file": "nwp_product",
           "var_colormap": "air_temperature_colormap",
           "var_method_save": "write3DVar"
@@ -276,7 +280,7 @@
       "incoming_radiation_data":{
         "id": {
           "var_type": ["var3d", "istantaneous"],
-          "var_name": "IncomingRadiation",
+          "var_name": "Incoming_Radiation",
           "var_file": "nwp_product",
           "var_colormap": "incoming_radiation_colormap",
           "var_method_save": "write3DVar"
@@ -310,7 +314,7 @@
       "relative_humidity_data":{
         "id": {
           "var_type": ["var3d", "istantaneous"],
-          "var_name": "RelativeHumidity",
+          "var_name": "Relative_Humidity",
           "var_file": "nwp_product",
           "var_colormap": "relative_humidity_colormap",
           "var_method_save": "write3DVar"

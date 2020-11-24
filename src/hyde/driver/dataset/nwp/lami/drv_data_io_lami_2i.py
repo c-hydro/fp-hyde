@@ -692,6 +692,12 @@ class DataProductBuilder:
 
         self.oVarFctSteps = kwargs['forecast_expected_step']
 
+        self.tmp_folder, self.tmp_filename = split(kwargs['tmp_data'])
+        if self.tmp_folder.__len__() == 0:
+            self.tmp_folder = None
+        if self.tmp_filename.__len__() == 0:
+            self.tmp_filename = None
+
         self.__defineVar()
     # -------------------------------------------------------------------------------------
 
@@ -799,7 +805,8 @@ class DataProductBuilder:
 
                             # -------------------------------------------------------------------------------------
                             # Get data
-                            [oFileHandle, oFileDriver, bFileOpen] = handleFileData(sVarFileName, sFileType='grib')
+                            [oFileHandle, oFileDriver, bFileOpen] = handleFileData(
+                                sVarFileName, file_type='grib', path_tmp=self.tmp_folder, file_tmp=False)
                             oVarAttrs = self.oVarData[sVarKey]
 
                             # Check variable name in file handle

@@ -129,7 +129,7 @@
     },
     "log": {
         "filename": "hyde_dynamicdata_nwp_ecmwf0100_log.txt",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/"
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/nwp/"
       },
     "library": {
       "filename": "",
