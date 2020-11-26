@@ -1,13 +1,13 @@
 {
   "algorithm":{
     "flags": {
-      "cleaning_static_data": true,
-      "cleaning_dynamic_ancillary_source": true,
-      "cleaning_dynamic_ancillary_processing": true,
-      "cleaning_dynamic_ancillary_outcome": true,
+      "cleaning_static_data": false,
+      "cleaning_dynamic_ancillary_source": false,
+      "cleaning_dynamic_ancillary_processing": false,
+      "cleaning_dynamic_ancillary_outcome": false,
       "cleaning_dynamic_product": true,
       "cleaning_dynamic_tmp": false,
-      "zipping_dynamic_product": false
+      "zipping_dynamic_product": true
     },
     "ancillary": {
       "domain" : "marche",
@@ -29,37 +29,37 @@
       "land": {
         "terrain_data": {
           "filename": "marche.dem.txt",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/gridded/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/"
         },
         "grid_data": {
-          "filename": "grid_ecmwf_0100.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/ancillary/"
+          "filename": "nwp_ecmwf0100_grid.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/nwp/"
         },
         "geo_data": {
-          "filename": "geo_ecmwf_0100.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/ancillary/"
+          "filename": "nwp_ecmwf0100_geo.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/nwp/"
         }
       },
       "colormap": {
         "rain_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
         },
         "air_temperature_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
         },
         "wind_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
         },
         "incoming_radiation_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
         },
         "relative_humidity_colormap" : {
           "filename": "",
-          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/static/ecmwf_0100/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
         }
       }
     },
@@ -83,53 +83,53 @@
       "source": {
         "air_temperature_source_data": {
           "filename": "{datetime_source}-ecmwf0100.t00z.T2m",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ecmwf_0100/{sub_path_time_source}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf0100/"
         },
         "rain_source_data": {
           "filename": "{datetime_source}-ecmwf0100.t00z.PRECI3",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ecmwf_0100/{sub_path_time_source}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf0100/"
         },
         "relative_humidity_source_data": {
           "filename": "{datetime_source}-ecmwf0100.t00z.RH2m",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ecmwf_0100/{sub_path_time_source}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf0100/"
         },
         "incoming_radiation_source_data": {
           "filename": "{datetime_source}-ecmwf0100.t00z.PRECI3",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ecmwf_0100/{sub_path_time_source}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf0100/"
         },
         "wind_source_data": {
           "filename": "{datetime_source}-ecmwf0100.t00z.VENTO10m",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/ecmwf_0100/{sub_path_time_source}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf0100/"
         }
       },
       "ancillary": {
         "nwp_source_ancillary": {
           "filename": "ecmwf_0100_{datetime_ancillary}_{domain}_source.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/ecmwf_0100/{sub_path_time_ancillary}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf_0100/{sub_path_time_ancillary}"
         },
         "nwp_processing_ancillary": {
           "filename": "ecmwf_0100_{datetime_ancillary}_{domain}_processing.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/ecmwf_0100/{sub_path_time_ancillary}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf_0100/{sub_path_time_ancillary}"
         },
         "nwp_analyzing_ancillary": {
           "filename": "ecmwf_0100_{datetime_ancillary}_{domain}_analyzing.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/ecmwf_0100/{sub_path_time_ancillary}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf_0100/{sub_path_time_ancillary}"
         },
         "nwp_outcome_ancillary": {
           "filename": "ecmwf_0100_{datetime_ancillary}_{domain}_outcome.workspace",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/ecmwf_0100/{sub_path_time_ancillary}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/ecmwf_0100/{sub_path_time_ancillary}"
         }
       },
       "outcome": {
         "nwp_outcome_data": {
           "filename": "ecmwf_0100_{datetime_outcome}_{domain}.nc",
-          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/outcome/ecmwf_0100/{sub_path_time_outcome}"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/nwp/ecmwf_0100/{sub_path_time_outcome}"
         }
       }
     },
     "log": {
-        "filename": "hyde_dynamicdata_nwp_ecmwf_0100_local_log.txt",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/ecmwf_0100/"
+        "filename": "hyde_dynamicdata_nwp_ecmwf0100_log.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/nwp/"
       },
     "library": {
       "filename": "",
@@ -282,7 +282,7 @@
           "var_type": ["instantaneous"],
           "var_source": ["ecmwf_0100"],
           "var_format": ["netcdf"],
-          "var_name": ["AirTemperature"],
+          "var_name": ["Air_Temperature"],
           "var_file": ["nwp_outcome_data"],
           "var_colormap": ["air_temperature_colormap"],
           "var_parameters": [null],
@@ -332,7 +332,7 @@
           "var_type": ["instantaneous", "instantaneous", "instantaneous"],
           "var_source": ["ecmwf_0100", "ecmwf_0100", "ecmwf_0100"],
           "var_format": [null, null, "netcdf"],
-          "var_name": ["10 metre U wind component", "10 metre V wind component", "WindSpeed"],
+          "var_name": ["10 metre U wind component", "10 metre V wind component", "Wind"],
           "var_file": [null, null, "nwp_outcome_data"],
           "var_colormap": ["wind_colormap", "wind_colormap", "wind_colormap"],
           "var_parameters": [null, null, null],
@@ -357,7 +357,7 @@
           "var_type": ["accumulated","instantaneous", "instantaneous", "instantaneous"],
           "var_source": ["ecmwf_0100","ecmwf_0100" ,"ecmwf_0100", "ecmwf_0100"],
           "var_format": [null,"netcdf","netcdf","netcdf"],
-          "var_name": ["Rain","CloudFactor","IncomingRadiation","ShortWaveRadiation"],
+          "var_name": ["Rain","Cloud_Factor","Incoming_Radiation","ShortWave_Radiation"],
           "var_file": [null, "nwp_outcome_data", "nwp_outcome_data", "nwp_outcome_data"],
           "var_colormap": [null, null, "incoming_radiation_colormap", "incoming_radiation_colormap"],
           "var_parameters": [null, null, null, null],
@@ -382,7 +382,7 @@
           "var_type": ["instantaneous"],
           "var_source": ["ecmwf_0100"],
           "var_format": ["netcdf"],
-          "var_name": ["RelativeHumidity"],
+          "var_name": ["Relative_Humidity"],
           "var_file": ["nwp_outcome_data"],
           "var_colormap": ["relative_humidity_colormap"],
           "var_parameters": [null],

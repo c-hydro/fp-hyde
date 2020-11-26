@@ -369,7 +369,7 @@ def write3DVar(oFileData, sVarName, a3dVarDataXYT, oVarAttr, sVarFormat, sVarDim
             a3dVarDataTYX[iStep, :, :] = a2dVarDataYX
 
         # Save Data
-        oVar[:, :] = np.transpose(np.rot90(a3dVarDataXYT, -1))
+        oVar[:, :, :] = a3dVarDataTYX
 
     else:
         Exc.getExc(

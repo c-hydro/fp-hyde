@@ -9,7 +9,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 hyde_downloader_modis_snow.py -settingfile configuration.json
+python3 hyde_downloader_modis_snow.py -settings_file configuration.json
 
 Version:
 20191007 (1.0.1) --> Hyde package refactor
@@ -417,7 +417,7 @@ def main():
 # Method to get script argument(s)
 def getSettings():
     oParser = ArgumentParser()
-    oParser.add_argument('-settingfile', action="store", dest="sFileSettings")
+    oParser.add_argument('-settings_file', action="store", dest="sFileSettings")
     oParserValue = oParser.parse_args()
 
     if oParserValue.sFileSettings:
