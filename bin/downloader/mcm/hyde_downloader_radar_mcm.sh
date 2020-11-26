@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------
 # Script information
 script_name='HYDE DOWNLOADER - RADAR PRODUCT PRECIPITATION MCM'
-script_version="1.0."
+script_version="1.0.0"
 script_date='2019/07/10'
 
 # Specific command line usage:

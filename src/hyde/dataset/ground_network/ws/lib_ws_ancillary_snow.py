@@ -10,16 +10,22 @@ Version:       '1.0.0'
 #######################################################################################
 # Library
 import logging
-import os
 import tempfile
 import rasterio
 
-import numpy as np
-
 from time import sleep
+from os.path import join
+from numpy import zeros, sqrt, where, cos, sin, pi, \
+    power, mean, nanmean, int32, linspace, meshgrid
 
-from src.hyde.algorithm.utils.ground_network.lib_ws_generic import random_string, delete_folder, make_folder
-from src.hyde.algorithm.utils.ground_network.lib_ws_process import exec_process
+from src.common.utils.lib_utils_apps_file import deleteFolder
+from src.common.utils.lib_utils_apps_process import execProcess
+from src.common.utils.lib_utils_op_string import randomString
+from src.common.default.lib_default_args import sLoggerName
+from src.common.driver.configuration.drv_configuration_debug import Exc
+
+# Logging
+oLogStream = logging.getLogger(sLoggerName)
 
 # Debug
 import matplotlib.pylab as plt
@@ -27,131 +33,123 @@ import matplotlib.pylab as plt
 
 
 # -------------------------------------------------------------------------------------
-# Command line to compute predictor(s) data
-command_line_predictor = dict(
-    slope_data={
-        'command_line': 'gdaldem slope {file_name_in} {file_name_out} -s 111120'
-    },
-    aspect_data={
-        'command_line': 'gdaldem aspect {file_name_in} {file_name_out}'
-    },
-    roughness_data={
-        'command_line': 'gdaldem roughness {file_name_in} {file_name_out}'
-    },
-    hillshade_data={
-        'command_line': 'gdaldem hillshade {file_name_in} {file_name_out} -s 111120'
-    }
-)
-# Command line to compute geographical data
-command_line_utils = dict(
-    translate_data={
-        'command_line': 'gdal_translate -of AAIGrid {file_name_in} {file_name_out}'
-    }
-)
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
 # Method to compute snow predictor(s)
-def compute_predictor(file_path_in, file_path_out, command_line_data, command_line_geo=None):
+def computeSnowPredictor(sFile_IN, sFile_OUT, sCommandLine_CMP):
 
-    if command_line_geo is None:
-        command_line_geo = command_line_utils['translate_data']['command_line']
+    sString_TEMP = randomString()
+    sFolder_TEMP = tempfile.mkdtemp()
+    sFile_TEMP = join(sFolder_TEMP, sString_TEMP + '.tiff')
 
-    file_name_tmp = random_string() + '.tiff'
-    folder_name_tmp = tempfile.mkdtemp()
-    file_path_tmp = os.path.join(folder_name_tmp, file_name_tmp)
+    sCommandLine_CMP = sCommandLine_CMP.replace('$FILE_REF', sFile_IN)
+    sCommandLine_CMP = sCommandLine_CMP.replace('$FILE_ANCILLARY', sFile_TEMP)
 
-    make_folder(folder_name_tmp)
-
-    # Execute command-line for computing data
-    command_line_tmp = command_line_data.format(**{'file_name_in': file_path_in, 'file_name_out': file_path_tmp})
-    [std_out_data, std_err_data, std_exit_data] = exec_process(command_line_tmp)
+    # Execute command line CMP
+    [sStdOut, sStdErr, iStdExit] = execProcess(sCLine=sCommandLine_CMP, sCPath=sFolder_TEMP)
+    # Wait 5 seconds for writing data on disk
     sleep(5)
 
-    # Read temporary data in tiff format
-    with rasterio.open(file_path_tmp, mode='r+') as dset_tmp:
-        data_tmp = dset_tmp.read()
-        values_tmp = data_tmp[0, :, :]
-    # Read input data in ascii format
-    with rasterio.open(file_path_in, mode='r+') as dset_in:
-        data_in = dset_in.read()
-        values_in = data_in[0, :, :]
+    # Read data TEMP in tiff format and get values
+    oData_TEMP = rasterio.open(sFile_TEMP)
+    a3dData_TEMP = oData_TEMP.read()
+    a2dData_TEMP = a3dData_TEMP[0, :, :]
 
-    # Execute command-line for translating data
-    command_line_tmp = command_line_geo.format(**{'file_name_in': file_path_tmp, 'file_name_out': file_path_out})
-    [std_out_geo, std_err_geo, std_exit_geo] = exec_process(command_line_tmp)
+    # Read data IN in ascii format and get values
+    oData_IN = rasterio.open(sFile_IN)
+    a3dData_IN = oData_IN.read()
+    a2dData_IN = a3dData_IN[0, :, :]
 
-    # Read output data in ascii format
-    with rasterio.open(file_path_out, mode='r+') as dset_out:
-        data_out = dset_out.read()
-        values_out = data_out[0, :, :]
+    # Execute command line TRANSLATE from tiff to ascii
+    sCommandLine_TRANSLATE = ('gdal_translate -of AAIGrid ' + sFile_TEMP + ' ' + sFile_OUT)
+    [sStdOut, sStdErr, iStdExit] = execProcess(sCLine=sCommandLine_TRANSLATE, sCPath=sFolder_TEMP)
+
+    # Read OUT data in ascii format and get values
+    oData_OUT = rasterio.open(sFile_OUT)
+    a3dData_OUT = oData_OUT.read()
+    a2dData_OUT = a3dData_OUT[0, :, :]
 
     # Remove temporary folder and its content
-    delete_folder(folder_name_tmp)
+    deleteFolder(sFolder_TEMP)
 
     # Debug
     # plt.figure(1)
-    # plt.imshow(values_in)
+    # plt.imshow(a2dData_IN); plt.colorbar()
     # plt.figure(2)
-    # plt.imshow(values_tmp)
+    # plt.imshow(a2dData_TEMP); plt.colorbar()
     # plt.figure(3)
-    # plt.imshow(values_out)
+    # plt.imshow(a2dData_OUT);plt.colorbar()
     # plt.show()
 
-    return values_out
+    return a2dData_OUT
 
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to compute snow kernel
-def compute_kernel(ref_geo_data, ref_geo_x, ref_geo_y, geo_cellsize_x, geo_cellsize_y,
-                   var_index_x, var_index_y, radius_influnce):
+def computeSnowKernel(a2dGeoData, a2dGeoX, a2dGeoY, dGeoXCellSize, dGeoYCellSize,
+                      a1iXIndex, a1iYIndex, dRadiusInt):
 
     # -------------------------------------------------------------------------------------
     # Dynamic values (NEW)
-    earth_radius = 6378388  # (Radius)
-    earth_ellipsoid = 0.00672267  # (Ellipsoid)
+    dR = 6378388  # (Radius)
+    dE = 0.00672267  # (Ellipsoid)
 
     # dx = (R * cos(lat)) / (sqrt(1 - e2 * sqr(sin(lat)))) * PI / 180
-    dx = (earth_radius * np.cos(ref_geo_y * np.pi / 180)) / (np.sqrt(1 - earth_ellipsoid * np.sqrt(np.sin(ref_geo_y * np.pi / 180)))) * np.pi / 180
+    a2dDX = (dR * cos(a2dGeoY * pi / 180)) / (
+        sqrt(1 - dE * sqrt(sin(a2dGeoY * pi / 180)))) * pi / 180
     # dy = (R * (1 - e2)) / pow((1 - e2 * sqr(sin(lat))),1.5) * PI / 180
-    dy = (earth_radius * (1 - earth_ellipsoid)) / np.power((1 - earth_ellipsoid * np.sqrt(np.sin(ref_geo_y / 180))), 1.5) * np.pi / 180
+    a2dDY = (dR * (1 - dE)) / power((1 - dE * sqrt(sin(a2dGeoY / 180))), 1.5) * pi / 180
 
     # a2dGeoAreaKm = ((a2dDX/(1/dGeoXCellSize)) * (a2dDY/(1/dGeoYCellSize))) / 1000000 # [km^2]
-    geo_area = ((dx / (1 / geo_cellsize_x)) * (dy / (1 / geo_cellsize_y)))  # [m^2]
+    a2dGeoAreaM = ((a2dDX / (1 / dGeoXCellSize)) * (a2dDY / (1 / dGeoYCellSize)))  # [m^2]
 
     # Area, Mean Dx and Dy values (meters)
-    geo_mx = np.sqrt(np.nanmean(geo_area))
-    geo_my = np.sqrt(np.nanmean(geo_area))
-    geo_mm = np.mean([geo_mx, geo_my])
+    # a2dData = a2dGeoAreaM
+    dGeoAreaMetersDxMean = sqrt(nanmean(a2dGeoAreaM))
+    dGeoAreaMetersDyMean = sqrt(nanmean(a2dGeoAreaM))
 
+    dGeoAreaMetersMean = mean([dGeoAreaMetersDxMean, dGeoAreaMetersDyMean])
+
+    # --------------------------------------------------------------------------------
     # Pixel(s) interpolation
-    pixel_distance = np.int32(radius_influnce * 1000 / geo_mm)
+    iPixelInt = int32(dRadiusInt * 1000 / dGeoAreaMetersMean)
+    # --------------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------------
     # Compute gridded indexes
-    ref_index_x = np.linspace(0, ref_geo_data.shape[1], ref_geo_data.shape[1])
-    ref_index_y = np.linspace(0, ref_geo_data.shape[0], ref_geo_data.shape[0])
-    grid_index_x, grid_index_y = np.meshgrid(ref_index_x, ref_index_y)
+    a1iX = linspace(0, a2dGeoData.shape[1], a2dGeoData.shape[1])
+    a1iY = linspace(0, a2dGeoData.shape[0], a2dGeoData.shape[0])
+    a2iX, a2iY = meshgrid(a1iX, a1iY)
+    # --------------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------------
     # Cycle(s) on snow sensor(s)
-    grid_weights = np.zeros([ref_geo_data.shape[0], ref_geo_data.shape[1]])
-    for index_x, index_y in zip(var_index_x, var_index_y):
+    a2dW = zeros([a2dGeoData.shape[0], a2dGeoData.shape[1]])
+    for iXIdx, iYIdx in zip(a1iXIndex, a1iYIndex):
 
+        # --------------------------------------------------------------------------------
         # Compute distance index matrix
-        grid_index_distance = np.zeros([ref_geo_data.shape[0], ref_geo_data.shape[1]])
-        grid_index_distance = np.sqrt((grid_index_y - index_y) ** 2 + (grid_index_x - index_x) ** 2)
+        a2dDistIdx = zeros([a2dGeoData.shape[0], a2dGeoData.shape[1]])
+        a2dDistIdx = sqrt((a2iY - iYIdx) ** 2 + (a2iX - iXIdx) ** 2)
 
         # Weight(s) matrix
-        grid_index_pixels = np.zeros([ref_geo_data.shape[0], ref_geo_data.shape[1]])
-        grid_index_pixels = np.where(grid_index_distance < pixel_distance)
+        a2iPixelIdx = zeros([a2dGeoData.shape[0], a2dGeoData.shape[1]])
+        a2iPixelIdx = where(a2dDistIdx < iPixelInt)
+        a2dW[a2iPixelIdx] = a2dW[a2iPixelIdx] + \
+                            (iPixelInt ** 2 - a2dDistIdx[a2iPixelIdx] ** 2) / \
+                            (iPixelInt ** 2 + a2dDistIdx[a2iPixelIdx] ** 2) / len(a1iXIndex)
+        # --------------------------------------------------------------------------------
 
-        grid_weights[grid_index_pixels] = grid_weights[grid_index_pixels] + \
-            (pixel_distance ** 2 - grid_index_distance[grid_index_pixels] ** 2) /\
-            (pixel_distance ** 2 + grid_index_distance[grid_index_pixels] ** 2) / len(var_index_x)
+    # --------------------------------------------------------------------------------
+    # Debug
+    # plt.figure(1)
+    # plt.imshow(a2dW); plt.colorbar();
+    # plt.show()
+    # --------------------------------------------------------------------------------
 
-    return grid_weights
+    # --------------------------------------------------------------------------------
+    # Return variable(s)
+    return a2dW
     # --------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------

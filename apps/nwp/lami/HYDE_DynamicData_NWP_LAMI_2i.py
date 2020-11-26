@@ -7,7 +7,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python HYDE_DynamicData_NWP_LAMI-2I.py -settings_file configuration_product.json -time YYYYMMDDHHMM
+python HYDE_DynamicData_NWP_LAMI_2i.py -settingsfile configuration_product.json -time YYYYMMDDHHMM
 
 Version:
 20181203 (1.0.0) --> Beta release for hyde package
@@ -42,7 +42,7 @@ from src.hyde.driver.dataset.nwp.lami.drv_data_io_lami_2i import DataProductClea
 # Method to get script argument(s)
 def GetArgs():
     oParser = argparse.ArgumentParser()
-    oParser.add_argument('-settings_file', action="store", dest="sSettingFile")
+    oParser.add_argument('-settingsfile', action="store", dest="sSettingFile")
     oParser.add_argument('-time', action="store", dest="sTimeArg")
     oParserValue = oParser.parse_args()
 
@@ -181,7 +181,6 @@ def main():
             albedo_file=defineString(oData_Path['albedo_data'],
                                                 removeDictKey(oData_Tags, ['Year', 'Month', 'Day', 'Hour', 'Minute'])),
             forecast_expected_step=oTimeStep,
-            tmp_data=oData_Path['tmp'],
         )
 
         if not exists(defineString(oData_Path['nwp_ancillary_data_collected'], oData_Tags)):

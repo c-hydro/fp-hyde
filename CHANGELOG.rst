@@ -2,22 +2,11 @@
 Changelog
 =========
 
-Version 1.9.6 [2020-11-02]
+Version 1.9.6 [2020-10-28]
 **************************
-APP: **HYDE_DynamicData_GroundNetwork_WS.py**
-    - Refactor of the procedure to create the datasets of observed variables
-
 BIN: **hyde_downloader_odbc_ws.py**
 	- Release for Hyde package
 
-FIX: **HYDE_DynamicData_NWP_ECMWF0100.py**
-    - Fix format of time argument passed by user
-	- Fix the orientation of latitude and values map(s)
-
-FIX: **HYDE_DynamicData_NWP_LAMI-2I.py**
-    - Fix format of settings file arguments
-    - Fix format of time argument passed by user
-	- Fix the settings of temporary folder to open file for multiprocessing application(s)
 
 Version 1.9.5 [2020-05-22]
 **************************

@@ -31,7 +31,7 @@ from src.hyde.driver.dataset.generic.drv_data_io_geo import DataGeo
 from src.hyde.driver.configuration.generic.drv_configuration_algorithm import DataAlgorithm
 from src.hyde.driver.configuration.generic.drv_configuration_time import DataTime
 from src.hyde.driver.configuration.generic.drv_configuration_tags import DataTags
-from src.common.driver.configuration.drv_configuration_debug import Exc
+from src.hyde.driver.configuration import Exc
 
 from src.hyde.driver.dataset.radar.drv_data_io_mcm import DataProductCleaner, DataProductTime, \
     DataProductBuilder, DataProductAnalyzer, DataProductFinalizer
