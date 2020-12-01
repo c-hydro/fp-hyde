@@ -421,12 +421,10 @@ def getVarGeo_ECMWF_0100(file_handle):
     geo_x, geo_y = getVarGeo_NWP(file_handle)
     return geo_x, geo_y
 
-
 # Method to get geographical reference for lami-2i
 def getVarGeo_LAMI_2i(file_handle):
     geo_x, geo_y = getVarGeo_NWP(file_handle)
     return geo_x, geo_y
-
 
 # Method to get geographical reference generic
 def getVarGeo_NWP(oFileHandle, iIdx=0):
@@ -561,11 +559,15 @@ def getVarAttr_NWP(oFileHandle, oVarComp=None, oVarKeyNA=None):
 
 
 # --------------------------------------------------------------------------------
+# Method to get time variable for ECMWF 0100
+def getVarTime_ECMWF_0100(oFileHandle, oVarComp):
+    oVarTime = getVarTime_NWP(oFileHandle, oVarComp)
+    return oVarTime
+
 # Method to get time variable for LAMI 2I
 def getVarTime_LAMI_2i(oFileHandle, oVarComp):
     oVarTime = getVarTime_NWP(oFileHandle, oVarComp)
     return oVarTime
-
 
 # Method to get time variable from NWP
 def getVarTime_NWP(oFileHandle, oVarComp):
@@ -639,11 +641,15 @@ def getVarTime_NWP(oFileHandle, oVarComp):
 
 
 # --------------------------------------------------------------------------------
+# Method to get 3d variable from ECMWF 0100
+def getVar3D_ECMWF_0100(oFileHandle, oVarComp=None):
+    oVarData = getVar3D_NWP(oFileHandle, oVarComp=oVarComp)
+    return oVarData
+
 # Method to get 3d variable from LAMI 2I
 def getVar3D_LAMI_2i(oFileHandle, oVarComp=None):
     oVarData = getVar3D_NWP(oFileHandle, oVarComp=oVarComp)
     return oVarData
-
 
 # Method to get 3d variable from generic NWP
 def getVar3D_NWP(oFileHandle, oVarComp=None):

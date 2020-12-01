@@ -10,7 +10,7 @@
     },
     "ancillary": {
       "domain" : "regional_domain",
-	  "write_engine": "netcdf4",
+      "write_engine": "netcdf4",
       "zip_format": ".gz"
     },
     "general": {
@@ -22,7 +22,7 @@
       "algorithm": "Processing tool developed by CIMA Research Foundation"
     },
     "parameters": {
-      "ensemble": {"start": 1, "end": 33},
+      "ensemble": {"start": 1, "end": 3},
       "ratio_s": 4,
       "ratio_t": 1,
       "slope_s": null,
@@ -39,17 +39,17 @@
       "land": {
         "terrain_data": {
           "filename": "marche.dem.txt",
-          "folder": "/hydro/data/static_data/land/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/"
         },
         "grid_data": {
-          "filename": "rf.lami-2i.grid_data.workspace",
-          "folder": "/hydro/data/static_data/ancillary/rf_lami-2i/"
+          "filename": "rfarm_lami-2i_grid.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/rfarm/lami-2i/"
         }
       },
       "colormap": {
         "rain_colormap" : {
           "filename": null,
-          "folder" : "/hydro/data/static_data/colormap/"
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
         }
       }
     },
@@ -71,31 +71,31 @@
         "rain_input_data": {
           "__comment__": "20181220-lami-2i.t00z.PRECI1",
           "filename": "{datetime_input}-lami-2i.t00z.PRECI1",
-          "folder": "/hydro/data/dynamic_data/source/nwp/lami-2i/"
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp//lami-2i/"
         },
         "rain_input_ancillary" : {
-          "filename" : "{datetime_input}_lami_2i_t00z_precipitaion1h.workspace",
-          "folder": "/hydro/data/dynamic_data/ancillary/rfarm_lami-2i/{sub_path_time}/"
+          "filename" : "nwp_lami-2i_precipitation1h_{datetime_input}.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/rfarm/lami-2i/{sub_path_time}/"
         }
       },
       "outcome": {
         "rain_outcome_ancillary": {
-          "filename": "rf.lami-2i.{datetime_outcome}_{ensemble}.workspace",
-          "folder": "/hydro/data/dynamic_data/ancillary/rfarm_lami-2i/{sub_path_time}/"
+          "filename": "rfarm_lami-2i_{datetime_outcome}_{ensemble}.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/rfarm/lami-2i/{sub_path_time}/"
         },
         "rain_outcome_data": {
-          "filename": "rf.lami-2i.{datetime_outcome}.nc",
-          "folder": "/hydro/data/dynamic_data/outcome/rainfarm/lami-2i/{sub_path_time}/{ensemble}/"
+          "filename": "rfarm.lami-2i.{datetime_outcome}_{ensemble}.nc",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/rfarm/lami-2i/{sub_path_time}/{ensemble}/"
         }
       }
     },
     "log": {
-        "filename": "rfarm_lami-2i_log_history.txt",
-        "folder": "/hydro/log/"
+        "filename": "rfarm_lami-2i_log.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/rfarm/"
     },
     "temp": {
         "filename": null,
-        "folder": "/hydro/tmp/rfarm_lami-2i/"
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_tmp/rfarm/"
     },
     "library": {
       "filename": "",
@@ -107,7 +107,7 @@
     }
   },
   "time": {
-    "time_now": "201909220700",
+    "time_now": "201812210000",
     "time_period": 0,
     "time_frequency": "D",
     "time_rounding": "D"
@@ -119,7 +119,7 @@
           "var_type": ["var3d", "accumulated"],
           "var_source": "lami_2i",
           "var_format": "grib",
-          "var_name": "Total Precipitation",
+          "var_name": "tp",
           "var_file": "rain_data",
           "var_colormap": null,
           "var_parameters": null

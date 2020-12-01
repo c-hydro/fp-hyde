@@ -122,7 +122,7 @@
       },
       "outcome": {
         "nwp_outcome_data": {
-          "filename": "ecmwf_0100_{datetime_outcome}_{domain}.nc",
+          "filename": "nwp.ecmwf0100.{datetime_outcome}_{domain}.nc",
           "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/nwp/ecmwf_0100/{sub_path_time_outcome}"
         }
       }

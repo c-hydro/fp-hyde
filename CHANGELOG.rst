@@ -20,6 +20,9 @@ FIX: **HYDE_DynamicData_NWP_LAMI-2I.py**
 	- Fix the settings of temporary folder to open file for multiprocessing application(s)
 	- Fix the name and the order of the dimensions in the output datasets
 
+FIX: **HYDE_Model_RFarm.py**
+    - Fix and update the data reader of the lami-2i nwp and the ecmwf0100 nwp
+    
 Version 1.9.5 [2020-05-22]
 **************************
 APP: **HYDE_DynamicData_DroughtIndex_SSPI.py**
