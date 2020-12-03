@@ -319,7 +319,7 @@
           "standard_name": ["total_precipitation"],
           "Missing_value": [-9999.0],
           "_FillValue": [-9999.0],
-          "ScaleFactor": [1],
+          "ScaleFactor": [0.001],
           "Valid_range": [[0, null]],
           "units": ["mm"],
           "Format": ["f4"],

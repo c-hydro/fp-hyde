@@ -6,6 +6,9 @@ Version 1.9.6 [2020-11-02]
 **************************
 APP: **HYDE_DynamicData_GroundNetwork_WS.py**
     - Refactor of the procedure to create the datasets of observed variables
+    
+BIN: **hyde_downloader_modis_snow.py**
+	- Release for Hyde package and refactoring to python3
 
 BIN: **hyde_downloader_odbc_ws.py**
 	- Release for Hyde package

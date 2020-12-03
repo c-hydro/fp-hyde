@@ -16,7 +16,7 @@ from bin.downloader.ws.odbc.lib_utils_db_sirmip import define_db_settings, get_d
 
 
 # -------------------------------------------------------------------------------------
-# Class driver geographical data
+# Class driver dynamic data
 class DriverData:
 
     def __init__(self, time_step, src_dict=None, ancillary_dict=None, dst_dict=None,
