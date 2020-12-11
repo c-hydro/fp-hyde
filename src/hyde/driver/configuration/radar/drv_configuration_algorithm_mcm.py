@@ -1,9 +1,9 @@
 """
 Class Features
 
-Name:          drv_configuration_algorithm_ws
+Name:          drv_configuration_algorithm_mcm
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20201102'
+Date:          '20201206'
 Version:       '1.0.0'
 """
 
@@ -15,12 +15,11 @@ import re
 
 from collections import OrderedDict
 
-from src.hyde.algorithm.io.ground_network.lib_ws_io_generic import read_file_settings
-from src.hyde.algorithm.utils.ground_network.lib_ws_generic import make_folder, get_dict_values
-from src.hyde.algorithm.utils.ground_network.lib_ws_logging import set_logging_file
+from src.hyde.algorithm.io.radar.lib_mcm_io_generic import read_file_settings
+from src.hyde.algorithm.utils.radar.lib_mcm_generic import make_folder, get_dict_values
+from src.hyde.algorithm.utils.radar.lib_mcm_logging import set_logging_file
 
-from src.hyde.algorithm.settings.ground_network.lib_ws_args import logger_name, \
-    logger_formatter, logger_handle
+from src.hyde.algorithm.settings.radar.lib_mcm_args import logger_name, logger_formatter, logger_handle
 
 # Debug
 # import matplotlib.pylab as plt

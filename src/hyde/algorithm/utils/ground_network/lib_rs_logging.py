@@ -1,9 +1,9 @@
 """
 Library Features:
 
-Name:          lib_ws_logging
+Name:          lib_rs_logging
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20201102'
+Date:          '20201210'
 Version:       '1.0.0'
 """
 

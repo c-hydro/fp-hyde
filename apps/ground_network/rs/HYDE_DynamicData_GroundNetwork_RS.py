@@ -1,50 +1,41 @@
 """
-MODIS Processing Tool - SNOW PRODUCT
+GROUND_NETWORK Processing Tool - RIVER STATION(S) PRODUCT
 
-__date__ = '20201202'
-__version__ = '3.5.0'
+__date__ = '20201210'
+__version__ = '2.0.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 HYDE_DynamicData_MODIS_Snow.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
+python3 HYDE_DynamicData_GroundNetwork_RS.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version:
-20201202 (3.5.0) --> Hyde package refactor
-20180910 (3.0.0) --> Beta release to put algorithm into FloodProofs library
-20151015 (2.0.0) --> Updated codes, classes and methods
-20150725 (1.5.0) --> Updated codes, classes and methods
-20150715 (1.0.6) --> Added filter to compute quality index
-20150522 (1.0.5) --> Added merging between tiles
-20150514 (1.0.4) --> Updated output file attributes
-20150513 (1.0.3) --> Added mosaic tile(s) option, update settings file and reader
-20141210 (1.0.2) --> Added checking no data available on FTP server
-20140808 (1.0.1) --> Re-arranged some functions and other stuff
-20140807 (1.0.0) --> First Release
-20140805 (0.0.1) --> First Code
+20201210 (2.0.0) --> Release 2.0 Beta (HyDE package)
+20151204 (1.0.0) --> Release 1.0 Beta
 """
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
-# Complete library
+# Libraries
 import logging
 
 from argparse import ArgumentParser
 from time import time, strftime, gmtime
 
-from src.hyde.driver.configuration.satellite.modis.drv_configuration_algorithm_modis import DriverAlgorithm
-from src.hyde.driver.configuration.satellite.modis.drv_configuration_time_modis import DriverTime
+from src.hyde.driver.configuration.ground_network.rs.drv_configuration_algorithm_rs import DriverAlgorithm
+from src.hyde.driver.configuration.ground_network.rs.drv_configuration_time_rs import DriverTime
 
-from src.hyde.driver.dataset.satellite.modis.drv_data_modis_geo import DriverGeo
-from src.hyde.driver.dataset.satellite.modis.drv_data_modis_io import DriverData
+from src.hyde.driver.dataset.ground_network.rs.drv_data_rs_geo import DriverGeo
+from src.hyde.driver.dataset.ground_network.rs.drv_data_rs_io import DriverData
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_project = 'HyDE'
-alg_name = 'MODIS PROCESSING TOOL SNOW'
-alg_version = '3.5.0'
-alg_release = '2020-12-02'
+alg_name = 'GROUND NETWORK PROCESSING TOOL RS'
+alg_version = '2.0.0'
+alg_release = '2020-12-10'
 alg_type = 'DataDynamic'
 # Algorithm parameter(s)
 time_format = '%Y-%m-%d %H:%M'
@@ -138,6 +129,8 @@ def main():
     logging.info('[' + alg_project + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
     logging.info('End Program - Time elapsed: ' + str(elapsed_time) + ' seconds')
     # -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
