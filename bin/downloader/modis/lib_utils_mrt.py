@@ -60,13 +60,22 @@ def define_mrt_resample_cmd(file_name_parameters,
 def define_mrt_mosaic_file(file_name_tile, tile_list):
 
     # Create tile dictionary
-    tile_dict = {}
+    tile_dict = None
     for tile_id, tile_step in enumerate(tile_list):
-        tile_dict[tile_id] = tile_step + '\n'
+        if os.path.exists(tile_step):
+            if tile_dict is None:
+                tile_dict = {}
+            tile_dict[tile_id] = tile_step + '\n'
+        else:
+            logging.warning(' ===> Tile ' + tile_step + ' not found! Domain coverage could not be completed.')
 
-    file_handle = open(file_name_tile, 'w')
-    file_handle.writelines(tile_dict.values())
-    file_handle.close()
+    if tile_dict is not None:
+        file_handle = open(file_name_tile, 'w')
+        file_handle.writelines(tile_dict.values())
+        file_handle.close()
+        return True
+    else:
+        return False
 
 # -------------------------------------------------------------------------------------
 

@@ -208,8 +208,8 @@ class DriverData:
                         if (not os.path.exists(file_path_anc_step)) and (not os.path.exists(file_path_dst_step)):
 
                             time_from, time_to = parse_query_time(time_step)
-                            #var_data = get_data_rs(var_tag, time_from, time_to, self.db_settings)
-                            #write_obj(file_path_anc_step, var_data)
+                            var_data = get_data_rs(var_tag, time_from, time_to, self.db_settings)
+                            write_obj(file_path_anc_step, var_data)
 
                             logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
 

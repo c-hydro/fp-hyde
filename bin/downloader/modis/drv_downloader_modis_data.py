@@ -485,20 +485,24 @@ class DriverData:
                         file_folder_mosaic_data, file_name_mosaic_data = os.path.split(file_path_mosaic_data)
                         make_folder(file_folder_mosaic_data)
 
-                        define_mrt_mosaic_file(file_path_mosaic_tiles, file_tile_list)
+                        file_status = define_mrt_mosaic_file(file_path_mosaic_tiles, file_tile_list)
 
-                        cmd_mosaic = define_mrt_mosaic_cmd(file_path_mosaic_tiles, file_path_mosaic_data,
-                                                           mrt_folder=library_folder,
-                                                           mrt_executable=library_app_mosaic_exec)
+                        if file_status:
+                            cmd_mosaic = define_mrt_mosaic_cmd(file_path_mosaic_tiles, file_path_mosaic_data,
+                                                               mrt_folder=library_folder,
+                                                               mrt_executable=library_app_mosaic_exec)
 
-                        execute_mrt_cmd(cmd_mosaic)
+                            execute_mrt_cmd(cmd_mosaic)
 
-                        file_composite_collections[time_step] = [file_path_mosaic_data]
+                            file_composite_collections[time_step] = [file_path_mosaic_data]
 
-                        if os.path.exists(file_path_mosaic_tiles):
-                            os.remove(file_path_mosaic_tiles)
+                            if os.path.exists(file_path_mosaic_tiles):
+                                os.remove(file_path_mosaic_tiles)
+                            logging.info(' ------> Execute mosaic ... DONE. Datasets are stored in mosaic format')
+                        else:
+                            logging.info(' ------> Execute mosaic ... FAILED. All tiles are not available')
+                            file_composite_collections[time_step] = None
 
-                        logging.info(' ------> Execute mosaic ... DONE. Datasets are stored in mosaic format')
                     else:
                         logging.info(' ------> Execute mosaic ... SKIPPED. Mosaic previously computed')
                         file_composite_collections[time_step] = [file_path_mosaic_data]
