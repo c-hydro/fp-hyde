@@ -320,115 +320,120 @@ class DriverData:
             file_composite_list = file_composite_collections[time_step]
             file_path_dst = file_path_dst_obj[time_step]
 
-            if not library_app_mosaic_mode:
-                file_resample_list = []
-                file_destination_list = []
-                file_parameters_list = []
-                for tile_name in tile_list:
-                    template_values = {'tile_composite': tile_name}
-                    file_path_res_tmp = fill_tags2string(file_path_resample_data, self.template_dict, template_values)
-                    file_resample_list.append(file_path_res_tmp)
-                    file_path_dst_tmp = fill_tags2string(file_path_dst, self.template_dict, template_values)
-                    file_destination_list.append(file_path_dst_tmp)
-                    file_path_params_tmp = fill_tags2string(file_path_resample_params, self.template_dict,
-                                                            template_values)
-                    file_parameters_list.append(file_path_params_tmp)
-            else:
-                template_values = {'tile_composite': tile_name_composite}
-                file_path_res_tmp = fill_tags2string(file_path_resample_data, self.template_dict, template_values)
-                file_resample_list = [file_path_res_tmp]
-                file_path_dst_tmp = fill_tags2string(file_path_dst, self.template_dict, template_values)
-                file_destination_list = [file_path_dst_tmp]
-                file_path_params_tmp = fill_tags2string(file_path_resample_params, self.template_dict, template_values)
-                file_parameters_list = [file_path_params_tmp]
-
             logging.info(' ------> Execute resampling ... ')
-            file_composite_collections[time_step] = {}
+            if file_composite_list is not None:
 
-            for file_path_composite, file_path_parameters, file_path_resample, file_path_destination in zip(
-                    file_composite_list, file_parameters_list, file_resample_list, file_destination_list):
-
-                folder_name_composite, file_name_composite = os.path.split(file_path_composite)
-                folder_name_resample, file_name_resample = os.path.split(file_path_resample)
-                make_folder(folder_name_resample)
-                folder_name_parameters, file_name_parameters = os.path.split(file_path_parameters)
-                make_folder(folder_name_parameters)
-                folder_name_destination, file_name_destination = os.path.split(file_path_destination)
-                make_folder(folder_name_destination)
-                file_path_zip = file_path_destination + self.compression_extension
-
-                logging.info(' -------> Compute from ' + file_name_composite + ' to '
-                             + file_name_resample + ' ... ')
-
-                if flag_upd_dst:
-                    if os.path.exists(file_path_destination):
-                        os.remove(file_path_destination)
-                    if os.path.exists(file_path_zip):
-                        os.remove(file_path_zip)
-                if self.file_compression_dst:
-                    file_check = file_path_zip
+                if not library_app_mosaic_mode:
+                    file_resample_list = []
+                    file_destination_list = []
+                    file_parameters_list = []
+                    for tile_name in tile_list:
+                        template_values = {'tile_composite': tile_name}
+                        file_path_res_tmp = fill_tags2string(file_path_resample_data, self.template_dict, template_values)
+                        file_resample_list.append(file_path_res_tmp)
+                        file_path_dst_tmp = fill_tags2string(file_path_dst, self.template_dict, template_values)
+                        file_destination_list.append(file_path_dst_tmp)
+                        file_path_params_tmp = fill_tags2string(file_path_resample_params, self.template_dict,
+                                                                template_values)
+                        file_parameters_list.append(file_path_params_tmp)
                 else:
-                    file_check = file_path_destination
+                    template_values = {'tile_composite': tile_name_composite}
+                    file_path_res_tmp = fill_tags2string(file_path_resample_data, self.template_dict, template_values)
+                    file_resample_list = [file_path_res_tmp]
+                    file_path_dst_tmp = fill_tags2string(file_path_dst, self.template_dict, template_values)
+                    file_destination_list = [file_path_dst_tmp]
+                    file_path_params_tmp = fill_tags2string(file_path_resample_params, self.template_dict, template_values)
+                    file_parameters_list = [file_path_params_tmp]
 
-                if library_app_resample_mode:
+                file_composite_collections[time_step] = {}
 
-                    if not os.path.exists(file_check):
+                for file_path_composite, file_path_parameters, file_path_resample, file_path_destination in zip(
+                        file_composite_list, file_parameters_list, file_resample_list, file_destination_list):
 
-                        define_mrt_resample_file(file_path_composite, file_path_parameters, file_path_resample,
-                                                 spatial_subset_type=library_app_resample_spacial_subset_type,
-                                                 resampling_type=library_app_resample_resampling_method,
-                                                 proj=library_app_resample_proj,
-                                                 datum=library_app_resample_datum)
+                    folder_name_composite, file_name_composite = os.path.split(file_path_composite)
+                    folder_name_resample, file_name_resample = os.path.split(file_path_resample)
+                    make_folder(folder_name_resample)
+                    folder_name_parameters, file_name_parameters = os.path.split(file_path_parameters)
+                    make_folder(folder_name_parameters)
+                    folder_name_destination, file_name_destination = os.path.split(file_path_destination)
+                    make_folder(folder_name_destination)
+                    file_path_zip = file_path_destination + self.compression_extension
 
-                        cmd_resample = define_mrt_resample_cmd(file_path_parameters,
-                                                               mrt_folder=library_folder,
-                                                               mrt_executable=library_app_resample_exec)
-                        execute_mrt_cmd(cmd_resample)
+                    logging.info(' -------> Compute from ' + file_name_composite + ' to '
+                                 + file_name_resample + ' ... ')
 
-                        logging.info(' -------> Compute from ' + file_name_composite + ' to '
-                                     + file_name_resample + ' ... DONE')
-
-                        logging.info(' -------> Move from ' + file_name_resample + ' to '
-                                     + file_name_destination + ' ... ')
-
-                        if os.path.exists(file_path_resample):
-                            os.rename(file_path_resample, file_path_destination)
-                            logging.info(' -------> Move from ' + file_name_resample + ' to '
-                                         + file_name_destination + ' ... DONE')
-
-                        else:
-                            logging.info(' -------> Move from ' + file_name_resample + ' to '
-                                         + file_name_destination + ' ... FAILED. Resampled file not available')
-
-                        logging.info(' -------> Zip ' + file_name_destination + ' ... ')
-                        if self.file_compression_dst:
-                            zip_filename(file_path_destination, file_path_zip)
-                            if os.path.exists(file_path_destination):
-                                os.remove(file_path_destination)
-                            logging.info(' -------> Zip ' + file_name_destination + ' ... DONE')
-                        else:
-                            logging.info(' -------> Zip ' + file_name_destination +
-                                         ' ... SKIPPED. Compression not activated')
-
-                        if os.path.exists(file_path_composite):
-                            os.remove(file_path_composite)
-                        if os.path.exists(file_path_parameters):
-                            os.remove(file_path_parameters)
-                        if os.path.exists(file_path_resample):
-                            os.remove(file_path_resample)
+                    if flag_upd_dst:
                         if os.path.exists(file_path_destination):
                             os.remove(file_path_destination)
+                        if os.path.exists(file_path_zip):
+                            os.remove(file_path_zip)
+                    if self.file_compression_dst:
+                        file_check = file_path_zip
+                    else:
+                        file_check = file_path_destination
 
+                    if library_app_resample_mode:
+
+                        if not os.path.exists(file_check):
+
+                            define_mrt_resample_file(file_path_composite, file_path_parameters, file_path_resample,
+                                                     spatial_subset_type=library_app_resample_spacial_subset_type,
+                                                     resampling_type=library_app_resample_resampling_method,
+                                                     proj=library_app_resample_proj,
+                                                     datum=library_app_resample_datum)
+
+                            cmd_resample = define_mrt_resample_cmd(file_path_parameters,
+                                                                   mrt_folder=library_folder,
+                                                                   mrt_executable=library_app_resample_exec)
+                            execute_mrt_cmd(cmd_resample)
+
+                            logging.info(' -------> Compute from ' + file_name_composite + ' to '
+                                         + file_name_resample + ' ... DONE')
+
+                            logging.info(' -------> Move from ' + file_name_resample + ' to '
+                                         + file_name_destination + ' ... ')
+
+                            if os.path.exists(file_path_resample):
+                                os.rename(file_path_resample, file_path_destination)
+                                logging.info(' -------> Move from ' + file_name_resample + ' to '
+                                             + file_name_destination + ' ... DONE')
+
+                            else:
+                                logging.info(' -------> Move from ' + file_name_resample + ' to '
+                                             + file_name_destination + ' ... FAILED. Resampled file not available')
+
+                            logging.info(' -------> Zip ' + file_name_destination + ' ... ')
+                            if self.file_compression_dst:
+                                zip_filename(file_path_destination, file_path_zip)
+                                if os.path.exists(file_path_destination):
+                                    os.remove(file_path_destination)
+                                logging.info(' -------> Zip ' + file_name_destination + ' ... DONE')
+                            else:
+                                logging.info(' -------> Zip ' + file_name_destination +
+                                             ' ... SKIPPED. Compression not activated')
+
+                            if os.path.exists(file_path_composite):
+                                os.remove(file_path_composite)
+                            if os.path.exists(file_path_parameters):
+                                os.remove(file_path_parameters)
+                            if os.path.exists(file_path_resample):
+                                os.remove(file_path_resample)
+                            if os.path.exists(file_path_destination):
+                                os.remove(file_path_destination)
+
+                        else:
+                            logging.info(' -------> Resample from ' + file_name_composite + ' to '
+                                         + file_name_resample + ' ... SKIPPED. Resampled datasets previously computed')
                     else:
                         logging.info(' -------> Resample from ' + file_name_composite + ' to '
-                                     + file_name_resample + ' ... SKIPPED. Resampled datasets previously computed')
-                else:
-                    logging.info(' -------> Resample from ' + file_name_composite + ' to '
-                                 + file_name_resample + ' ... NOT ACTIVATED')
+                                     + file_name_resample + ' ... NOT ACTIVATED')
 
-            logging.info(' ------> Execute resampling ... DONE')
+                logging.info(' ------> Execute resampling ... DONE')
+                logging.info(' -----> Time Step ' + str(time_step) + ' ... DONE')
 
-            logging.info(' -----> Time Step ' + str(time_step) + ' ... DONE')
+            else:
+                logging.info(' ------> Execute resampling ... SKIPPED. Datasets not available')
+                logging.info(' -----> Time Step ' + str(time_step) + ' ... DONE')
 
         logging.info(' ----> Resample datasets ... DONE')
 

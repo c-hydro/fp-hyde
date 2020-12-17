@@ -62,12 +62,15 @@ def define_mrt_mosaic_file(file_name_tile, tile_list):
     # Create tile dictionary
     tile_dict = None
     for tile_id, tile_step in enumerate(tile_list):
-        if os.path.exists(tile_step):
+        if (tile_step is not None) and (os.path.exists(tile_step)):
             if tile_dict is None:
                 tile_dict = {}
             tile_dict[tile_id] = tile_step + '\n'
         else:
-            logging.warning(' ===> Tile ' + tile_step + ' not found! Domain coverage could not be completed.')
+            if tile_step is not None:
+                logging.warning(' ===> Tile ' + tile_step + ' not found! Domain coverage could not be completed.')
+            else:
+                logging.warning(' ===> Tile expected with id ' + str(tile_id) + ' is not available. Object is None')
 
     if tile_dict is not None:
         file_handle = open(file_name_tile, 'w')
