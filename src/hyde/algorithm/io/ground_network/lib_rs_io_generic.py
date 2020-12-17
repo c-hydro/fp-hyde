@@ -63,6 +63,16 @@ def create_filename_tmp(prefix='tmp_', suffix='.tiff', folder=None):
 
 
 # -------------------------------------------------------------------------------------
+# Method to write ascii 1d
+def write_file_ascii(file_name, file_data, file_attrs, file_format='%10.1f', file_new_line='\n'):
+
+    file_array = np.array(file_data)
+    np.savetxt(file_name, file_array, fmt=file_format, newline=file_new_line)
+
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
 # Method to read file csv
 def read_file_csv(file_name, file_time=None, file_header=None,
                   file_sep=',', file_skiprows=1, file_skipcols=None,

@@ -2,13 +2,36 @@
 Changelog
 =========
 
-Version 1.9.6 [2020-11-02]
+Version 1.9.6 [2020-12-14]
 **************************
+APP: **HYDE_DynamicData_MODIS_Snow.py**
+	- Release for Hyde package
+	    - Previous Version(s):
+	        - [2018-09-10] Beta release for FloodProofs library
+            - [2015-10-15] Updated codes, classes and methods
+            - [2015-07-15] Added filter to compute quality index
+            - [2015-05-14] Updated output file attributes
+            - [2014-08-08] Refactor of functions and other stuff
+            - [2014-08-07] Beta Release
+            
+APP: **HYDE_DynamicData_Radar_MCM.py**
+	- Release for Hyde package
+	    - Previous Version(s):
+	        - [2019-07-09] Beta release for FloodProofs library
+
+APP: **HYDE_DynamicData_GroundNetwork_RS.py**
+    - Release for Hyde package and refactor of the procedure to create the datasets of river stations observed discharges
+        - Previous Version(s):
+            - [2015-12-04] Latest operational version
+            
 APP: **HYDE_DynamicData_GroundNetwork_WS.py**
-    - Refactor of the procedure to create the datasets of observed variables
+    - Refactor of the procedure to create the datasets of weather stations observed variables
     
 BIN: **hyde_downloader_modis_snow.py**
 	- Release for Hyde package and refactoring to python3
+
+BIN: **hyde_downloader_odbc_rs.py**
+	- Release for Hyde package
 
 BIN: **hyde_downloader_odbc_ws.py**
 	- Release for Hyde package

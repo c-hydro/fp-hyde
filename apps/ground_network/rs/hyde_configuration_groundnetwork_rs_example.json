@@ -49,7 +49,7 @@
         "time_rounding": "H"
       },
       "source": {
-        "discharge_data": {
+        "discharge": {
           "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/river_stations/{source_sub_path_time}",
           "file_name": "discharge_{domain_name}_{source_datetime}.csv",
           "file_fields": ["longitude", "latitude", "discharge", "time", "units", "catchment", "name", "tag", "type",
@@ -80,7 +80,7 @@
   },
   "variables": {
     "source": {
-      "discharge_data": {
+      "discharge": {
         "var_mode": true,
         "var_name": "Discharge",
         "var_method_compute": null,
@@ -96,7 +96,7 @@
       }
     },
     "destination": {
-      "discharge_data":{
+      "discharge":{
         "var_mode": true,
         "var_name": "Discharge",
         "var_attributes": {

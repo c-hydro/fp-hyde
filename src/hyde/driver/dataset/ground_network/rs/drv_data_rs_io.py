@@ -15,20 +15,19 @@ import logging
 import os
 import time
 
+import numpy as np
 import xarray as xr
 import pandas as pd
 
 from src.hyde.algorithm.settings.ground_network.lib_rs_conventions import conventions_vars
 from src.hyde.dataset.ground_network.rs.lib_rs_variables import convert_values2points
 
-from src.hyde.algorithm.io.ground_network.lib_rs_io_generic import write_obj, read_obj, convert_values2da, \
-    create_dset, write_dset, read_file_csv
+from src.hyde.algorithm.io.ground_network.lib_rs_io_generic import write_obj, read_obj, \
+    create_dset, write_dset, read_file_csv, write_file_ascii
 from src.hyde.algorithm.utils.ground_network.lib_rs_generic import make_folder, fill_tags2string, list_folder, \
     get_root_path
 
 from src.hyde.algorithm.io.ground_network.lib_rs_io_gzip import zip_filename
-
-from src.hyde.driver.dataset.ground_network.ws.cpl_data_variables_ws import DriverVariable
 # -------------------------------------------------------------------------------------
 
 
@@ -229,54 +228,43 @@ class DriverData:
 
                     logging.info(' ------> Create array object ... ')
 
-                    var_dset_anc = self.read_dset_obj(var_file_path_anc)
+                    var_dict_anc = self.read_dset_obj(var_file_path_anc)
 
                     # Iterate over variables
                     var_data_dict = {}
                     var_attrs_dict = {}
-                    for var_key_anc in list(var_dset_anc.keys()):
+                    for var_key_anc in list(var_dict_anc.keys()):
 
                         logging.info(' -------> Variable ' + var_key_anc + ' ... DONE')
 
-                        var_da_anc = var_dset_anc[var_key_anc]
+                        var_da_anc = var_dict_anc[var_key_anc]
                         var_name_dst = var_dict_dst[var_key_anc]['var_name']
                         var_mode_dst = var_dict_dst[var_key_anc]['var_mode']
                         var_attrs_dst = var_dict_dst[var_key_anc]['var_attributes']
 
                         if var_mode_dst:
-                            var_data_dict[var_name_dst] = var_da_anc.values
+
+                            var_value_list = []
+                            for var_da_step in var_da_anc:
+                                var_value_step = np.float(var_da_step.values)
+                                var_value_list.append(var_value_step)
+
+                            var_data_dict[var_name_dst] = var_value_list
                             var_attrs_dict[var_name_dst] = var_attrs_dst
                             logging.info(' -------> Variable ' + var_key_anc + ' ... DONE')
                         else:
 
                             logging.info(' -------> Variable ' + var_key_anc + ' ... SKIPPED. Variable not selected')
 
-                    # Create datasets
-                    var_dset = create_dset(var_data_dict,
-                                           time_data_values=time_step,
-                                           geo_data_values=geo_collections['land_data'].values,
-                                           geo_x_values=geo_collections[self.tag_coord_geo_x].values,
-                                           geo_y_values=geo_collections[self.tag_coord_geo_y].values,
-                                           var_attrs_dict=var_attrs_dict,
-                                           geo_data_attrs_dict=conventions_vars['terrain'],
-                                           geo_x_attrs_dict=conventions_vars['longitude'],
-                                           geo_y_attrs_dict=conventions_vars['latitude'],
-                                           global_attrs_dict=global_attrs,
-                                           geo_data_1d=False)
-
-                    logging.info(' ------> Create array object ... DONE')
-
-                    logging.info(' ------> Save array object ... ')
-
+                    # Save data using a 1d ascii file
+                    logging.info(' ------> Save file ascii ... ')
                     var_folder_name_dst, var_file_name_dst = os.path.split(var_file_path_dst)
                     make_folder(var_folder_name_dst)
-                    write_dset(var_file_path_dst, var_dset, dset_compression_level=self.dst_vars_compression_level,
-                               dset_engine=self.dst_vars_writing_engine)
-
-                    logging.info(' ------> Save array object ... DONE')
+                    for (var_dst, data_dst), attrs_dst in zip(var_data_dict.items(), var_attrs_dict.values()):
+                        write_file_ascii(var_file_path_dst, data_dst, attrs_dst)
+                    logging.info(' ------> Save file ascii ... DONE')
 
                     logging.info(' ------> Zip file ... ')
-
                     if self.file_compression_dst:
 
                         zip_filename(var_file_path_dst, var_file_path_zip)
@@ -331,10 +319,6 @@ class DriverData:
 
                     logging.info(' ------> Variable ' + var_key + ' ... ')
 
-                    # Debug
-                    # var_key = 'snow_height_data'
-                    # var_fields = var_src_dict[var_key]
-
                     var_mode = var_fields['var_mode']
                     var_name = var_fields['var_name']
                     var_method_compute = var_fields['var_method_compute']
@@ -363,7 +347,14 @@ class DriverData:
 
                             if var_dict is None:
                                 var_dict = {}
-                            var_dict[var_name] = convert_values2points(var_file_data_src, geo_collections)
+
+                            if var_method_compute is None:
+                                var_tag = var_key
+                            else:
+                                logging.error(' ===> Variable compute method is not allowed for river stations')
+                                raise NotImplementedError('Case not implemented yet')
+
+                            var_dict[var_tag] = convert_values2points(var_file_data_src, geo_collections)
 
                             logging.info(' -------> Compute data ... DONE')
                             logging.info(' ------> Variable ' + var_key + ' ... DONE')
