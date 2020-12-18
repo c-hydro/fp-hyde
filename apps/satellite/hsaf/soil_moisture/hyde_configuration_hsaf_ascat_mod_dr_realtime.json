@@ -1,0 +1,181 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_data": false,
+      "cleaning_dynamic_out": false,
+      "cleaning_dynamic_analysis": false,
+      "cleaning_dynamic_points": null,
+      "cleaning_dynamic_maps": null,
+      "cleaning_dynamic_dr": false,
+      "cleaning_dynamic_tmp": false
+    },
+    "ancillary": {
+      "domain" : "italy"
+    },
+    "general": {
+      "title": "HSAF - Root zone soil moisture product",
+      "web-site": "http://hsaf.meteoam.it/",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "5.0.0 [20190801]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "file_domain": {
+          "filename": "dem_italy_0.033.txt",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/gridded/domain/"
+        },
+        "file_grid_ref_warp5": {
+          "filename": "TUW_WARP5_grid_info_2_3.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/gridded/ascat/warp5_global/"
+        },
+        "file_grid_ref_global": {
+          "filename": "grid_italy.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/gridded/mod_rzsm/warp5/"
+        },
+        "file_grid_ref_dr": {
+          "filename": "grid.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/gridded/mod_rzsm/dr/"
+        },
+        "file_grid_ref_domain": {
+          "filename": "rzsm_grid_europe.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/gridded/mod_rzsm/nrt/grid_domain/h14/"
+        }
+      },
+      "colormap": {
+        "rzsm_colormap" : {
+          "filename": null,
+          "folder" : "/home/hsaf/hsaf_datasets/static/soil_moisture/colormap"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "__comment": "A = end of year, AS = start of year, AS-AUG = arbitrary month, A-OFFSET = arbitrary date",
+        "time_forecast_period": 0,
+        "time_forecast_frequency": "D",
+        "time_observed_period": 5,
+        "time_observed_frequency": "A-OFFSET",
+        "time_rounding": "D"
+      },
+      "input": {
+        "rzsm_data_in": {
+          "filename": "rzsm_{datetime}_europe.nc",
+          "folder": "/home/hsaf/hsaf_datasets/dynamic/source/rzsm/{sub_path_time}/"
+        }
+      },
+      "ancillary": {
+        "rzsm_data_out": {
+          "__comment__": "DO NOT CHANGE FILENAME",
+          "filename": "{cell}.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/ancillary/mod_rzsm/mod_ts_{time_start}_{time_end}/"
+        },
+        "rzsm_data_analysis": {
+          "filename": "rzsm_analysis_{time_start}_{time_end}_{cell}.workspace",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/ancillary/mod_rzsm/mod_analysis_{time_start}_{time_end}/"
+        },
+        "rzsm_data_points": {
+          "filename": null,
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/ancillary/mod_rzsm/"
+        }
+      },
+      "data_record": {
+        "rzsm_data_dr": {
+          "filename": "rzsm_dr_{time_start}_{time_end}_{cell}.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/ancillary/mod_rzsm/mod_dr_{time_start}_{time_end}/"
+        },
+        "rzsm_data_dr_scaled": {
+          "__comment__": "DO NOT CHANGE FILENAME",
+          "filename": "{cell}.nc",
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/ancillary/mod_rzsm/mod_dr_scaled_{time_start}_{time_end}/"
+        }
+      },
+      "outcome": {
+        "rzsm_data_maps": {
+          "filename": null,
+          "folder": "/home/hsaf/hsaf_datasets/static/soil_moisture/ancillary/mod_rzsm/"
+        }
+      }
+    },
+    "log": {
+        "filename": "hsaf_log_product_sm_mod_rzsm_dr.txt",
+        "folder": "/home/hsaf/log/hsaf/"
+      },
+    "temp": {
+        "filename": null,
+        "folder": "/home/hsaf/hsaf_datasets/tmp/mod_rzsm/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": "201901010000",
+    "time_period": 0,
+    "time_frequency": "D",
+    "time_rounding": "D"
+  },
+  "variables": {
+    "input": {
+      "rzsm_data": {
+        "id": {
+          "var_type": [ ["var2d", "profile_index"], ["var2d", "profile_index"], ["var2d", "profile_index"] ],
+          "var_name": ["var_0_7", "var_0_28", "var_0_100"],
+          "var_file": ["rzsm_data_in", "rzsm_data_in", "rzsm_data_in"],
+          "var_parameters": [null, null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "root zone soil moisture index product from 0 to 7 cm",
+            "root zone soil moisture index product from 0 to 28 cm",
+            "root zone soil moisture index product from 0 to 100 cm"],
+          "standard_name": [
+            "rzsm_0_7",
+            "rzsm_0_28",
+            "rzsm_0_100"],
+          "Missing_value": [-9999.0, -9999.0, -9999.0],
+          "_FillValue": [-9999.0, -9999, -9999],
+          "ScaleFactor": [1, 1, 1],
+          "Valid_range": [ [0, 100], [0, 100], [0, 100] ],
+          "units": ["%", "%", "%"],
+          "description": "http://hsaf.meteoam.it/description-sm-das-2.php"
+        }
+      }
+    },
+    "outcome": {
+      "rzsm_data":{
+        "id": {
+          "var_type": [ ["var2d", "profile_index"], ["var2d", "profile_index"], ["var2d", "profile_index"] ],
+          "var_name": ["var_0_7_scaled", "var_0_28_scaled", "var_0_100_scaled"],
+          "var_file": ["rzsm_data_maps", "rzsm_data_maps", "rzsm_data_maps"],
+          "var_colormap": [null, null, null],
+          "var_parameters": [null, null, null]
+        },
+        "attributes": {
+          "long_name": [
+            "normalized root zone soil moisture index product from 0 to 7 cm",
+            "normalized root zone soil moisture index product from 0 to 28 cm",
+            "normalized root zone soil moisture index product from 0 to 100 cm"],
+          "standard_name": [
+            "rzsm_0_7_scaled",
+            "rzsm_0_28_scaled",
+            "rzsm_0_100_scaled"],
+          "Missing_value": [-9999.0, -9999.0, -9999.0],
+          "_FillValue": [-9999.0, -9999.0, -9999.0],
+          "ScaleFactor": [1, 1, 1],
+          "Valid_range": [ [0, 100], [0, 100], [0, 100] ],
+          "units": ["%", "%", "%"],
+          "description": "http://hsaf.meteoam.it/description-sm-das-2.php"
+        }
+      }
+    }
+  }
+}
