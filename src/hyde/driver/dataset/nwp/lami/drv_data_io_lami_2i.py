@@ -527,8 +527,8 @@ class DataProductFinalizer:
                         # Write geo system information
                         oFileDriver.oFileLibrary.writeGeoSystem(oFileData, oFileGeoSystemInfo)
                         # Write X, Y, time, nsim, ntime and nens
-                        oFileDriver.oFileLibrary.writeDims(oFileData, 'X', self.oVarData.iCols)
-                        oFileDriver.oFileLibrary.writeDims(oFileData, 'Y', self.oVarData.iRows)
+                        oFileDriver.oFileLibrary.writeDims(oFileData, 'west_east', self.oVarData.iCols)
+                        oFileDriver.oFileLibrary.writeDims(oFileData, 'south_north', self.oVarData.iRows)
                         oFileDriver.oFileLibrary.writeDims(oFileData, 'time', self.oVarData.iTime)
                         oFileDriver.oFileLibrary.writeDims(oFileData, 'nsim', 1)
                         oFileDriver.oFileLibrary.writeDims(oFileData, 'ntime', 2)
@@ -549,8 +549,8 @@ class DataProductFinalizer:
                         sVarFormatX = oVarConventions_Default[sVarNameX]['Format']
                         oFileDriver.oFileLibrary.write2DVar(oFileData, sVarNameX,
                                                             a2VarDataX, oVarAttrsX, sVarFormatX,
-                                                            sVarDimY=oFileDims['Y']['name'],
-                                                            sVarDimX=oFileDims['X']['name'])
+                                                            sVarDimY=oFileDims['south_north']['name'],
+                                                            sVarDimX=oFileDims['west_east']['name'])
                         # Write latitude information
                         sVarNameY = 'latitude'
                         a2VarDataY = oDataGeo.a2dGeoY
@@ -558,8 +558,8 @@ class DataProductFinalizer:
                         sVarFormatY = oVarConventions_Default[sVarNameY]['Format']
                         oFileDriver.oFileLibrary.write2DVar(oFileData, sVarNameY,
                                                             a2VarDataY, oVarAttrsY, sVarFormatY,
-                                                            sVarDimY=oFileDims['Y']['name'],
-                                                            sVarDimX=oFileDims['X']['name'])
+                                                            sVarDimY=oFileDims['south_north']['name'],
+                                                            sVarDimX=oFileDims['west_east']['name'])
 
                         # Info create file
                         oLogStream.info(' ----> Create file ' + sVarFileName + ' ... OK')
@@ -588,8 +588,8 @@ class DataProductFinalizer:
 
                         # -------------------------------------------------------------------------------------
                         # Get file dimensions
-                        sVarDimX = oFileDims['X']['name']
-                        sVarDimY = oFileDims['Y']['name']
+                        sVarDimX = oFileDims['west_east']['name']
+                        sVarDimY = oFileDims['south_north']['name']
                         sVarDimT = oFileDims['time']['name']
 
                         # Get var structure
@@ -691,6 +691,12 @@ class DataProductBuilder:
                          }
 
         self.oVarFctSteps = kwargs['forecast_expected_step']
+
+        self.tmp_folder, self.tmp_filename = split(kwargs['tmp_data'])
+        if self.tmp_folder.__len__() == 0:
+            self.tmp_folder = None
+        if self.tmp_filename.__len__() == 0:
+            self.tmp_filename = None
 
         self.__defineVar()
     # -------------------------------------------------------------------------------------
@@ -799,7 +805,8 @@ class DataProductBuilder:
 
                             # -------------------------------------------------------------------------------------
                             # Get data
-                            [oFileHandle, oFileDriver, bFileOpen] = handleFileData(sVarFileName, sFileType='grib')
+                            [oFileHandle, oFileDriver, bFileOpen] = handleFileData(
+                                sVarFileName, file_type='grib', path_tmp=self.tmp_folder, file_tmp=False)
                             oVarAttrs = self.oVarData[sVarKey]
 
                             # Check variable name in file handle
