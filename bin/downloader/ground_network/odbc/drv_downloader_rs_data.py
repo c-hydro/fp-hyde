@@ -284,18 +284,25 @@ class DriverData:
 
                         var_data = read_obj(file_path_anc_step)
 
-                        var_df = organize_data_rs(time_step, var_data, sections_data, data_type=var_type,
-                                                  data_scale_factor=var_scale_factor, data_min_count=var_min_count,
-                                                  data_units=var_units, data_valid_range=var_valid_range)
+                        if var_data.__len__() > 0:
 
-                        var_df = order_data(var_df, var_fields_expected)
+                            var_df = organize_data_rs(time_step, var_data, sections_data, data_type=var_type,
+                                                      data_scale_factor=var_scale_factor, data_min_count=var_min_count,
+                                                      data_units=var_units, data_valid_range=var_valid_range)
 
-                        folder_name_dst_dset, file_name_dst_dset = os.path.split(file_path_dst_step)
-                        make_folder(folder_name_dst_dset)
+                            var_df = order_data(var_df, var_fields_expected)
 
-                        write_file_csv(file_path_dst_step, var_df)
+                            folder_name_dst_dset, file_name_dst_dset = os.path.split(file_path_dst_step)
+                            make_folder(folder_name_dst_dset)
 
-                        logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
+                            write_file_csv(file_path_dst_step, var_df)
+
+                            logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
+
+                        else:
+
+                            logging.info(' ------> Time Step ' + str(time_step) + ' ... FAILED. ')
+                            logging.warning(' ===> Data downloaded from database source service is null.')
 
                     elif (not os.path.exists(file_path_anc_step)) and (os.path.exists(file_path_dst_step)):
                         logging.info(' ------> Time Step ' + str(time_step) +

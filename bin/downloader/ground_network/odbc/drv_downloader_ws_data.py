@@ -281,18 +281,24 @@ class DriverData:
 
                         var_data = read_obj(file_path_anc_step)
 
-                        var_df = organize_data_ws(var_data, data_type=var_type,
-                                                  data_scale_factor=var_scale_factor, data_min_count=var_min_count,
-                                                  data_units=var_units, data_valid_range=var_valid_range)
+                        if var_data.__len__() > 0:
+                            var_df = organize_data_ws(var_data, data_type=var_type,
+                                                      data_scale_factor=var_scale_factor, data_min_count=var_min_count,
+                                                      data_units=var_units, data_valid_range=var_valid_range)
 
-                        var_df = order_data(var_df, var_fields_expected)
+                            var_df = order_data(var_df, var_fields_expected)
 
-                        folder_name_dst_dset, file_name_dst_dset = os.path.split(file_path_dst_step)
-                        make_folder(folder_name_dst_dset)
+                            folder_name_dst_dset, file_name_dst_dset = os.path.split(file_path_dst_step)
+                            make_folder(folder_name_dst_dset)
 
-                        write_file_csv(file_path_dst_step, var_df)
+                            write_file_csv(file_path_dst_step, var_df)
 
-                        logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
+                            logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
+
+                        else:
+
+                            logging.info(' ------> Time Step ' + str(time_step) + ' ... FAILED. ')
+                            logging.warning(' ===> Data downloaded from database source service is null.')
 
                     elif (not os.path.exists(file_path_anc_step)) and (os.path.exists(file_path_dst_step)):
                         logging.info(' ------> Time Step ' + str(time_step) +
