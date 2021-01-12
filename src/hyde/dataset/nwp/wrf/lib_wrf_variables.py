@@ -35,7 +35,14 @@ def getVarAttributes(var_attrs_in):
             else:
                 var_attr_tmp = var_attrs_tmp[var_attr_key]
                 var_attr_list = [var_attr_tmp, var_attr_value]
-                var_attr_list = list(set(var_attr_list))
+
+                var_attr_list_filter = []
+                for var_attr_step in var_attr_list:
+                    if isinstance(var_attr_step, list):
+                        var_attr_step = var_attr_step[0]
+                    var_attr_list_filter.append(var_attr_step)
+
+                var_attr_list = list(set(var_attr_list_filter))
                 var_attrs_tmp[var_attr_key] = var_attr_list
 
     var_attr_out = {}
