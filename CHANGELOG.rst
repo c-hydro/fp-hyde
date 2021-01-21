@@ -2,8 +2,13 @@
 Changelog
 =========
 
-Version 1.9.6 [2020-12-14]
+Version 1.9.6 [2021-01-13]
 **************************
+APP: **HYDE_DynamicData_EF_Rain.py**
+	- Release for Hyde package
+	    - Previous Version(s):
+	        - [2015-09-23] Previous final version
+
 APP: **HYDE_DynamicData_MODIS_Snow.py**
 	- Release for Hyde package
 	    - Previous Version(s):
