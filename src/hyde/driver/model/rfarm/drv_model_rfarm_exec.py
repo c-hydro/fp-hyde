@@ -14,6 +14,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from copy import deepcopy
+
 from src.common.utils.lib_utils_op_system import createTemp
 
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name, time_format
@@ -24,6 +26,8 @@ from src.hyde.model.rfarm.lib_rfarm_utils_generic import extendGrid, computeGrid
 
 import src.hyde.model.rfarm.lib_rfarm_core as lib_core
 
+# Debug
+import matplotlib.pylab as plt
 # Logging
 log_stream = logging.getLogger(logger_name)
 #################################################################################
@@ -41,7 +45,7 @@ model_parameters_default = {
     'ct_sf': 2,                                 # reliable time scale (time model aggregated Ctsf times)
     'multi_core': False,                        # multi core process (False or True)
     'domain_extension': 0,      	            # domain extended buffer (min value = 0) [km]
-    'folder_tmp': None,                          # tmp folder to store data
+    'folder_tmp': None,                         # tmp folder to store data
     'filename_tmp': 'rf_{ensemble}.pkl'         # tmp filename to store data
 }
 # -------------------------------------------------------------------------------------
@@ -76,6 +80,7 @@ class RFarmModel:
     j_max_rf = None
 
     data_rf = None
+    data_slopes = None
 
     nt = None
     ndelta = None
@@ -105,7 +110,7 @@ class RFarmModel:
                  domain_extension=model_parameters_default['domain_extension'],
                  folder_tmp=model_parameters_default['folder_tmp'],
                  filename_tmp=model_parameters_default['filename_tmp'],
-                 model_algorithm="execRF_NWP",
+                 model_algorithm="exec_nwp",
                  model_var="Rain",
                  model_metagauss=None,
                  ):
@@ -204,17 +209,35 @@ class RFarmModel:
                                                time_format)
 
         # Compute time steps for rainfarm disaggregation
-        self.time_steps_rf = computeTimeSteps(time_start_in.strftime(time_format),
-                                              time_end_in.strftime(time_format),
-                                              time_delta_in,
-                                              time_delta_in / self.ratio_t,
-                                              time_format)
+        if self.model_algorithm == 'exec_nwp':
+            self.time_steps_rf = computeTimeSteps(time_start_in.strftime(time_format),
+                                                  time_end_in.strftime(time_format),
+                                                  time_delta_in,
+                                                  time_delta_in / self.ratio_t,
+                                                  time_format)
+
+        elif self.model_algorithm == 'exec_expert_forecast':
+            time_ratio = self.ct_sf / self.ratio_t
+            self.time_steps_rf = computeTimeSteps(time_start_in.strftime(time_format),
+                                                  time_end_in.strftime(time_format),
+                                                  time_delta_in,
+                                                  time_delta_in * time_ratio,
+                                                  time_format)
+
         # Compute time steps for output data
-        self.time_steps_ref = computeTimeSteps(time_start_in.strftime(time_format),
-                                               time_end_in.strftime(time_format),
-                                               time_delta_in,
-                                               time_delta_in * self.ct_sf / (self.ratio_t * self.ct_sf),
-                                               time_format)
+        if self.model_algorithm == 'exec_nwp':
+            self.time_steps_ref = computeTimeSteps(time_start_in.strftime(time_format),
+                                                   time_end_in.strftime(time_format),
+                                                   time_delta_in,
+                                                   time_delta_in * self.ct_sf / (self.ratio_t * self.ct_sf),
+                                                   time_format)
+        elif self.model_algorithm == 'exec_expert_forecast':
+            time_ratio = self.ct_sf / self.ratio_t
+            self.time_steps_ref = computeTimeSteps(time_start_in.strftime(time_format),
+                                                   time_end_in.strftime(time_format),
+                                                   time_delta_in,
+                                                   time_delta_in * time_ratio,
+                                                   time_format)
 
         time_start_ref = pd.to_datetime(self.time_steps_ref[0])
         time_end_ref = pd.to_datetime(self.time_steps_ref[-1])
@@ -233,12 +256,22 @@ class RFarmModel:
     # Method to configure model data
     def configure_data(self, values_in):
 
-        # Time Ratio to convert accumulated rain to istantaneous rain
+        # Time Ratio to convert accumulated rain to instantaneous rain
         time_ratio_rf = int(self.time_delta_in/self.time_delta_ref)
 
-        # Call method to compute rainfarm model data
-        self.data_rf = computeVar(values_in, time_ratio_rf,
-                                  self.i_min_rf, self.i_max_rf, self.j_min_rf, self.j_max_rf)
+        # Call method to compute input datasets
+        if self.model_algorithm == 'exec_nwp':
+            self.data_rf = computeVar(values_in, time_ratio_rf,
+                                      self.i_min_rf, self.i_max_rf, self.j_min_rf, self.j_max_rf)
+            self.data_slopes = None
+        elif self.model_algorithm == 'exec_expert_forecast':
+
+            dim_geo_x = self.lons_ref.shape[0]
+            dim_geo_y = self.lats_ref.shape[1]
+            dim_time = self.time_steps_in.__len__()
+
+            self.data_rf = np.zeros(shape=[dim_geo_x, dim_geo_y, dim_time])
+            self.data_slopes = values_in
 
         # DEBUG
         # import matplotlib.pylab as plt
@@ -278,16 +311,16 @@ class RFarmModel:
 
     # -------------------------------------------------------------------------------------
     # Method to execute model
-    def execute_run(self):
+    def execute_run(self, domain_name='domain', domain_id=1, domain_mask=None):
 
         # Choose computing mode
         if self.multi_core:
             raise NotImplemented
             # Define process(es) for RF model using multi core mode
-            # ensemble_status = self.workerMultiCore()
+            # ensemble_status = self.worker_multi_core()
         else:
             # Define process(es) for RF model using single core mode
-            ensemble_status = self.workerSingleCore()
+            ensemble_status = self.worker_single_core(domain_name, domain_id, domain_mask)
 
         # Save data in global workspace
         return ensemble_status
@@ -296,7 +329,7 @@ class RFarmModel:
 
     # -------------------------------------------------------------------------------------
     # Method to run model in single core
-    def workerSingleCore(self):
+    def worker_single_core(self, domain_name, domain_id, domain_mask):
 
         # Get field name
         ensemble_var = self.model_var
@@ -308,43 +341,134 @@ class RFarmModel:
             # Starting info
             log_stream.info(' ----> Set ensemble ' + str(ensemble_n) + ' ... ')
 
-            # Run RF model
-            if np.any(self.data_rf):
+            if self.model_algorithm == 'exec_nwp':
 
-                # Disaggregation (if some value(s) are not null)
-                [ensemble_rf, metagauss_rf] = self.lib_algorithm(
-                    self.data_rf,
-                    self.ratio_s, self.ratio_t,
-                    cssf=self.cs_sf, ctsf=self.ct_sf,
-                    f=self.model_metagauss,
-                    celle3_rainfarm=None,
-                    sx=self.slope_s, st=self.slope_t)
+                # Run RF model
+                if np.any(self.data_rf):
 
-                # Check disaggregated result(s)
-                checkResult(self.data_rf, ensemble_rf, self.ratio_s, self.ratio_t)
+                    # Disaggregation (if some value(s) are not null)
+                    [ensemble_rf, metagauss_rf] = self.lib_algorithm(
+                        self.data_rf,
+                        self.ratio_s, self.ratio_t,
+                        cssf=self.cs_sf, ctsf=self.ct_sf,
+                        f=self.model_metagauss,
+                        celle3_rainfarm=None,
+                        sx=self.slope_s, st=self.slope_t)
 
-                # DEBUG
-                # import matplotlib.pylab as plt
+                    # Check disaggregated result(s)
+                    checkResult(self.data_rf, ensemble_rf, self.ratio_s, self.ratio_t)
+
+                    # DEBUG
+                    # import matplotlib.pylab as plt
+                    # plt.figure(1)
+                    # plt.imshow(self.data_rf[:, :, 1])
+                    # plt.colorbar()
+                    # plt.clim(0, 100)
+
+                    # plt.figure(2)
+                    # plt.imshow(ensemble_rf[:, :, 1])
+                    # plt.colorbar()
+                    # plt.clim(0, 100)
+                    # plt.show()
+
+                else:
+
+                    # Exit with null field(s) if all values are zeros
+                    ensemble_rf = np.zeros([self.data_rf.shape[0]*self.ratio_s,
+                                            self.data_rf.shape[1]*self.ratio_s,
+                                            self.data_rf.shape[2]*int(int(self.nt)/int(self.nat))])
+
+            elif self.model_algorithm == 'exec_expert_forecast':
+
+                # Define time idx max
+                time_idx_max = int(self.nat / self.ratio_t)
+
+                # Iterate over time idx
+                ensemble_rf_t = np.zeros([self.ns * self.ns, self.nat])
+                for time_idx_step in range(0, time_idx_max):
+
+                    time_idx_start = time_idx_step * self.ratio_t
+                    time_idx_end = time_idx_step * self.ratio_t + self.ratio_t
+
+                    # Iterate over subdomains
+                    for area_tag, area_id, (slope_tag, slope_fields) in zip(domain_name, domain_id, self.data_slopes.items()):
+
+                        # Starting info area
+                        log_stream.info(' -----> Evaluate -- Area ' + area_tag + ' -- IdxMin: ' + str(time_idx_start) +
+                                        ' -- IdxMax: ' + str(time_idx_end) + ' ... ')
+
+                        assert(area_tag == slope_tag)
+
+                        # Get alert area index
+                        subdomain_mask = deepcopy(domain_mask)
+                        subdomain_idx = np.argwhere(subdomain_mask.ravel() == area_id)
+
+                        rain_avg = slope_fields['rain_average'][time_idx_step]
+                        slope_s = slope_fields['slope_x'][time_idx_step]
+                        slope_t = slope_fields['slope_t'][time_idx_step]
+
+                        nat = int(self.nat / self.ratio_t)
+                        ratio_t = int(self.ratio_t/nat)
+                        ct_sf = self.ratio_t / self.ct_sf
+
+                        # RainFarm disaggregation
+                        """
+                        Parameters example:
+                        rain average: 0.0; slope s: 3.5; slope t: 0.5; ratio s: 1; ratio t/ nat: 3; 
+                        cs_sf: 1; ct_sf: 1; nat: 4; ns: 644; ns: 644
+                        """
+                        [ensemble_rf_xyt, metagauss_rf] = self.lib_algorithm(
+                            None,
+                            self.ratio_s, ratio_t,
+                            cssf=self.cs_sf, ctsf=ct_sf,
+                            f=self.model_metagauss,
+                            celle3_rainfarm=None,
+                            sx=slope_s, st=slope_t,
+                            nx=self.ns, ny=self.ns, nt=nat)
+
+                        # Post-process result(s)
+                        ensemble_rf_step = np.reshape(ensemble_rf_xyt, [self.ns * self.ns, self.ratio_t])
+
+                        # Compute mean and weight(s)
+                        ensemble_rf_avg = np.nanmean(ensemble_rf_step[subdomain_idx, :])
+                        if ensemble_rf_avg > 0.0:
+                            ensemble_rf_weights = rain_avg / self.ratio_t / ensemble_rf_avg
+                        else:
+                            ensemble_rf_weights = 0.0
+
+                        # Normalized result(s) using weight(s)
+                        ensemble_rf_t[subdomain_idx, time_idx_start:time_idx_end] = ensemble_rf_step[subdomain_idx, :] * ensemble_rf_weights
+
+                        # Ending info area
+                        log_stream.info(' -----> Evaluate -- Area ' + area_tag + ' -- IdxMin: ' + str(time_idx_start) +
+                                        ' -- IdxMax: ' + str(time_idx_end) + ' ... DONE')
+
+                # Reshape results in XYT format
+                ensemble_rf = np.reshape(ensemble_rf_t, [self.ns, self.ns, self.nat])
+
+                # Debug
                 # plt.figure(1)
-                # plt.imshow(self.data_rf[:, :, 1])
+                # plt.imshow(ensemble_rf[:, :, 23])
                 # plt.colorbar()
-                # plt.clim(0, 100)
-
-                # plt.figure(2)
-                # plt.imshow(ensemble_rf[:, :, 1])
-                # plt.colorbar()
-                # plt.clim(0, 100)
                 # plt.show()
 
             else:
-
-                # Exit with null field(s) if all values are zeros
-                ensemble_rf = np.zeros([self.data_rf.shape[0]*self.ratio_s,
-                                        self.data_rf.shape[1]*self.ratio_s,
-                                        self.data_rf.shape[2]*int(int(self.nt)/int(self.nat))])
+                log_stream.error(' ===> RainFarm application type is not correctly defined [' +
+                                 self.model_algorithm + ']. Check your settings')
+                raise NotImplemented('RainFarm application type not implemented yet')
 
             # Ensemble history
             ensemble_status.append(ensemble_filename)
+
+            # Ensemble info
+            ensemble_rf_avg = np.nanmean(ensemble_rf)
+            ensemble_rf_min = np.nanmin(ensemble_rf)
+            ensemble_rf_max = np.nanmax(ensemble_rf)
+            log_stream.info(' -----> Evaluate'
+                            ' -- Values Avg: ' + "{:.4f}".format(ensemble_rf_avg) +
+                            ' -- Values Min: ' + "{:.4f}".format(ensemble_rf_min) +
+                            ' -- Values Max: ' + "{:.4f}".format(ensemble_rf_max)
+                            )
 
             # Dump ensemble to free memory
             saveResult(ensemble_filename, ensemble_var, ensemble_rf,
@@ -362,8 +486,8 @@ class RFarmModel:
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
-    # Method to run model in single core
-    def workerMultiCore(self):
+    # Method to run model in multi cores mode
+    def worker_multicore(self):
 
         # Iterate over ensemble(s)
         ensemble_status = []

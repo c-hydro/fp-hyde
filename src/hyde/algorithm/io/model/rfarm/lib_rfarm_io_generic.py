@@ -1,5 +1,15 @@
+"""
+Library Features:
+
+Name:          lib_rfarm_io_generic
+Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
+Date:          '20210104'
+Version:       '1.0.0'
+"""
+
 # -------------------------------------------------------------------------------------
 # Libraries
+import logging
 import os
 import pickle
 import json
@@ -159,6 +169,19 @@ def write_dset(filename, dset, attrs=None, mode='w', engine='h5netcdf', compress
 
     dset.to_netcdf(path=filename, format='NETCDF4', mode=mode, engine=engine, encoding=data_encoding)
 
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to get file settings in json format
+def read_file_settings(file_name_settings):
+    if os.path.exists(file_name_settings):
+        with open(file_name_settings) as file_handle:
+            data_settings = json.load(file_handle)
+    else:
+        logging.error(' ===> Error in reading algorithm settings file')
+        raise IOError('File not found')
+    return data_settings
 # -------------------------------------------------------------------------------------
 
 

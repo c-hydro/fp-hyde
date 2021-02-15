@@ -139,10 +139,10 @@ def create_dset(var_data_values,
     var_dset = xr.Dataset(coords={dim_key_time: ([dim_name_time], var_data_time)})
     var_dset.coords[dim_key_time] = var_dset.coords[dim_key_time].astype('datetime64[ns]')
 
-    var_da_terrain = xr.DataArray(var_geo_values,  name=var_geo_name,
+    var_da_terrain = xr.DataArray(np.flipud(var_geo_values),  name=var_geo_name,
                                   dims=dims_order_2d,
                                   coords={dim_key_x: ([dim_name_y, dim_name_x], var_geo_x_tmp),
-                                          dim_key_y: ([dim_name_y, dim_name_x], var_geo_y_tmp)})
+                                          dim_key_y: ([dim_name_y, dim_name_x], np.flipud(var_geo_y_tmp))})
     var_dset[var_geo_name] = var_da_terrain
     var_geo_attrs_select = select_attrs(var_geo_attrs)
 
@@ -150,16 +150,16 @@ def create_dset(var_data_values,
         var_dset[var_geo_name].attrs = var_geo_attrs_select
 
     if var_data_values.shape.__len__() == 2:
-        var_da_data = xr.DataArray(var_data_values, name=var_data_name,
+        var_da_data = xr.DataArray(np.flipud(var_data_values), name=var_data_name,
                                    dims=dims_order_2d,
                                    coords={dim_key_x: ([dim_name_y, dim_name_x], var_geo_x_tmp),
-                                           dim_key_y: ([dim_name_y, dim_name_x], var_geo_y_tmp)})
+                                           dim_key_y: ([dim_name_y, dim_name_x], np.flipud(var_geo_y_tmp))})
     elif var_data_values.shape.__len__() == 3:
-        var_da_data = xr.DataArray(var_data_values, name=var_data_name,
+        var_da_data = xr.DataArray(np.flipud(var_data_values), name=var_data_name,
                                    dims=dims_order_3d,
                                    coords={dim_key_time: ([dim_name_time], var_data_time),
                                            dim_key_x: ([dim_name_y, dim_name_x], var_geo_x_tmp),
-                                           dim_key_y: ([dim_name_y, dim_name_x], var_geo_y_tmp)})
+                                           dim_key_y: ([dim_name_y, dim_name_x], np.flipud(var_geo_y_tmp))})
     else:
         raise NotImplemented
 

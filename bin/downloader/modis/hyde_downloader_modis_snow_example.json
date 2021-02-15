@@ -1,0 +1,93 @@
+{
+  "flags": {
+    "update_dynamic_data_source": false,
+    "update_dynamic_data_ancillary": false,
+    "update_dynamic_data_destination": false
+  },
+  "info": {
+    "domain_name": "italy",
+    "compression_extension": ".gz"
+  },
+  "template": {
+    "domain_name": "string_domain_name",
+    "product_name": "string_product_name",
+    "product_version": "string_product_version",
+    "tile_name": "string_tile_name",
+    "tile_composite": "string_tile_composite",
+    "machine_data_folder" : "string_machine_data_folder",
+    "machine_data_root" : "string_machine_data_root",
+    "machine_datetime": "%Y.%m.%d",
+    "source_datetime": "%Y%j",
+    "source_sub_path_time": "%Y/%m/%d/",
+    "ancillary_datetime": "%Y%m%d",
+    "ancillary_sub_path_time": "%Y/%m/%d/",
+    "destination_datetime": "%Y%m%d%H%M",
+    "destination_sub_path_time": "%Y/%m/%d/"
+  },
+  "data": {
+    "machine": {
+      "name": "urs.earthdata.nasa.gov",
+      "user": null,
+      "password": null,
+      "proxy": null,
+      "data_root": "n5eil01u.ecs.nsidc.org",
+      "data_folder":"MOSA"
+    },
+    "ancillary": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/modis/{ancillary_sub_path_time}",
+      "file_name_download_tiles": "modis_http_downloader_{ancillary_datetime}_{tile_name}.sh",
+      "file_name_mosaic_tiles": "modis_mrt_mosaic_tiles.prm",
+      "file_name_mosaic_data": "modis_mrt_mosaic_data_{product_name}_{product_version}_{tile_composite}.hdf",
+      "file_name_resample_parameters": "modis_mrt_resample_params.txt",
+      "file_name_resample_data": "modis_mrt_resample_data_{product_name}_{product_version}_{tile_composite}_{ancillary_datetime}.hdf"
+    },
+    "source": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/modis/{source_sub_path_time}",
+      "file_name": "{product_name}.A{source_datetime}.{tile_name}.{product_version}.*.hdf",
+      "http_address": "https://{machine_data_root}/{machine_data_folder}/{product_name}.{product_version}/{machine_datetime}/"
+    },
+    "destination": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/modis/{destination_sub_path_time}",
+      "file_name": "{product_name}_{product_version}_{destination_datetime}_{tile_composite}.hdf4",
+      "file_compression": true
+    }
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/modis/",
+    "file_name": "hyde_downloader_modis_snow_log.txt",
+    "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+  },
+  "time": {
+    "time_now": "2018-10-01 00:00",
+    "time_period": 2,
+    "time_frequency": "D",
+    "time_rounding": "D"
+  },
+  "product": {
+    "name": "MYD10A1",
+    "version": "006",
+    "tiles":{
+      "tile1": {"h": 18, "v": 4},
+      "tile2": {"h": 18, "v": 5},
+      "tile3": {"h": 19, "v": 4},
+      "tile4": {"h": 19, "v": 5}
+    }
+  },
+  "library" : {
+    "name": "mrt",
+    "folder" : "/home/fabio/Desktop/Library/mrt-4.1/bin/",
+    "app_mosaic": {
+      "executable": "mrtmosaic",
+      "activation": true
+    },
+    "app_resample": {
+      "executable": "resample",
+      "activation": true,
+      "spatial_subset_type": "OUTPUT_PROJ_COORDS",
+      "resampling_method": "NN",
+      "proj": "GEO",
+      "datum": "WGS84"
+    }
+  }
+}
+

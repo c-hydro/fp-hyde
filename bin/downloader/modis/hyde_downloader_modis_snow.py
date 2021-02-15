@@ -9,7 +9,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 hyde_downloader_modis_snow.py -settingfile configuration.json
+python3 hyde_downloader_modis_snow.py -settings_file configuration.json
 
 Version:
 20191007 (1.0.1) --> Hyde package refactor
@@ -19,9 +19,18 @@ Version:
 
 # -------------------------------------------------------------------------------------
 # Complete library
+import logging
+import os
 import time
 import datetime
 import gzip
+
+from bin.downloader.modis.lib_utils_io import read_file_settings
+from bin.downloader.modis.lib_utils_system import make_folder
+from bin.downloader.modis.lib_utils_time import set_time
+
+#from bin.downloader.modis.drv_downloader_ws_geo import DriverGeo#
+from bin.downloader.modis.drv_downloader_modis_data import DriverData
 
 from shutil import rmtree, copyfileobj
 from glob import glob
@@ -35,11 +44,12 @@ from json import load
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
-sAlgName = 'MODIS DOWNLOADING TOOL - MODIS SNOW'
-sAlgVersion = '1.0.0'
-sAlgRelease = '2018-09-06'
+alg_name = 'HYDE DOWNLOADING TOOL - MODIS SNOW'
+alg_version = '1.5.0'
+alg_release = '2020-12-02'
 # Algorithm parameter(s)
-sZipExt = '.gz'
+time_format = '%Y-%m-%d %H:%M'
+zip_ext = '.gz'
 # -------------------------------------------------------------------------------------
 
 
@@ -48,438 +58,139 @@ sZipExt = '.gz'
 def main():
 
     # -------------------------------------------------------------------------------------
+    # Get algorithm settings
+    alg_settings, alg_time = get_args()
+
+    # Set algorithm settings
+    data_settings = read_file_settings(alg_settings)
+
+    # Set algorithm logging
+    make_folder(data_settings['log']['folder_name'])
+    set_logging(logger_file=os.path.join(data_settings['log']['folder_name'],
+                                         data_settings['log']['file_name']),
+                logger_format=data_settings['log']['format'])
+    # -------------------------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------------------
     # Info algorithm
-    print(' ============================================================================ ')
-    print(' ==> ' + sAlgName + ' (Version: ' + sAlgVersion + ' Release_Date: ' + sAlgRelease + ')')
-    print(' ==> START ... ')
-    print(' ')
+    logging.info(' ============================================================================ ')
+    logging.info(' ==> ' + alg_name + ' (Version: ' + alg_version + ' Release_Date: ' + alg_release + ')')
+    logging.info(' ==> START ... ')
+    logging.info(' ')
 
     # Time algorithm information
-    dStartTime = time.time()
+    start_time = time.time()
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
-    # Get algorithm settings
-    with open(getSettings(), "r") as oFileSettings:
-        oDataSettings = load(oFileSettings)
+    # Organize time run
+    time_run, time_range = set_time(time_run_args=alg_time, time_run_file=data_settings['time']['time_now'],
+                                    time_format=time_format)
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
-    # Define time information
-    if oDataSettings['time_info']['time_get'] is None:
-        sTime_GET = datetime.datetime.now().strftime('%Y%m%d')
-    else:
-        sTime_GET = oDataSettings['time_info']['time_get']
-
-    oTime_STEPS = date_range(end=sTime_GET,
-                             periods=oDataSettings['time_info']['time_period'],
-                             freq=oDataSettings['time_info']['time_frequency'])
-    # -------------------------------------------------------------------------------------
-
-    # -------------------------------------------------------------------------------------
-    # Iterate over times
-    for oTime_STEP in oTime_STEPS:
+    # Iterate over time(S)
+    for time_step in time_range:
 
         # -------------------------------------------------------------------------------------
-        # Select time step
-        sTime_STEP = oTime_STEP.strftime('%Y.%m.%d')
-        sYear_STEP = oTime_STEP.strftime('%Y')
-        sMonth_STEP = oTime_STEP.strftime('%m')
-        sDay_STEP = oTime_STEP.strftime('%d')
-        sJDay_STEP = str(oTime_STEP.timetuple().tm_yday).zfill(3)
-
         # Info time
-        print(' ===> TIME STEP: ' + sTime_STEP + ' [JD: ' + sJDay_STEP + ']')
+        logging.info(' ---> TIME STEP: ' + str(time_step) + ' ... ')
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
-        # Define tile(s)
-        oTileName = []
-        for sTileKey, oTileIdx in sorted(oDataSettings['data_info']['tiles'].items()):
-
-            # Define tile string id
-            sTileIdx_H = 'h' + str(oTileIdx['H']).zfill(2)
-            sTileIdx_V = 'v' + str(oTileIdx['V']).zfill(2)
-            sTileIdx = sTileIdx_H + sTileIdx_V
-
-            oTileName.append(sTileIdx)
-        sTileName = '_'.join(oTileName)
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Zip extension
-        if oDataSettings['data_info']['outcome']['zip'] is True:
-            sZipExt_OUTCOME = sZipExt
-        else:
-            sZipExt_OUTCOME = ''
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Define data tags
-        oData_TAGS = {'$product': oDataSettings['data_info']['product'],
-                      '$version': oDataSettings['data_info']['version'],
-                      '$tiles': sTileName,
-                      '$time': sTime_STEP, '$yyyy': sYear_STEP, '$mm': sMonth_STEP, '$dd': sDay_STEP, '$jd': sJDay_STEP,
-                      '$data_root': oDataSettings['http_info']['data_root'],
-                      '$data_folder': oDataSettings['http_info']['data_folder']}
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Define TMP folder
-        sFolder_TMP = setTags(oDataSettings['data_info']['temp']['folder'], oData_TAGS)
-        deleteFolder(sFolder_TMP)
-        makeFolder(sFolder_TMP)
-
-        # Define DOWNLOAD, TILE, MOSAIC and RESEMPLE filename(s)
-        sFileName_TMP_DWN_TILE = setTags(oDataSettings['data_info']['temp']['file_download_tile'], oData_TAGS)
-        sFileName_TMP_MOS_TILE = setTags(oDataSettings['data_info']['temp']['file_mosaic_tiles'], oData_TAGS)
-        sFileName_TMP_MOS_DATA = setTags(oDataSettings['data_info']['temp']['file_mosaic_data'], oData_TAGS)
-        sFileName_TMP_RES_DATA = setTags(oDataSettings['data_info']['temp']['file_resample_data'], oData_TAGS)
-        sFileName_TMP_RES_PARAMS = setTags(oDataSettings['data_info']['temp']['file_resample_parameters'], oData_TAGS)
-
-        # Delete old file(s)
-        deleteFile(join(sFolder_TMP, sFileName_TMP_DWN_TILE))
-        deleteFile(join(sFolder_TMP, sFileName_TMP_MOS_TILE))
-        deleteFile(join(sFolder_TMP, sFileName_TMP_MOS_DATA))
-        deleteFile(join(sFolder_TMP, sFileName_TMP_RES_DATA))
-        deleteFile(join(sFolder_TMP, sFileName_TMP_RES_PARAMS))
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Define SOURCE and OUTCOME folder(s)
-        sFolder_SOURCE = setTags(oDataSettings['data_info']['source']['folder'], oData_TAGS)
-        makeFolder(sFolder_SOURCE)
-        sFolder_OUTCOME = setTags(oDataSettings['data_info']['outcome']['folder'], oData_TAGS)
-        makeFolder(sFolder_OUTCOME)
-
-        # Define SOURCE and OUTCOME filename(s)
-        sFileName_SOURCE_DATA = setTags(oDataSettings['data_info']['source']['file'], oData_TAGS)
-        sFileName_SOURCE_HTTP = setTags(oDataSettings['data_info']['source']['http'], oData_TAGS)
-        sFileName_OUTCOME_DATA = setTags(oDataSettings['data_info']['outcome']['file'], oData_TAGS)
-        sFileName_OUTCOME_ZIP = sFileName_OUTCOME_DATA + sZipExt_OUTCOME
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Algorithm flag(s)
-        bFileName_SOURCE_DATA = oDataSettings['data_info']['flag']['source_data']
-        bFileName_OUTCOME_DATA = oDataSettings['data_info']['flag']['outcome_data']
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Info data
-        print(' ====> GET FILE: ' + sFileName_OUTCOME_DATA + ' ... ')
-        # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Check outcome data availability
-        if ((not exists(join(sFolder_OUTCOME, sFileName_OUTCOME_DATA))) or
-             (not exists(join(sFolder_OUTCOME, sFileName_OUTCOME_ZIP)))) or (bFileName_OUTCOME_DATA is True):
-
-            # -------------------------------------------------------------------------------------
-            # Iterate over tile(s)
-            oFileTile = dict()
-            oFileList = []
-            for iTileID, sTileIdx in enumerate(sorted(oTileName)):
-
-                # -------------------------------------------------------------------------------------
-                # Info tile
-                print(' =====> GET TILE: ' + sTileIdx + ' ... ')
-                # -------------------------------------------------------------------------------------
-
-                # -------------------------------------------------------------------------------------
-                # Define variable name
-                sFileVar_SOURCE = oDataSettings['data_info']['product'] + '.' + oDataSettings['data_info']['version']
-                # Define DWN_TILE, DATA and HTTP filename(s)
-                sFileName_SOURCE_DATA_ID = sFileName_SOURCE_DATA.replace('$tile', sTileIdx)
-                sFileName_SOURCE_HTTP_ID = sFileName_SOURCE_HTTP.replace('$tile', sTileIdx)
-                sFileName_TMP_DWN_TILE_ID = sFileName_TMP_DWN_TILE.replace('$tile', sTileIdx)
-                # -------------------------------------------------------------------------------------
-
-                # -------------------------------------------------------------------------------------
-                # Test file availability
-                sFileName_SOURCE_DATA_CPL = glob(sFolder_SOURCE + '*' + sTileIdx + '*.hdf')
-
-                # Condition for activating file downloading
-                if (not sFileName_SOURCE_DATA_CPL) or (bFileName_SOURCE_DATA is True):
-
-                    # -------------------------------------------------------------------------------------
-                    # Define downloader script
-                    oFileLines = dict()
-                    oFileLines[0] = str('#!/bin/bash') + '\n'
-
-                    oFileLines[1] = str('touch .netrc') + '\n'
-                    oFileLines[2] = str('echo "machine ' + oDataSettings['http_info']['website'] +
-                                        ' login  ' + oDataSettings['http_info']['user'] +
-                                        ' password ' + oDataSettings['http_info']['password'] +
-                                        '" >> .netrc') + '\n'
-                    oFileLines[3] = str('chmod 0600 .netrc') + '\n'
-                    oFileLines[4] = str('touch .urs_cookies') + '\n'
-
-                    oFileLines[5] = str('wget -P ' + sFolder_TMP)
-                    oFileLines[5] += str(' --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies')
-                    oFileLines[5] += str(' --keep-session-cookies --no-check-certificate --auth-no-challenge=on')
-                    oFileLines[5] += str(' -r --reject "index.html*" -np -e robots=off')
-                    oFileLines[5] += str(' --no-parent -A "' + sFileName_SOURCE_DATA_ID + '"')
-                    oFileLines[5] += str(' ' + sFileName_SOURCE_HTTP_ID) + '\n'
-
-                    oFileLines[6] = str('mv ' +
-                                        join(sFolder_TMP,
-                                             oDataSettings['http_info']['data_root'],
-                                             oDataSettings['http_info']['data_folder'],
-                                             sFileVar_SOURCE, sTime_STEP, sFileName_SOURCE_DATA_ID) + ' ' +
-                                        sFolder_SOURCE)
-
-                    # Open, write and close executable file
-                    oFile = open(join(sFolder_TMP, sFileName_TMP_DWN_TILE_ID), 'w')
-                    oFile.writelines(oFileLines.values())
-                    oFile.close()
-                    # -------------------------------------------------------------------------------------
-
-                    # -------------------------------------------------------------------------------------
-                    # Run bash executable file
-                    makeExec(join(sFolder_TMP, sFileName_TMP_DWN_TILE_ID))
-                    oProcExec = Popen(join(sFolder_TMP, sFileName_TMP_DWN_TILE_ID),)
-                                      #stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
-                    oProcExec.communicate()
-
-                    # Get complete filename
-                    oFileRetrieve = glob(sFolder_SOURCE + '*' + sTileIdx + '*.hdf')
-                    if oFileRetrieve.__len__() > 0:
-                        sFileName_SOURCE_DATA_CPL = glob(sFolder_SOURCE + '*' + sTileIdx + '*.hdf')[0]
-                        # Info tile
-                        print(' =====> GET TILE: ' + sTileIdx + ' ... DONE!')
-                    elif oFileRetrieve.__len__() == 0:
-                        sFileName_SOURCE_DATA_CPL = None
-                        print(' =====> GET TILE: ' + sTileIdx + ' ... FAILED!')
-                    # -------------------------------------------------------------------------------------
-                else:
-                    # -------------------------------------------------------------------------------------
-                    # File previously downloaded, get filename only
-                    sFileName_SOURCE_DATA_CPL = glob(sFolder_SOURCE + '*' + sTileIdx + '*.hdf')[0]
-                    # Info tile
-                    print(' =====> GET TILE: ' + sTileIdx + ' ... SKIPPED! Tile previously downloaded!')
-                    # -------------------------------------------------------------------------------------
-
-                # -------------------------------------------------------------------------------------
-                # Save complete filename
-                if sFileName_SOURCE_DATA_CPL is not None:
-                    oFileTile[sTileIdx] = sFileName_SOURCE_DATA_CPL + '\n'
-                    oFileList.append(sFileName_SOURCE_DATA_CPL)
-                # -------------------------------------------------------------------------------------
-
-            # -------------------------------------------------------------------------------------
-            # Check tile(s) availability
-            if oFileList:
-
-                # -------------------------------------------------------------------------------------
-                # Tile data using mrt mosaic application
-                print(' =====> MOSAICKING DATA ... ')
-                if oDataSettings['mrt_info']['app_mosaic']['activation']:
-
-                    # -------------------------------------------------------------------------------------
-                    # Tile condition
-                    if oFileTile.__len__() > 1:
-
-                        # -------------------------------------------------------------------------------------
-                        # Open and save file with tile(s) definition
-                        oFile_TMP_MOS_TILE = open(join(sFolder_TMP, sFileName_TMP_MOS_TILE), 'w')
-                        oFile_TMP_MOS_TILE.writelines(oFileTile.values())
-                        oFile_TMP_MOS_TILE.close()
-                        # -------------------------------------------------------------------------------------
-
-                        # -------------------------------------------------------------------------------------
-                        # Command line mosaicking
-                        sLineCmd_MOS = (join(oDataSettings['mrt_info']['bin'], 'mrtmosaic') +
-                                        ' -i ' + join(sFolder_TMP, sFileName_TMP_MOS_TILE) +
-                                        ' -o ' + join(sFolder_TMP, sFileName_TMP_MOS_DATA))
-
-                        # Execute mosaicking algorithm
-                        oProcExec = Popen(sLineCmd_MOS, shell=True,
-                                          stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
-                        oProcExec.communicate()
-
-                        # Info mosaicking
-                        print(' =====> MOSAICKING DATA ... DONE!')
-                        # -------------------------------------------------------------------------------------
-
-                    else:
-                        # -------------------------------------------------------------------------------------
-                        # Tile data equal to 1 (only one file)
-                        sFileName_TMP_MOS_TILE = oFileList[0]
-                        rename(join(sFolder_TMP, sFileName_TMP_MOS_TILE), join(sFolder_TMP, sFileName_TMP_MOS_DATA))
-                        # Info mosaicking
-                        print(' =====> MOSAICKING DATA ... SKIPPED! Only one tile downloaded and available!')
-                        # -------------------------------------------------------------------------------------
-                else:
-                    # -------------------------------------------------------------------------------------
-                    # Tile data not activated (only one tile)
-                    sFileName_TMP_MOS_TILE = oFileList[0]
-                    rename(join(sFolder_TMP, sFileName_TMP_MOS_TILE), join(sFolder_TMP, sFileName_TMP_MOS_DATA))
-                    # Info mosaicking
-                    print(' =====> MOSAICKING DATA ... NOT ACTIVATED!')
-                    # -------------------------------------------------------------------------------------
-
-                # -------------------------------------------------------------------------------------
-                # Resample data using mrt resample application
-                print(' =====> RESAMPLING DATA ... ')
-                if oDataSettings['mrt_info']['app_mosaic']['activation']:
-
-                    # -------------------------------------------------------------------------------------
-                    # Define resample file
-                    oFileLines = dict()
-                    oFileLines[0] = str('INPUT_FILENAME = ' +
-                                        join(sFolder_TMP, sFileName_TMP_MOS_DATA)) + '\n'
-                    oFileLines[1] = str('SPATIAL_SUBSET_TYPE = ' +
-                                        oDataSettings['mrt_info']['app_resample']['special_subset']) + '\n'
-                    oFileLines[2] = str('OUTPUT_FILENAME =  ' +
-                                        join(sFolder_TMP, sFileName_TMP_RES_DATA)) + '\n'
-                    oFileLines[3] = str('RESAMPLING_TYPE = ' +
-                                        oDataSettings['mrt_info']['app_resample']['resampling_method']) + '\n'
-                    oFileLines[4] = str('OUTPUT_PROJECTION_TYPE = ' +
-                                        oDataSettings['mrt_info']['app_resample']['proj']) + '\n'
-                    oFileLines[5] = str('DATUM =  ' +
-                                        oDataSettings['mrt_info']['app_resample']['datum']) + '\n'
-
-                    # # Open, write and close parameters file
-                    oFile_PARAMS = open(join(sFolder_TMP, sFileName_TMP_RES_PARAMS), 'w')
-                    oFile_PARAMS.writelines(oFileLines.values())
-                    oFile_PARAMS.close()
-                    # -------------------------------------------------------------------------------------
-
-                    # -------------------------------------------------------------------------------------
-                    # Command line resampling
-                    sLineCmd_RES = (join(oDataSettings['mrt_info']['bin'], 'resample') + ' -p ' +
-                                    join(sFolder_TMP, sFileName_TMP_RES_PARAMS))
-
-                    # Execute mosaicking algorithm
-                    oProcExec = Popen(sLineCmd_RES, shell=True,
-                                      stdin=PIPE, stdout=DEVNULL, stderr=STDOUT)
-                    oProcExec.communicate()
-                    # -------------------------------------------------------------------------------------
-
-                    # -------------------------------------------------------------------------------------
-                    # Rename OUTCOME file
-                    rename(join(sFolder_TMP, sFileName_TMP_RES_DATA), join(sFolder_OUTCOME, sFileName_OUTCOME_DATA))
-                    # Info resampling
-                    print(' =====> RESAMPLING DATA ... DONE!')
-                    # -------------------------------------------------------------------------------------
-                else:
-                    # -------------------------------------------------------------------------------------
-                    # Condition about resampling not activated
-                    rename(join(sFolder_TMP, sFileName_TMP_RES_DATA), join(sFolder_OUTCOME, sFileName_OUTCOME_DATA))
-                    # Info resampling
-                    print(' =====> RESAMPLING DATA ... NOT ACTIVATED!')
-                    # -------------------------------------------------------------------------------------
-
-                # -------------------------------------------------------------------------------------
-                # Condition about availability of expected outcome filename
-                print(' ====> GET FILE: ' + sFileName_OUTCOME_DATA + ' ... DONE!')
-                # -------------------------------------------------------------------------------------
-            else:
-                # -------------------------------------------------------------------------------------
-                # Condition about availability of expected outcome filename
-                print(' ====> GET FILE: ' + sFileName_OUTCOME_DATA + ' ... FAILED. Tile(s) are not available!')
-                # -------------------------------------------------------------------------------------
-        else:
-            # -------------------------------------------------------------------------------------
-            # Condition about availability of expected outcome filename
-            print(' ====> GET FILE: ' + sFileName_OUTCOME_DATA + ' ... SKIPPED. Data previously downloaded!')
-            # -------------------------------------------------------------------------------------
-
-        # -------------------------------------------------------------------------------------
-        # Zip outcome filename (to save disk space)
-        print(' ====> ZIP FILE: ' + sFileName_OUTCOME_DATA + ' ... ')
-        if oDataSettings['data_info']['outcome']['zip'] is True:
-            zipFile(join(sFolder_OUTCOME, sFileName_OUTCOME_DATA), join(sFolder_OUTCOME, sFileName_OUTCOME_ZIP))
-            deleteFile(join(sFolder_OUTCOME, sFileName_OUTCOME_DATA))
-            print(' ====> ZIP FILE: ' + sFileName_OUTCOME_DATA + ' ... DONE!')
-        else:
-            print(' ====> ZIP FILE: ' + sFileName_OUTCOME_DATA + ' ... SKIPPED! Zip file not activated!')
-
-        # Delete all temporary files and script
-        deleteFolder(sFolder_TMP)
+        # Get datasets information
+        driver_data = DriverData(time_step,
+                                 machine_dict=data_settings['data']['machine'],
+                                 src_dict=data_settings['data']['source'],
+                                 ancillary_dict=data_settings['data']['ancillary'],
+                                 dst_dict=data_settings['data']['destination'],
+                                 time_dict=data_settings['time'],
+                                 product_dict=data_settings['product'],
+                                 info_dict=data_settings['info'],
+                                 template_dict=data_settings['template'],
+                                 library_dict=data_settings['library'],
+                                 flag_updating_source=data_settings['flags']['update_dynamic_data_source'],
+                                 flag_updating_ancillary=data_settings['flags']['update_dynamic_data_ancillary'],
+                                 flag_updating_destination=data_settings['flags']['update_dynamic_data_destination'],
+                                 )
+        # Download datasets
+        file_tile_collections = driver_data.download_data()
+        # Mosaic datasets
+        file_mosaic_collections = driver_data.mosaic_data(file_tile_collections)
+        # Resample datasets
+        driver_data.resample_data(file_mosaic_collections)
         # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Info algorithm
-    dTimeElapsed = round(time.time() - dStartTime, 1)
+    time_elapsed = round(time.time() - start_time, 1)
 
-    print(' ')
-    print(' ==> ' + sAlgName + ' (Version: ' + sAlgVersion + ' Release_Date: ' + sAlgRelease + ')')
-    print(' ==> TIME ELAPSED: ' + str(dTimeElapsed) + ' seconds')
-    print(' ==> ... END')
-    print(' ==> Bye, Bye')
-    print(' ============================================================================ ')
+    logging.info(' ')
+    logging.info(' ==> ' + alg_name + ' (Version: ' + alg_version + ' Release_Date: ' + alg_release + ')')
+    logging.info(' ==> TIME ELAPSED: ' + str(time_elapsed) + ' seconds')
+    logging.info(' ==> ... END')
+    logging.info(' ==> Bye, Bye')
+    logging.info(' ============================================================================ ')
     # -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to get script argument(s)
-def getSettings():
-    oParser = ArgumentParser()
-    oParser.add_argument('-settingfile', action="store", dest="sFileSettings")
-    oParserValue = oParser.parse_args()
+def get_args():
+    parser_handle = ArgumentParser()
+    parser_handle.add_argument('-settings_file', action="store", dest="alg_settings")
+    parser_handle.add_argument('-time', action="store", dest="alg_time")
+    parser_values = parser_handle.parse_args()
 
-    if oParserValue.sFileSettings:
-        sFileSettings = oParserValue.sFileSettings
+    if parser_values.alg_settings:
+        alg_settings = parser_values.alg_settings
     else:
-        sFileSettings = 'fp_downloader_modis_snow.json'
+        alg_settings = 'configuration.json'
 
-    return sFileSettings
-# -------------------------------------------------------------------------------------
+    if parser_values.alg_time:
+        alg_time = parser_values.alg_time
+    else:
+        alg_time = None
 
+    return alg_settings, alg_time
 
-# -------------------------------------------------------------------------------------
-# Method to gzip existing file
-def zipFile(sFileName_UNCOMPRESSED, sFileName_COMPRESSED):
-    if isfile(sFileName_UNCOMPRESSED):
-        if not isfile(sFileName_COMPRESSED):
-            if sFileName_UNCOMPRESSED != sFileName_COMPRESSED:
-                with open(sFileName_UNCOMPRESSED, 'rb') as oFile_IN:
-                    with gzip.open(sFileName_COMPRESSED, 'wb') as oFile_OUT:
-                        copyfileobj(oFile_IN, oFile_OUT)
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to remove file
-def deleteFile(sFileName):
-    if isfile(sFileName):
-        remove(sFileName)
-# -------------------------------------------------------------------------------------
+# Method to set logging information
+def set_logging(logger_file='log.txt', logger_format=None):
+    if logger_format is None:
+        logger_format = '%(asctime)s %(name)-12s %(levelname)-8s ' \
+                        '%(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s'
 
+    # Remove old logging file
+    if os.path.exists(logger_file):
+        os.remove(logger_file)
 
-# -------------------------------------------------------------------------------------
-# Method to delete folder and its content
-def deleteFolder(sPathFolder):
-    if exists(sPathFolder):
-        rmtree(sPathFolder)
-# -------------------------------------------------------------------------------------
+    # Set level of root debugger
+    logging.root.setLevel(logging.DEBUG)
 
+    # Open logging basic configuration
+    logging.basicConfig(level=logging.DEBUG, format=logger_format, filename=logger_file, filemode='w')
 
-# -------------------------------------------------------------------------------------
-# Method to make folder
-def makeFolder(sPathFolder):
-    if not exists(sPathFolder):
-        makedirs(sPathFolder)
-# -------------------------------------------------------------------------------------
+    # Set logger handle
+    logger_handle_1 = logging.FileHandler(logger_file, 'w')
+    logger_handle_2 = logging.StreamHandler()
+    # Set logger level
+    logger_handle_1.setLevel(logging.DEBUG)
+    logger_handle_2.setLevel(logging.DEBUG)
+    # Set logger formatter
+    logger_formatter = logging.Formatter(logger_format)
+    logger_handle_1.setFormatter(logger_formatter)
+    logger_handle_2.setFormatter(logger_formatter)
 
+    # Add handle to logging
+    logging.getLogger('').addHandler(logger_handle_1)
+    logging.getLogger('').addHandler(logger_handle_2)
 
-# -------------------------------------------------------------------------------------
-# Method to make executable a bash file
-def makeExec(path):
-    mode = stat(path).st_mode
-    mode |= (mode & 0o444) >> 2    # copy R bits to X
-    chmod(path, mode)
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
-# Method to set tag(s) in generic string
-def setTags(sString, oTags):
-    for sTagKey, sTagValue in oTags.items():
-        sString = sString.replace(sTagKey, sTagValue)
-    return sString
 # -------------------------------------------------------------------------------------
 
 

@@ -12,7 +12,9 @@ import logging
 import os
 import re
 
+import numpy as np
 import pandas as pd
+import xarray as xr
 
 from copy import deepcopy
 
@@ -118,10 +120,14 @@ class ModelRunner:
     # Method to initialize class
     def __init__(self, time_step, time_range,
                  variable_in, variable_out, data_geo, template, parameters,
-                 file_ancillary_in=None, file_ancillary_out=None, file_in=None, file_out=None,
+                 file_dict_ancillary_in=None, file_dict_ancillary_out=None,
+                 file_dict_in=None, file_dict_out=None,
                  file_ancillary_in_updating=True, file_ancillary_out_updating=None,
                  file_out_updating=None, file_out_zipping=False, file_ext_zipping='.gz',
-                 file_write_engine='netcdf4'):
+                 file_write_engine='netcdf4', file_domain_name='regional_domain', file_dim_type='time',
+                 tag_folder_name='folder', tag_file_name='filename',
+                 tag_terrain_data='terrain_data', tag_alert_area_data='alert_area_data',
+                 tag_model_algorithm='exec_nwp'):
 
         # Generic information
         self.time_step = time_step
@@ -132,24 +138,94 @@ class ModelRunner:
         self.model_tags_template = template
         self.model_parameters = parameters
 
+        self.file_dict_in = file_dict_in
+        self.file_dict_ancillary_in = file_dict_ancillary_in
+        self.file_dict_ancillary_out = file_dict_ancillary_out
+        self.file_dict_out = file_dict_out
+
+        self.tag_folder_name = tag_folder_name
+        self.tag_file_name = tag_file_name
+        self.tag_terrain_data = tag_terrain_data
+        self.tag_alert_area_data = tag_alert_area_data
+
+        self.tag_model_algorithm = tag_model_algorithm
+
+        folder_name_in = self.file_dict_in[self.tag_folder_name]
+        file_name_in = self.file_dict_in[self.tag_file_name]
+        file_in = os.path.join(folder_name_in, file_name_in)
+
+        folder_ancillary_in = self.file_dict_ancillary_in[self.tag_folder_name]
+        file_ancillary_in = self.file_dict_ancillary_in[self.tag_file_name]
+        file_ancillary_in = os.path.join(folder_ancillary_in, file_ancillary_in)
+
+        folder_ancillary_out = self.file_dict_ancillary_out[self.tag_folder_name]
+        file_ancillary_out = self.file_dict_ancillary_out[self.tag_file_name]
+        file_ancillary_out = os.path.join(folder_ancillary_out, file_ancillary_out)
+
+        folder_name_out = self.file_dict_out[self.tag_folder_name]
+        file_name_out = self.file_dict_out[self.tag_file_name]
+        file_out = os.path.join(folder_name_out, file_name_out)
+
+        self.data_geo_terrain = self.data_geo[self.tag_terrain_data]
+        self.data_geo_alert_area = self.data_geo[self.tag_alert_area_data]
+
+        if isinstance(file_domain_name, str):
+            self.var_domain_name = [file_domain_name]
+            self.var_domain_id = [1]
+        elif isinstance(file_domain_name, dict):
+            var_domain_name = []
+            var_domain_id = []
+            for domain_key, domain_fields in file_domain_name.items():
+                domain_name = domain_fields['name']
+                domain_id = domain_fields['id']
+                var_domain_name.append(domain_name)
+                var_domain_id.append(domain_id)
+            self.var_domain_name = var_domain_name
+            self.var_domain_id = var_domain_id
+        else:
+            raise NotImplementedError('Domain name format not permitted')
+        self.file_dim_type = file_dim_type
+
         # Data input file
         if file_in is not None:
-            model_tags_in_values = {'datetime_input': self.time_step, 'sub_path_time': self.time_step}
 
-            file_in_raw = fill_tags2string(file_in, self.model_tags_template, model_tags_in_values)
-            self.folder_in_raw, self.filename_in_raw = os.path.split(file_in_raw)
+            if self.file_dim_type == 'time':
+                model_tags_in_values = {'datetime_input': self.time_step, 'sub_path_time': self.time_step}
 
-            self.folder_in_list = []
-            self.filename_in_list = []
-            for time_iter in self.time_range:
-                model_tags_list_values = {'datetime_input': time_iter, 'sub_path_time': self.time_step}
-                file_in_list = fill_tags2string(file_in, self.model_tags_template, model_tags_list_values)
-                folder_in_list, filename_in_list = os.path.split(file_in_list)
-                self.folder_in_list.append(folder_in_list)
-                self.filename_in_list.append(filename_in_list)
+                file_in_raw = fill_tags2string(file_in, self.model_tags_template, model_tags_in_values)
+                self.folder_in_raw, self.filename_in_raw = os.path.split(file_in_raw)
+            elif self.file_dim_type == 'domain':
+                model_tags_in_values = {'datetime_input': self.time_step, 'sub_path_time': self.time_step,
+                                        'domain': self.var_domain_name[0]}
 
+                file_in_raw = fill_tags2string(file_in, self.model_tags_template, model_tags_in_values)
+                self.folder_in_raw, self.filename_in_raw = os.path.split(file_in_raw)
+            else:
+                raise NotImplementedError('File dim type not allowed')
+
+            if self.file_dim_type == 'time':
+                self.folder_in_list = []
+                self.filename_in_list = []
+                for time_iter in self.time_range:
+                    model_tags_list_values = {'datetime_input': time_iter, 'sub_path_time': self.time_step}
+                    file_in_list = fill_tags2string(file_in, self.model_tags_template, model_tags_list_values)
+                    folder_in_list, filename_in_list = os.path.split(file_in_list)
+                    self.folder_in_list.append(folder_in_list)
+                    self.filename_in_list.append(filename_in_list)
+            elif self.file_dim_type == 'domain':
+                self.folder_in_list = []
+                self.filename_in_list = []
+                for domain_iter in self.var_domain_name:
+                    model_tags_list_values = {'datetime_input': self.time_step, 'sub_path_time': self.time_step,
+                                              'domain': domain_iter}
+                    file_in_list = fill_tags2string(file_in, self.model_tags_template, model_tags_list_values)
+                    folder_in_list, filename_in_list = os.path.split(file_in_list)
+                    self.folder_in_list.append(folder_in_list)
+                    self.filename_in_list.append(filename_in_list)
+            else:
+                raise NotImplementedError('File dim type not allowed')
         else:
-            raise TypeError
+            raise TypeError('File input are not correctly defined')
 
         if not os.path.exists(self.folder_in_raw):
             raise FileNotFoundError(' Path does not exist [' + self.folder_in_raw + ']')
@@ -206,6 +282,7 @@ class ModelRunner:
             var_dims=self.var_info_in['id']['var_type'][0],
             var_type=self.var_info_in['id']['var_type'][1],
             var_units=self.var_info_in['attributes']['units'],
+            var_domain=self.var_domain_name,
             file_format=self.var_info_in['id']['var_format'],
             file_source=self.var_info_in['id']['var_source'],
             folder_tmp=self.folder_ancillary_in_raw, filename_tmp=self.filename_ancillary_in_raw,
@@ -225,7 +302,8 @@ class ModelRunner:
             domain_extension=self.model_parameters['domain_extension'],
             folder_tmp=self.folder_ancillary_out_raw,
             filename_tmp=self.filename_ancillary_out_raw,
-            model_var=self.var_info_out['id']['var_name']
+            model_var=self.var_info_out['id']['var_name'],
+            model_algorithm=self.tag_model_algorithm
         )
 
         # Model driver of saving RFarm result(s)
@@ -348,16 +426,27 @@ class ModelRunner:
             # Check ancillary outcome flag
             if self.file_ancillary_out_updating:
 
-                values_obj = data_obj.values
-                lons_obj = data_obj['longitude'].values
-                lats_obj = data_obj['latitude'].values
+                if isinstance(data_obj, dict):
 
-                time_obj = data_obj['time'].values
+                    values_obj = data_obj['data']
+                    lons_obj = self.data_geo_terrain['longitude']
+                    lats_obj = self.data_geo_terrain['latitude']
+                    time_obj = data_obj['time']
 
-                lons_geo = self.data_geo['longitude']
-                lats_geo = self.data_geo['latitude']
-                res_lon_geo = self.data_geo['res_lon']
-                res_lat_geo = self.data_geo['res_lat']
+                elif isinstance(data_obj, xr.DataArray):
+
+                    values_obj = data_obj.values
+                    lons_obj = data_obj['longitude'].values
+                    lats_obj = data_obj['latitude'].values
+                    time_obj = data_obj['time'].values
+
+                else:
+                    raise NotImplementedError('Object not in supported format')
+
+                lons_geo = self.data_geo_terrain['longitude']
+                lats_geo = self.data_geo_terrain['latitude']
+                res_lon_geo = self.data_geo_terrain['res_lon']
+                res_lat_geo = self.data_geo_terrain['res_lat']
 
                 # Configure model grid(s)
                 self.driver_rf_model.configure_grid(lons_obj, lats_obj,
@@ -391,13 +480,27 @@ class ModelRunner:
         # Starting info
         log_stream.info(' ---> Model execution ... ')
 
+        # Get domain information
+        domain_id = self.var_domain_id
+        domain_name = self.var_domain_name
+
+        # Get alert area domain(s)
+        if self.data_geo_alert_area is not None:
+            domain_mask = self.data_geo_alert_area['values']
+        else:
+            terrain_data = self.data_geo_terrain['values']
+            domain_mask = np.zeros(shape=[terrain_data.shape[0], terrain_data.shape[1]])
+            domain_mask[:, :] = 1
+            domain_mask[terrain_data < 0] = -9999
+
         # Check data availability
         if self.driver_rf_data.found_data_first:
 
             # Check ancillary outcome flag
             if self.file_ancillary_out_updating:
                 # Method to execute model run(s)
-                ensemble_obj = self.driver_rf_model.execute_run()
+                ensemble_obj = self.driver_rf_model.execute_run(domain_name=domain_name, domain_id=domain_id,
+                                                                domain_mask=domain_mask)
                 # Ending info
                 log_stream.info(' ---> Model execution ... DONE!')
             else:
@@ -428,9 +531,9 @@ class ModelRunner:
         if self.driver_rf_data.found_data_first:
 
             # Geographical info
-            values_geo = self.data_geo['values']
-            lons_geo = self.data_geo['longitude']
-            lats_geo = self.data_geo['latitude']
+            values_geo = self.data_geo_terrain['values']
+            lons_geo = self.data_geo_terrain['longitude']
+            lats_geo = self.data_geo_terrain['latitude']
 
             # Method to set ancillary out flag
             self.file_out_updating = self.__set_ancillary_out_flag(self.file_out_updating)

@@ -11,6 +11,7 @@ Version:       '1.0.0'
 # Library
 import logging
 import time
+import datetime
 import pandas as pd
 
 from src.hyde.algorithm.settings.nwp.ecmwf.lib_ecmwf_args import logger_name, time_format
@@ -138,7 +139,9 @@ class DataTime:
             else:
                 log_stream.info(' -----> Time argument is set using script configuration file')
 
-            time_now = pd.to_datetime(self.time_now, format=time_format)
+            time_format_now = self.validate(self.time_now)
+
+            time_now = pd.to_datetime(self.time_now, format=time_format_now)
             time_now = time_now.floor('min')
             time_now = time_now.replace(minute=0)
 
@@ -151,6 +154,20 @@ class DataTime:
             raise BaseException('Error in time now definition!')
 
         return time_now
+    # -------------------------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------------------
+    # Method to validate date string
+    @staticmethod
+    def validate(date_text):
+        try:
+            datetime.datetime.strptime(date_text, time_format)
+            time_format_select = time_format
+        except BaseException as base_exp:
+            log_stream.info(' -----> Time format expected was ' + time_format + '. Try to parse with %Y-%m-%d %H:$M.')
+            datetime.datetime.strptime(date_text, '%Y-%m-%d %H:%M')
+            time_format_select = '%Y-%m-%d %H:%M'
+        return time_format_select
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -171,7 +188,9 @@ class DataTime:
             else:
                 log_stream.info(' -----> Time argument is set using script arg(s)')
 
-            time_arg = pd.to_datetime(self.time_arg, format=time_format)
+            time_format_arg = self.validate(self.time_arg)
+
+            time_arg = pd.to_datetime(self.time_arg, format=time_format_arg)
             time_arg = time_arg.floor('min')
             time_arg = time_arg.replace(minute=0)
 

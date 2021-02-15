@@ -1,0 +1,227 @@
+{
+  "algorithm":{
+    "flag": {
+      "update_static_data_ancillary": true,
+      "update_dynamic_data_ancillary": true,
+      "update_dynamic_data_destination": true,
+      "clean_temporary_data": true
+    },
+    "general": {
+      "title": "EXPERT FORECAST RAIN",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "2.0.0 [20210104]",
+      "project-info": "HyDE - Hydrological Data Engines",
+      "algorithm": "Expert Forecast rain preprocessing tools"
+    },
+    "info": {
+      "domain": "marche",
+      "group": {
+        "alert_area_a": {
+          "name": "alert_area_a",
+          "id": 1,
+          "variables": {
+            "rain_average": {
+              "variable_1": {"tag": "areale_A_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "areale_A_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "areale_A_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            },
+            "rain_peak": {
+              "variable_1": {"tag": "picco_A_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "picco_A_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "picco_A_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            }
+          }
+        },
+        "alert_area_b": {
+          "name": "alert_area_b",
+          "id": 2,
+          "variables": {
+            "rain_average": {
+              "variable_1": {"tag": "areale_B_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "areale_B_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "areale_B_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            },
+            "rain_peak": {
+              "variable_1": {"tag": "picco_B_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "picco_B_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "picco_B_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            }
+          }
+        },
+        "alert_area_c": {
+          "name": "alert_area_c",
+          "id": 3,
+          "variables": {
+            "rain_average": {
+              "variable_1": {"tag": "areale_C_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "areale_C_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "areale_C_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            },
+            "rain_peak": {
+              "variable_1": {"tag": "picco_C_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "picco_C_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "picco_C_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            }
+          }
+        },
+        "alert_area_d": {
+          "name": "alert_area_d",
+          "id": 4,
+          "variables": {
+            "rain_average": {
+              "variable_1": {"tag": "areale_D_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "areale_D_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "areale_D_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            },
+            "rain_peak": {
+              "variable_1": {"tag": "picco_D_oggi_12-24", "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "picco_D_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "picco_D_domani_12-24", "hour_start": "13", "hour_end": "00"}
+            }
+          }
+        },
+        "alert_area_e": {
+          "name": "alert_area_e",
+          "id": 5,
+          "variables": {
+            "rain_average": {
+              "variable_1": {"tag": "areale_E_oggi_12-24",  "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "areale_E_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "areale_E_domani_12-24",  "hour_start": "13", "hour_end": "00"}
+            },
+            "rain_peak": {
+              "variable_1": {"tag": "picco_E_oggi_12-24",  "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "picco_E_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "picco_E_domani_12-24",  "hour_start": "13", "hour_end": "00"}
+            }
+          }
+        },
+        "alert_area_f": {
+          "name": "alert_area_f",
+          "id": 6,
+          "variables": {
+            "rain_average": {
+              "variable_1": {"tag": "areale_F_oggi_12-24",  "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "areale_F_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "areale_F_domani_12-24",  "hour_start": "13", "hour_end": "00"}
+            },
+            "rain_peak": {
+              "variable_1": {"tag": "picco_F_oggi_12-24",  "hour_start": "13", "hour_end": "00"},
+              "variable_2": {"tag": "picco_F_domani_0-12", "hour_start": "01", "hour_end": "12"},
+              "variable_3": {"tag": "picco_F_domani_12-24",  "hour_start": "13", "hour_end": "00"}
+            }
+          }
+        }
+      }
+    },
+    "template": {
+      "domain_name": "string_domain",
+      "alert_area_name": "string",
+      "source_datetime": "%Y-%m-%d",
+      "source_sub_path_time": "%Y/%m/%d/",
+      "ancillary_datetime": "%Y%m%d%H%M",
+      "ancillary_sub_path_time": "%Y/%m/%d/",
+      "destination_datetime": "%Y%m%d%H%M",
+      "destination_sub_path_time": "%Y/%m/%d/"
+    }
+  },
+  "data": {
+    "static": {
+      "source" : {
+        "terrain" : {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/",
+          "file_name": "marche.dem.txt"
+        },
+        "alert_area": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/",
+          "file_name": "marche.alertarea_2017.txt"
+        },
+        "slopes": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/rainfarm/",
+          "file_name": "marche.vm.mat"
+        }
+      },
+      "ancillary": {
+        "grid_reference": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/expert_forecast/",
+          "file_name": "ef_rain_grid.workspace"
+        },
+        "geo_reference": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/expert_forecast/",
+          "file_name": "ef_rain_geo.workspace"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_dataset_period": 3,
+        "time_dataset_frequency": "12H",
+        "time_dataset_rounding": "12H",
+        "time_dataset_eta": "12",
+        "time_file_period": 2,
+        "time_file_frequency": "D",
+        "time_file_rounding": "D",
+        "time_file_eta": "00"
+      },
+      "source": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/nwp/subjective-forecast_aa2017/",
+        "file_name": "{source_datetime}_dati_prev.csv"
+      },
+      "ancillary": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/expert_forecast/{ancillary_sub_path_time}",
+        "file_name": "ef_rain_{domain_name}_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/expert_forecast/{destination_sub_path_time}",
+        "file_name": "ef.rain.{destination_datetime}_{domain_name}_{alert_area_name}.json",
+        "file_compression": false
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/ef/",
+    "file_name": "hyde_preprocessing_ef_rain_log.txt",
+    "file_history": true
+  },
+  "time": {
+    "time_run": "2021-01-03 10:32",
+    "time_period": 2,
+    "time_frequency": "D",
+    "time_rounding": "D"
+  },
+  "variables": {
+    "source": {
+      "rain": {
+        "var_mode": true,
+        "var_name": "rain",
+        "var_method_compute": null,
+        "var_attributes": {
+          "long_name": "rain",
+          "standard_name": "rain",
+          "missing_value": -9999.0,
+          "fill_value": -9999.0,
+          "scale_factor": 1,
+          "valid_range": [0, null],
+          "units": "mm"
+        }
+      }
+    },
+    "destination": {
+      "rain": {
+        "var_mode": true,
+        "var_name": "rain",
+        "var_attributes": {
+          "long_name": "rain",
+          "standard_name": "rain",
+          "missing_value": -9999.0,
+          "fill_value": -9999.0,
+          "scale_factor": 1,
+          "valid_range": [0, null],
+          "units": "mm",
+          "description": ""
+        }
+      }
+    }
+  }
+}

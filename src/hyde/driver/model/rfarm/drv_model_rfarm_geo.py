@@ -10,13 +10,12 @@ Version:       '1.0.0'
 #######################################################################################
 # Library
 import logging
-
-from os import makedirs, remove
-from os.path import join, split, exists
+import os
 
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
-from src.hyde.algorithm.geo.model.rfarm.lib_rfarm_geo import load_domain
+from src.hyde.algorithm.geo.model.rfarm.lib_rfarm_geo import read_file_raster
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import read_obj, write_obj
+from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import make_folder
 
 # Log
 log_stream = logging.getLogger(logger_name)
@@ -29,53 +28,90 @@ class DataGeo:
 
     # -------------------------------------------------------------------------------------
     # Method class initialization
-    def __init__(self, file_domain, file_grid, file_updating=False):
+    def __init__(self, src_dict,
+                 tag_folder_name='folder', tag_file_name='filename',
+                 tag_terrain_data='terrain_data', tag_alert_area_data='alert_area_data',
+                 tag_ancillary_data='grid_data',
+                 cleaning_static_data=True):
 
         # -------------------------------------------------------------------------------------
         # Get path(s) and filename(s)
-        filepath_domain, filename_domain = split(file_domain)
-        filepath_grid, filename_grid = split(file_grid)
+        self.src_dict = src_dict
 
-        # Store information in global workspace
-        self.filepath_domain = filepath_domain
-        self.filename_domain = filename_domain
-        self.filepath_grid = filepath_grid
-        self.filename_grid = filename_grid
+        self.tag_folder_name = tag_folder_name
+        self.tag_file_name = tag_file_name
 
-        if not exists(self.filepath_grid):
-            makedirs(self.filepath_grid)
+        self.tag_terrain_data = tag_terrain_data
+        self.tag_alert_area_data = tag_alert_area_data
+        self.tag_ancillary_data = tag_ancillary_data
 
-        if file_updating:
-            if exists(join(self.filepath_grid, self.filename_grid)):
-                remove(join(self.filepath_grid, self.filename_grid))
+        self.folder_name_terrain = src_dict[self.tag_terrain_data][self.tag_folder_name]
+        self.file_name_terrain = src_dict[self.tag_terrain_data][self.tag_file_name]
+        self.file_path_terrain = os.path.join(self.folder_name_terrain, self.file_name_terrain)
+
+        if self.tag_alert_area_data in list(src_dict.keys()):
+            self.folder_name_alert_area = src_dict[self.tag_alert_area_data][self.tag_folder_name]
+            self.file_name_alert_area = src_dict[self.tag_alert_area_data][self.tag_file_name]
+            self.file_path_alert_area = os.path.join(self.folder_name_alert_area, self.file_name_alert_area)
+        else:
+            self.folder_name_alert_area = None
+            self.file_name_alert_area = None
+            self.file_path_alert_area = None
+
+        self.folder_name_ancillary = src_dict[self.tag_ancillary_data][self.tag_folder_name]
+        self.file_name_ancillary = src_dict[self.tag_ancillary_data][self.tag_file_name]
+        self.file_path_ancillary = os.path.join(self.folder_name_ancillary, self.file_name_ancillary)
+
+        self.cleaning_static_data = cleaning_static_data
+
+        if self.cleaning_static_data:
+            if os.path.exists(self.file_path_ancillary):
+                os.remove(self.file_path_ancillary)
         # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
-    # Method to get geographical data
-    def getDataGeo(self):
+    # Method to compose geographical data
+    def compose(self):
 
-        log_stream.info(' ---> Reference grid ... ')
-        if not exists(join(self.filepath_grid, self.filename_grid)):
+        logging.info(' ---> Organize Geo ... ')
 
-            if exists(join(self.filepath_domain, self.filename_domain)):
+        geo_collections = {}
+        if not os.path.exists(self.file_path_ancillary):
 
-                domain_obj = load_domain(join(self.filepath_domain, self.filename_domain))
-                write_obj(join(self.filepath_grid, self.filename_grid), domain_obj)
-
-                log_stream.info(' ---> Reference grid ... DONE')
-
+            logging.info(' ----> Terrain datasets ... ')
+            if os.path.exists(self.file_path_terrain):
+                terrain_obj = read_file_raster(self.file_path_terrain)
+                logging.info(' ----> Terrain datasets ... DOME')
             else:
-                log_stream.error(' ---> Reference grid ... FAILED! FILE DOMAIN NOT FOUND! [' +
-                                 join(self.filepath_domain, self.filename_domain + '] '))
-                raise FileNotFoundError
+                logging.error(' ----> Terrain datasets ... FAILED! File not found.')
+                raise FileNotFoundError('File ' + self.file_path_terrain + ' not found')
+
+            logging.info(' ----> Alert area datasets ... ')
+            if os.path.exists(self.file_path_alert_area):
+                alert_area_obj = read_file_raster(self.file_path_alert_area)
+                logging.info(' ----> Alert area datasets ... DOME')
+            else:
+                logging.info(' ----> Alert area datasets ... SKIPPED! File not found.')
+                alert_area_obj = None
+
+            # Create geo collections
+            geo_collections[self.tag_terrain_data] = terrain_obj
+            geo_collections[self.tag_alert_area_data] = alert_area_obj
+
+            # Save geo collections
+            folder_name, file_name = os.path.split(self.file_path_terrain)
+            make_folder(folder_name)
+            write_obj(self.file_path_ancillary, geo_collections)
 
         else:
-            log_stream.info(' ---> Reference grid ... PREVIOUSLY CREATED')
-            domain_obj = read_obj(join(self.filepath_grid, self.filename_grid))
+            # Read geo collections
+            geo_collections = read_obj(self.file_path_ancillary)
 
-        return domain_obj
+        logging.info(' ---> Organize Geo ... DONE')
+
+        return geo_collections
 
     # -------------------------------------------------------------------------------------
 

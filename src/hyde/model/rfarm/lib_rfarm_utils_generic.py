@@ -345,7 +345,7 @@ def computeGrid(a2dGeoX_IN, a2dGeoY_IN,
     # -------------------------------------------------------------------------------------
     # Define pixels number (max dimension for square matrix) and redefine spatial ratio
     if bGrid == 1:
-        iNPixels_REF = min((iJMax_REF - iJMin_REF) + 1, (iIMax_REF - iIMin_REF) + 1)
+        iNPixels_REF = max((iJMax_REF - iJMin_REF) + 1, (iIMax_REF - iIMin_REF) + 1)
     elif bGrid == 2:
         iNPixels_REF = max((iJMax_REF - iJMin_REF) + 1, (iIMax_REF - iIMin_REF) + 1)
     else:
@@ -387,21 +387,33 @@ def computeGrid(a2dGeoX_IN, a2dGeoY_IN,
 
     # -------------------------------------------------------------------------------------
     # Define grid rainfarm
-    dGeoXMin_RF = a2dGeoX_IN[iIMax_RF, iJMin_RF] - .5*((dRatioS - 1)/dRatioS)*dGeoXStep_CUT
-    dGeoYMin_RF = a2dGeoY_IN[iIMax_RF, iJMin_RF] - .5*((dRatioS - 1)/dRatioS)*dGeoYStep_CUT
-    dGeoXMax_RF = a2dGeoX_IN[iIMin_RF, iJMax_RF] + .5*((dRatioS - 1)/dRatioS)*dGeoXStep_CUT
-    dGeoYMax_RF = a2dGeoY_IN[iIMin_RF, iJMax_RF] + .5*((dRatioS - 1)/dRatioS)*dGeoYStep_CUT
-    
+    if bGrid == 1:
+        dGeoXMin_RF = np.min(a2dGeoX_IN)
+        dGeoYMin_RF = np.min(a2dGeoY_IN)
+        dGeoXMax_RF = np.max(a2dGeoX_IN)
+        dGeoYMax_RF = np.max(a2dGeoY_IN)
+    elif bGrid == 2:
+        dGeoXMin_RF = a2dGeoX_IN[iIMax_RF, iJMin_RF] - .5 * ((dRatioS - 1) / dRatioS) * dGeoXStep_CUT
+        dGeoYMin_RF = a2dGeoY_IN[iIMax_RF, iJMin_RF] - .5 * ((dRatioS - 1) / dRatioS) * dGeoYStep_CUT
+        dGeoXMax_RF = a2dGeoX_IN[iIMin_RF, iJMax_RF] + .5 * ((dRatioS - 1) / dRatioS) * dGeoXStep_CUT
+        dGeoYMax_RF = a2dGeoY_IN[iIMin_RF, iJMax_RF] + .5 * ((dRatioS - 1) / dRatioS) * dGeoYStep_CUT
+
     a1dGeoX_RF = np.linspace(dGeoXMin_RF, dGeoXMax_RF, iResolution_RF, endpoint=True)
     a1dGeoY_RF = np.linspace(dGeoYMin_RF, dGeoYMax_RF, iResolution_RF, endpoint=True)
     
     a2dGeoX_RF, a2dGeoY_RF = np.meshgrid(a1dGeoX_RF, a1dGeoY_RF)
     a2dGeoY_RF = np.flipud(a2dGeoY_RF)
-    
+
     # LL corner
-    dGeoXLL_RF = a2dGeoX_IN[iIMax_RF, iJMin_RF]
-    dGeoYLL_RF = a2dGeoX_IN[iIMax_RF, iJMin_RF]
-    
+    if bGrid == 1:
+        dGeoXLL_RF = np.nanmin(a2dGeoX_IN)
+        dGeoYLL_RF = np.nanmin(a2dGeoY_IN)
+    elif bGrid == 2:
+        dGeoXLL_RF = a2dGeoX_IN[iIMax_RF, iJMin_RF]
+        dGeoYLL_RF = a2dGeoY_IN[iIMax_RF, iJMin_RF]
+    else:
+        pass
+
     # Compute grid indexes using nearest interpolation
     a2iIndex_RF = lib_regrid.gridIndex(a2dGeoX_RF, a2dGeoY_RF, a2dGeoX_REF, a2dGeoY_REF)
     
@@ -629,10 +641,10 @@ def searchGridIndex(iIMax_REF, iJMin_REF, iRows_REF, iCols_REF, iNPixels,
         pass
     
     # Check mod
-    # iIDelta_RF = iIMax_RF - iIMin_RF + 1
-    # iJDelta_RF = iJMax_RF - iJMin_RF + 1
-    # iIMod_RF = checkMod(iIDelta_RF, iRatioS)
-    # iJMod_RF = checkMod(iJDelta_RF, iRatioS)
+    #iIDelta_RF = iIMax_RF - iIMin_RF + 1
+    #iJDelta_RF = iJMax_RF - iJMin_RF + 1
+    #iIMod_RF = checkMod(iIDelta_RF, iRatioS)
+    #iJMod_RF = checkMod(iJDelta_RF, iRatioS)
     
     # Info
     log_stream.info(
@@ -667,7 +679,7 @@ def searchGridIndex(iIMax_REF, iJMin_REF, iRows_REF, iCols_REF, iNPixels,
             log_stream.warning(' ====> JMax_RF >= Rows_REF ')
             if iJMin_RF > 0:
                 iJMin_RF = iJMin_RF - 1
-            else:
+            elif iJMin_RF <= 0:
                 log_stream.warning(' ====> JMin_RF <= 0 ')
                 pass
         

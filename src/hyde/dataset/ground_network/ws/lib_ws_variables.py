@@ -3,520 +3,488 @@ Library Features:
 
 Name:          lib_ws_variables
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20180918'
-Version:       '1.0.0'
+Date:          '20201102'
+Version:       '2.0.0'
 """
 
 #######################################################################################
 # Library
 import logging
-from numpy import argsort, polyfit, polyval, isnan, mean, delete, zeros, ones, any, argwhere, concatenate
-from numpy.linalg import lstsq
+import numpy as np
 
-from src.common.analysis.lib_analysis_interpolation_point import interpPointData
-from src.common.analysis.lib_analysis_regression_stepwisefit import stepwisefit
+from src.hyde.algorithm.geo.ground_network.lib_ws_geo import find_geo_index, deg_2_km
 
-from src.hyde.dataset.ground_network.ws.lib_ws_ancillary_snow import computeSnowKernel
+from src.hyde.algorithm.analysis.ground_network.lib_ws_analysis_interpolation_point import interp_point2grid
+from src.hyde.algorithm.analysis.ground_network.lib_ws_analysis_regression_stepwisefit import stepwisefit
 
-from src.common.utils.lib_utils_apps_geo import findGeoIndex, Deg2Km
-
-from src.common.default.lib_default_args import sLoggerName
-from src.common.driver.configuration.drv_configuration_debug import Exc
-
-# Logging
-oLogStream = logging.getLogger(sLoggerName)
+from src.hyde.dataset.ground_network.ws.lib_ws_ancillary_snow import compute_kernel
 
 # Debug
-# import matplotlib.pylab as plt
+import matplotlib.pylab as plt
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
 #######################################################################################
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute rain field(s)
-def computeRain(a1dVarData, a1dVarGeoX, a1dVarGeoY,
-                a2dDomainGeoX, a2dDomainGeoY,
-                sVarUnits='mm', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                dInterpNodata=-9999.0,
-                sInterpMethod='idw', dInterpRadiusX=None, dInterpRadiusY=None):
+# Method to compute rain map
+def compute_rain(var_data, var_geo_x, var_geo_y,
+                 ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
+                 var_units='mm', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                 fx_nodata=-9999.0, fx_interp_name='idw',
+                 fx_interp_radius_x=None, fx_interp_radius_y=None):
 
-    # Init results
-    a2dVarData_INTERP = None
+    if var_units is None:
+        logging.warning(' ===> Rain variable unit is undefined; set to [mm]')
+        var_units = 'mm'
+    if var_units != 'mm':
+        logging.warning(' ===> Rain variable units in wrong format; expected in [mm], passed in [' +
+                        var_units + ']')
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: rain units are not set! Default units are [mm]', 2, 1)
-        sVarUnits = 'mm'
-    # Check variables units
-    if sVarUnits != 'mm':
-        Exc.getExc(' =====> WARNING: rain units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [mm]. Check your data!', 2, 1)
+    if var_data.ndim > 1:
+        logging.error(' ===> Rain variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-
-    # Compute results using 1d format
-    if iVarDim == 1:
-
-        # Interpolate point(s) data to grid
-        a2dVarData_INTERP = interpPointData(a1dVarData,
-                                            a1dVarGeoX, a1dVarGeoY,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-        # Check NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: rain data dimension(s) unexpected! Check your data!', 1, 1)
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # Results
-    return a2dVarData_INTERP
+    # Interpolate point(s) data to grid
+    grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
+                                  interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                  interp_radius_x=fx_interp_radius_x,
+                                  interp_radius_y=fx_interp_radius_y)
 
+    # Filter data nan and over domain
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    return grid_data
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute temperature field(s)
-def computeAirTemperature(a1dVarData, a1dVarGeoX, a1dVarGeoY, a1dVarGeoZ,
-                          a2dDomainGeoX, a2dDomainGeoY, a2dDomainGeoZ,
-                          sVarUnits='C', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                          dInterpNodata=-9999.0,
-                          sInterpMethod='idw', dInterpRadiusX=None, dInterpRadiusY=None):
+# Method to compute air temperature map
+def compute_air_temperature(var_data, var_geo_x, var_geo_y, var_geo_z,
+                            ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
+                            var_units='C', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                            fx_nodata=-9999.0, fx_interp_name='idw',
+                            fx_interp_radius_x=None, fx_interp_radius_y=None):
 
-    # Init results
-    a2dVarData_INTERP = None
+    if var_units is None:
+        logging.warning(' ===> Air temperature variable unit is undefined; set to [C]')
+        var_units = 'C'
+    if var_units != 'C':
+        logging.warning(' ===> Air temperature variable units in wrong format; expected in [C], passed in [' +
+                        var_units + ']')
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: air temperature units are not set! Default units are [C]', 2, 1)
-        sVarUnits = 'C'
-    # Check variables units
-    if sVarUnits != 'C':
-        Exc.getExc(' =====> WARNING: air temperature units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [C]. Check your data!', 2, 1)
+    if var_data.ndim > 1:
+        logging.error(' ===> Air temperature variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-
-    # Compute results 1d format
-    if iVarDim == 1:
-
-        # Sort altitude(s)
-        a1iIndexGeoZ_SORT = argsort(a1dVarGeoZ)
-
-        # Extract sorting value(s) from finite arrays
-        a1dVarGeoX_SORT = a1dVarGeoX[a1iIndexGeoZ_SORT]
-        a1dVarGeoY_SORT = a1dVarGeoY[a1iIndexGeoZ_SORT]
-        a1dVarGeoZ_SORT = a1dVarGeoZ[a1iIndexGeoZ_SORT]
-        a1dVarData_SORT = a1dVarData[a1iIndexGeoZ_SORT]
-
-        # Polyfit parameters and value(s) (--> linear regression)
-        a1dPolyParams = polyfit(a1dVarGeoZ_SORT, a1dVarData_SORT, 1)
-        a1dPolyValues = polyval(a1dPolyParams, a1dVarGeoZ_SORT)
-
-        # Define residual for point value(s)
-        a1dVarData_RES = a1dVarData_SORT - a1dPolyValues
-
-        # Interpolate point(s) data to grid
-        a2dVarData_INTERP = interpPointData(a1dVarData_RES,
-                                            a1dVarGeoX_SORT, a1dVarGeoY_SORT,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-
-        # Interpolate polynomial parameters on z map
-        a2dDomainPolyZ = polyval(a1dPolyParams, a2dDomainGeoZ)
-
-        # Calculate temperature (using z regression and idw method(s))
-        a2dVarData_INTERP = a2dDomainPolyZ + a2dVarData_INTERP
-
-        # Check NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
-
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: air temperature data dimension(s) unexpected! Check your data!', 1, 1)
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # Results
-    return a2dVarData_INTERP
+    # Sort altitude(s)
+    var_index_sort = np.argsort(var_geo_z)
 
+    # Extract sorting value(s) from finite arrays
+    var_geo_x_sort = var_geo_x[var_index_sort]
+    var_geo_y_sort = var_geo_y[var_index_sort]
+    var_geo_z_sort = var_geo_z[var_index_sort]
+    var_data_sort = var_data[var_index_sort]
+
+    # Polyfit parameters and value(s) (--> linear regression)
+    var_poly_parameters = np.polyfit(var_geo_z_sort, var_data_sort, 1)
+    var_poly_values = np.polyval(var_poly_parameters, var_geo_z_sort)
+
+    # Define residual for point value(s)
+    var_data_res = var_data_sort - var_poly_values
+
+    # Interpolate point(s) data to grid
+    grid_data_res = interp_point2grid(var_data_res, var_geo_x_sort, var_geo_y_sort, grid_geo_x, grid_geo_y,
+                                      epsg_code=ref_epsg,
+                                      interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                      interp_radius_x=fx_interp_radius_x,
+                                      interp_radius_y=fx_interp_radius_y)
+
+    # Interpolate polynomial parameters on z map
+    grid_poly_z = np.polyval(var_poly_parameters, ref_geo_z)
+
+    # Calculate temperature (using z regression and idw method(s))
+    grid_data = grid_poly_z + grid_data_res
+
+    # Filter data nan and over domain
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    # Debug
+    # plt.figure()
+    # plt.imshow(grid_data)
+    # plt.colorbar()
+    # plt.clim([-10, 30])
+    # plt.show()
+
+    return grid_data
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute wind speed field(s)
-def computeWindSpeed(a1dVarData, a1dVarGeoX, a1dVarGeoY,
-                     a2dDomainGeoX, a2dDomainGeoY,
-                     sVarUnits='m s-1', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                     dInterpNodata=-9999.0,
-                     sInterpMethod='idw', dInterpRadiusX=None, dInterpRadiusY=None):
+# Method to compute wind speed map
+def compute_wind_speed(var_data, var_geo_x, var_geo_y,
+                       ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
+                       var_units='m s-1', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                       fx_nodata=-9999.0, fx_interp_name='idw',
+                       fx_interp_radius_x=None, fx_interp_radius_y=None):
 
-    # Init results
-    a2dVarData_INTERP = None
+    if var_units is None:
+        logging.warning(' ===> Wind speed variable unit is undefined; set to [m s-1]')
+        var_units = 'm s-1'
+    if var_units != 'm s-1':
+        logging.warning(' ===> Wind speed variable units in wrong format; expected in [m s-1], passed in [' +
+                        var_units + ']')
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: wind speed units are not set! Default units are [m s-1]', 2, 1)
-        sVarUnits = 'm s-1'
-    # Check variables units
-    if sVarUnits != 'm s-1':
-        Exc.getExc(' =====> WARNING: wind speed units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [m s-1]. Check your data!', 2, 1)
+    if var_data.ndim > 1:
+        logging.error(' ===> Wind speed variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-
-    # Compute results using 1d format
-    if iVarDim == 1:
-
-        # Interpolate point(s) data to grid
-        a2dVarData_INTERP = interpPointData(a1dVarData,
-                                            a1dVarGeoX, a1dVarGeoY,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-        # Check NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: wind speed data dimension(s) unexpected! Check your data!', 1, 1)
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # Results
-    return a2dVarData_INTERP
+    # Interpolate point(s) data to grid
+    grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
+                                  interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                  interp_radius_x=fx_interp_radius_x,
+                                  interp_radius_y=fx_interp_radius_y)
+
+    # Filter data nan and over domain
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    # Debug
+    # plt.figure()
+    # plt.imshow(grid_data)
+    # plt.colorbar()
+    # plt.clim([0, 10])
+    # plt.show()
+
+    return grid_data
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute incoming radiation field(s)
-def computeIncomingRadiation(a1dVarData, a1dVarGeoX, a1dVarGeoY,
-                             a2dDomainGeoX, a2dDomainGeoY,
-                             sVarUnits='W m-2', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                             dInterpNodata=-9999.0,
-                             sInterpMethod='idw', dInterpRadiusX=None, dInterpRadiusY=None):
+# Method to compute incoming radiation map
+def compute_incoming_radiation(var_data, var_geo_x, var_geo_y,
+                               ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
+                               var_units='W m-2', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                               fx_nodata=-9999.0, fx_interp_name='idw',
+                               fx_interp_radius_x=None, fx_interp_radius_y=None):
 
-    # Init results
-    a2dVarData_INTERP = None
+    if var_units is None:
+        logging.warning(' ===> Incoming radiation variable unit is undefined; set to [W m-2]')
+        var_units = 'W m-2'
+    if var_units != 'W m-2':
+        logging.warning(' ===> Incoming radiation variable units in wrong format; expected in [W m-2], passed in [' +
+                        var_units + ']')
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: incoming radiation units are not set! Default units are [W m-2]', 2, 1)
-        sVarUnits = 'W m-2'
-    # Check variables units
-    if sVarUnits != 'W m-2':
-        Exc.getExc(' =====> WARNING: incoming radiation units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [W m-2]. Check your data!', 2, 1)
+    if var_data.ndim > 1:
+        logging.error(' ===> Incoming radiation variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-
-    # Compute results using 1d format
-    if iVarDim == 1:
-
-        # Interpolate point(s) data to grid
-        a2dVarData_INTERP = interpPointData(a1dVarData,
-                                            a1dVarGeoX, a1dVarGeoY,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-        # Check NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: incoming radiation data dimension(s) unexpected! Check your data!', 1, 1)
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # Results
-    return a2dVarData_INTERP
+    # Interpolate point(s) data to grid
+    grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
+                                  interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                  interp_radius_x=fx_interp_radius_x,
+                                  interp_radius_y=fx_interp_radius_y)
+
+    # Filter data nan and over domain
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    # Debug
+    # plt.figure()
+    # plt.imshow(grid_data)
+    # plt.colorbar()
+    # plt.clim([-50, 1200])
+    # plt.show()
+
+    return grid_data
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute air pressure field(s)
-def computeAirPressure(a1dVarData, a1dVarGeoX, a1dVarGeoY,
-                       a2dDomainGeoX, a2dDomainGeoY,
-                       sVarUnits='hPa', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                       dInterpNodata=-9999.0,
-                       sInterpMethod='idw', dInterpRadiusX=None, dInterpRadiusY=None):
+# Method to compute relative humidity map
+def compute_relative_humidity(var_data, var_geo_x, var_geo_y,
+                              ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
+                              var_units='%', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                              fx_nodata=-9999.0, fx_interp_name='idw',
+                              fx_interp_radius_x=None, fx_interp_radius_y=None):
 
-    # Init results
-    a2dVarData_INTERP = None
+    if var_units is None:
+        logging.warning(' ===> Relative humidity variable unit is undefined; set to [%]')
+        var_units = '%'
+    if var_units != '%':
+        logging.warning(' ===> Relative humidity variable units in wrong format; expected in [%], passed in [' +
+                        var_units + ']')
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: air pressure units are not set! Default units are [hPa]', 2, 1)
-        sVarUnits = 'hPa'
-    # Check variables units
-    if sVarUnits != 'hPa':
-        Exc.getExc(' =====> WARNING: air pressure units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [hPa]. Check your data!', 2, 1)
+    if var_data.ndim > 1:
+        logging.error(' ===> Relative humidity variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-
-    # Compute results using 1d format
-    if iVarDim == 1:
-
-        # Interpolate point(s) data to grid
-        a2dVarData_INTERP = interpPointData(a1dVarData,
-                                            a1dVarGeoX, a1dVarGeoY,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-        # Check NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: air pressure data dimension(s) unexpected! Check your data!', 1, 1)
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # Results
-    return a2dVarData_INTERP
+    # Interpolate point(s) data to grid
+    grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
+                                  interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                  interp_radius_x=fx_interp_radius_x,
+                                  interp_radius_y=fx_interp_radius_y)
+
+    # Filter data nan and over domain
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    # Debug
+    # plt.figure()
+    # plt.imshow(grid_data)
+    # plt.colorbar()
+    # plt.clim([0, 100])
+    # plt.show()
+
+    return grid_data
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute snow height field(s)
-def computeSnowHeight(a1dVarData, a1dVarGeoX, a1dVarGeoY,
-                      a2dDomainGeoX, a2dDomainGeoY, a2dDomainGeoZ,
-                      dDomainGeoCellSizeX, dDomainGeoCellSizeY,
-                      oAncillaryData=None,
-                      sVarUnits='cm', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                      dInterpNodata=-9999.0,
-                      sInterpMethod='idw',
-                      dInterpRadiusX=None, dInterpRadiusY=None, dInterRadiusInfluence=None):
-    # --------------------------------------------------------------------------------
-    # Init results
-    a2dVarData_INTERP = None
+# Method to compute air pressure map
+def compute_air_pressure(var_data, var_geo_x, var_geo_y,
+                         ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
+                         var_units='hPa', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                         fx_nodata=-9999.0, fx_interp_name='idw',
+                         fx_interp_radius_x=None, fx_interp_radius_y=None):
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: snow height units are not set! Default units are [cm]', 2, 1)
-        sVarUnits = 'cm'
-    # Check variables units
-    if sVarUnits != 'cm':
-        Exc.getExc(' =====> WARNING: snow height units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [cm]. Check your data!', 2, 1)
+    if var_units is None:
+        logging.warning(' ===> Air pressure variable unit is undefined; set to [hPa]')
+        var_units = 'hPa'
+    if var_units != 'hPa':
+        logging.warning(' ===> Air pressure variable units in wrong format; expected in [hPa], passed in [' +
+                        var_units + ']')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-    # --------------------------------------------------------------------------------
+    if var_data.ndim > 1:
+        logging.error(' ===> Air pressure variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # --------------------------------------------------------------------------------
-    # Compute results using 1d format
-    if iVarDim == 1:
-
-        # --------------------------------------------------------------------------------
-        # Convert influence radius from degree to meters
-        dInterRadiusInfluence = float(int(Deg2Km(dInterRadiusInfluence) * 1000))
-
-        # Control geo cellsize x and y
-        if dDomainGeoCellSizeX == dDomainGeoCellSizeY:
-            dGeoCellSize = dDomainGeoCellSizeX
-        else:
-            dGeoCellSize = mean(dDomainGeoCellSizeX, dDomainGeoCellSizeY)
-            Exc.getExc(' =====> WARNING: cellsize x and y are different! Select average value.', 2, 1)
-
-        # Find reference indexes for data x,y position(s)
-        a1iIndexX, a1iIndexY = findGeoIndex(a2dDomainGeoX, a2dDomainGeoY, a1dVarGeoX, a1dVarGeoY, dGeoCellSize)
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Get domain X, Y and Z (altitude)
-        a1dDomainGeoX = a2dDomainGeoX[a1iIndexX, a1iIndexY]
-        a1dDomainGeoY = a2dDomainGeoY[a1iIndexX, a1iIndexY]
-        a1dDomainGeoZ = a2dDomainGeoZ[a1iIndexX, a1iIndexY]
-
-        a1iDomainIdxNaN = argwhere(isnan(a1dDomainGeoZ)).ravel()
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Update domain values excluded nan values
-        a1dDomainGeoX = delete(a1dDomainGeoX, a1iDomainIdxNaN)
-        a1dDomainGeoY = delete(a1dDomainGeoY, a1iDomainIdxNaN)
-        a1dDomainGeoZ = delete(a1dDomainGeoZ, a1iDomainIdxNaN)
-        # Update var values excluded nan values (from domain data)
-        a1dVarData = delete(a1dVarData, a1iDomainIdxNaN)
-        a1dVarGeoX = delete(a1dVarGeoX, a1iDomainIdxNaN)
-        a1dVarGeoY = delete(a1dVarGeoY, a1iDomainIdxNaN)
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Iterate over data predictor(s)
-        a2dDomainPred = zeros([a1dDomainGeoZ.shape[0], oAncillaryData.__len__()])
-        a2dDomainPred[:, :] = -9999.0
-        a3dDomainPred = zeros(shape=[a2dDomainGeoX.shape[0], a2dDomainGeoY.shape[1], oAncillaryData.__len__()])
-        for iPredID, (sPredName, a2dPredData) in enumerate(oAncillaryData.items()):
-
-            # Get predictor data
-            a1dDomainPred = a2dPredData[a1iIndexX, a1iIndexY]
-            a1dDomainPred = delete(a1dDomainPred, a1iDomainIdxNaN)
-
-            # Store predictor data
-            a2dDomainPred[:, iPredID] = a1dDomainPred
-            a3dDomainPred[:, :, iPredID] = a2dPredData
-        # --------------------------------------------------------------------------------
-
-        # Debug (to evaluate regression)
-        # a1dVarData = [110, 100, 80, 120, 190, 126, 100, 102]
-
-        # --------------------------------------------------------------------------------
-        # Fit Data using stepwise function
-        [a1dB, a1dSe, a1dPVal, a1bInModel, oStats, iNextStep, oHistory] = stepwisefit(
-            a2dDomainPred, a1dVarData, [], 0.1)
-
-        # Check variable X predictor(s) availability
-        a1oInModel = a1bInModel.tolist()
-        if any(a1oInModel):
-
-            a1iModelIdxFalse = [iIdx for iIdx, bVx in enumerate(a1oInModel) if not bVx]
-            a2dDomainPred = delete(a2dDomainPred, a1iModelIdxFalse, axis=1)
-            a3dDomainPred = delete(a3dDomainPred, a1iModelIdxFalse, axis=2)
-
-        elif not any(a1oInModel):
-
-            a2dDomainPred = zeros(shape=[a1dDomainGeoZ.shape[0], 1])
-            a3dDomainPred = zeros(shape=[a2dDomainGeoX.shape[0], a2dDomainGeoY.shape[1], 1])
-            a2dDomainPred[:, 0] = a1dDomainGeoZ
-            a3dDomainPred[:, :, 0] = a2dDomainGeoZ
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Multivariate linear regression
-        a2dVarA = concatenate((a2dDomainPred, ones([a2dDomainPred.__len__(), 1])), axis=1)
-        a1dVarCoeff = lstsq(a2dVarA, a1dVarData, rcond=None)[0]
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Define basemap
-        a2dVarMap = ones([a2dDomainGeoX.shape[0], a2dDomainGeoY.shape[1]])
-        a2dVarMap[:, :] = a1dVarCoeff[-1]
-
-        a1dVarCoeff = a1dVarCoeff[:-1]
-        for iPredID, dVarCoeff in enumerate(a1dVarCoeff):
-            a2dVarMap = a2dVarMap + a3dDomainPred[:, :, iPredID] * dVarCoeff
-
-        # Filter data to avoid nan(s) and negative value(s)
-        a2dVarMap[isnan(a2dVarMap)] = -1
-        a2dVarMap[a2dVarMap < 0] = 0
-
-        a1dVarMap = a2dVarMap[[a1iIndexX, a1iIndexY]]
-        a1dVarMap = delete(a1dVarMap, a1iDomainIdxNaN)
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Compute and interpolate residual
-        a1dVarRes = a1dVarMap - a1dVarData
-
-        a2dVarRes_INTERP = interpPointData(a1dVarRes,
-                                            a1dVarGeoX, a1dVarGeoY,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-
-        # Variable estimantion (snow in cm)
-        a2dVarData_INTERP = a2dVarMap + a2dVarRes_INTERP
-        # Check for undefined data
-        a2dVarData_INTERP[a2dVarData_INTERP < 1.0] = dVarFillValue
-        # Check for NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Compute weight data (or kernel data)
-        a2dVarW = computeSnowKernel(a2dDomainGeoZ, a2dDomainGeoX, a2dDomainGeoY,
-                                    dDomainGeoCellSizeX, dDomainGeoCellSizeY,
-                                    a1iIndexX, a1iIndexY, dInterRadiusInfluence)
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Check NAN value(s)
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
-        a2dVarW[isnan(a2dVarW)] = dVarMissValue
-        # Check domain value(s)
-        a2dVarData_INTERP[isnan(a2dDomainGeoZ)] = dVarMissValue
-        a2dVarW[isnan(a2dDomainGeoZ)] = dVarMissValue
-        # --------------------------------------------------------------------------------
-
-        # --------------------------------------------------------------------------------
-        # Debug
-        # plt.figure(1)
-        # plt.imshow(a2dVarMap); plt.colorbar();plt.clim(0, 270)
-        # plt.figure(2)
-        # plt.imshow(a2dVarRes_INTERP); plt.colorbar();
-        # plt.figure(3)
-        # plt.imshow(a2dVarData_INTERP); plt.colorbar(); plt.clim(0, 270)
-        # plt.figure(4)
-        # plt.imshow(a2dVarW); plt.colorbar(); plt.clim(0, 1)
-        # plt.figure(5)
-        # plt.imshow(a2dDomainGeoZ); plt.colorbar(); plt.clim(0, 1500)
-        # plt.show()
-        # --------------------------------------------------------------------------------
-
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # --------------------------------------------------------------------------------
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: snow height data dimension(s) unexpected! Check your data!', 1, 1)
-        # --------------------------------------------------------------------------------
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # --------------------------------------------------------------------------------
-    # Return interpolation result
-    return a2dVarData_INTERP, a2dVarW
-    # --------------------------------------------------------------------------------
+    # Interpolate point(s) data to grid
+    grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
+                                  interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                  interp_radius_x=fx_interp_radius_x,
+                                  interp_radius_y=fx_interp_radius_y)
 
+    # Filter data nan and over domain
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    # Debug
+    # plt.figure()
+    # plt.imshow(grid_data)
+    # plt.colorbar()
+    # plt.clim([-10, 30])
+    # plt.show()
+
+    return grid_data
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute relative humidity field(s)
-def computeRelativeHumidity(a1dVarData, a1dVarGeoX, a1dVarGeoY,
-                            a2dDomainGeoX, a2dDomainGeoY,
-                            sVarUnits='%', dVarMissValue=-9999.0, dVarFillValue=-9999.0,
-                            dInterpNodata=-9999.0,
-                            sInterpMethod='idw', dInterpRadiusX=None, dInterpRadiusY=None):
+# Method to compute snow height and snow kernel maps
+def compute_snow_height(var_data, var_geo_x, var_geo_y, var_geo_z,
+                        ref_geo_x, ref_geo_y, ref_geo_z, ref_cell_size, ref_epsg='4326', ref_no_data=-9999.0,
+                        ref_geo_aspect=None, ref_geo_slope=None, ref_geo_hillshade=None,
+                        var_units='cm', var_missing_value=-9999.0, var_fill_value=-9999.0,
+                        fx_nodata=-9999.0, fx_interp_name='idw',
+                        fx_interp_radius_x=None, fx_interp_radius_y=None, fx_regression_radius_influence=None):
 
-    # Init results
-    a2dVarData_INTERP = None
+    if var_units is None:
+        logging.warning(' ===> Snow height variable unit is undefined; set to [C]')
+        var_units = 'cm'
+    if var_units != 'cm':
+        logging.warning(' ===> Snow height variable units in wrong format; expected in [C], passed in [' +
+                        var_units + ']')
 
-    # Set variable units and types
-    if sVarUnits is None:
-        Exc.getExc(' =====> WARNING: relative humidity units are not set! Default units are [%]', 2, 1)
-        sVarUnits = '%'
-    # Check variables units
-    if sVarUnits != '%':
-        Exc.getExc(' =====> WARNING: relative humidity units is not correct!'
-                   ' Units used: [' + sVarUnits + '] - Units expected: [%]. Check your data!', 2, 1)
+    if var_data.ndim > 1:
+        logging.error(' ===> Snow height variable dimensions are not allowed')
+        raise IOError('Dimension must be equal to 1')
 
-    # Get variables dimensions
-    iVarDim = a1dVarData.ndim
-
-    # Compute results using 1d format
-    if iVarDim == 1:
-
-        # Interpolate point(s) data to grid
-        a2dVarData_INTERP = interpPointData(a1dVarData,
-                                            a1dVarGeoX, a1dVarGeoY,
-                                            a2dDomainGeoX, a2dDomainGeoY,
-                                            dInterpNoData=dInterpNodata,
-                                            sInterpMethod=sInterpMethod,
-                                            dInterpRadiusX=dInterpRadiusX,
-                                            dInterpRadiusY=dInterpRadiusY)
-        # Check NAN value
-        a2dVarData_INTERP[isnan(a2dVarData_INTERP)] = dVarMissValue
+    if ref_geo_x.ndim == 1 and ref_geo_y.ndim == 1:
+        grid_geo_x, grid_geo_y = np.meshgrid(ref_geo_x, ref_geo_y)
+    elif ref_geo_x.ndim == 2 and ref_geo_y.ndim == 2:
+        grid_geo_x = ref_geo_x
+        grid_geo_y = ref_geo_y
     else:
-        # Error for unexpected data dimension(s)
-        Exc.getExc(' =====> ERROR: relative humidity data dimension(s) unexpected! Check your data!', 1, 1)
+        logging.error(' ===> Reference dimensions in bed format')
+        raise IOError('Data format not allowed')
 
-    # Results
-    return a2dVarData_INTERP
+    # Define geo predictors
+    ref_predictors_collections = [i for i in [ref_geo_z, ref_geo_aspect, ref_geo_slope, ref_geo_hillshade] if i is not None]
+    ref_predictors_n = ref_predictors_collections.__len__()
 
+    # Convert influence radius from degree to meters
+    fx_regression_radius_influence = float(int(deg_2_km(fx_regression_radius_influence) * 1000))
+    # Find reference indexes for data x,y position(s)
+    index_geo_x, index_geo_y = find_geo_index(ref_geo_x, ref_geo_y, var_geo_x, var_geo_y, ref_cell_size)
+
+    # Get domain X, Y and Z (altitude)
+    ref_point_x = grid_geo_x[index_geo_x, index_geo_y]
+    ref_point_y = grid_geo_y[index_geo_x, index_geo_y]
+    ref_point_z = ref_geo_z[index_geo_x, index_geo_y]
+
+    ref_index_nan = np.argwhere(np.isnan(ref_point_z)).ravel()
+
+    # Update domain values excluded nan values
+    ref_point_x_select = np.delete(ref_point_x, ref_index_nan)
+    ref_point_y_select = np.delete(ref_point_y, ref_index_nan)
+    ref_point_z_select = np.delete(ref_point_z, ref_index_nan)
+    # Update var values excluded nan values (from domain data)
+    var_data_select = np.delete(var_data, ref_index_nan)
+    var_point_x_select = np.delete(var_geo_x, ref_index_nan)
+    var_point_y_select = np.delete(var_geo_y, ref_index_nan)
+
+    # Organize predictors dataset(s)
+    ref_point_predictors_container = np.zeros(shape=[ref_point_z_select.shape[0], ref_predictors_n])
+    ref_point_predictors_container[:, :] = -9999.0
+    ref_grid_predictors_container = np.zeros(shape=[grid_geo_x.shape[0], grid_geo_y.shape[1], ref_predictors_n])
+    ref_grid_predictors_container[:, :, :] = -9999.0
+
+    for id_item, ref_predictors_item in enumerate(ref_predictors_collections):
+        ref_point_predictors = ref_predictors_item[index_geo_x, index_geo_y]
+        ref_point_predictors_select = np.delete(ref_point_predictors, ref_index_nan)
+
+        ref_point_predictors_container[:, id_item] = ref_point_predictors_select
+        ref_grid_predictors_container[:, :, id_item] = ref_predictors_item
+
+    # Debug (to evaluate regression)
+    # var_data_select = [110, 100, 80, 120, 190, 126, 100, 102, 31, 49]
+
+    # Fit Data using stepwise function
+    [swf_b, swf_se, swf_pval, swf_inmodel, swf_stats, swf_nextstep, swf_history] = stepwisefit(
+        ref_point_predictors_container, var_data_select, [], 0.1)
+
+    # Check variable X predictor(s) availability
+    swf_inmodel = swf_inmodel.tolist()
+    if any(swf_inmodel):
+
+        swf_inmodel_false = [idx for idx, vx in enumerate(swf_inmodel) if not vx]
+        ref_point_predictors_container = np.delete(ref_point_predictors_container, swf_inmodel_false, axis=1)
+        ref_grid_predictors_container = np.delete(ref_grid_predictors_container, swf_inmodel_false, axis=2)
+
+    elif not any(swf_inmodel):
+
+        ref_point_predictors_container = np.zeros(shape=[ref_point_z_select.shape[0], 1])
+        ref_grid_predictors_container = np.zeros(shape=[grid_geo_x.shape[0], grid_geo_y.shape[1], 1])
+        ref_point_predictors_container[:, 0] = ref_point_z_select
+        ref_grid_predictors_container[:, :, 0] = ref_geo_z
+
+    # Multivariate linear regression
+    var_a = np.concatenate((ref_point_predictors_container,
+                            np.ones([ref_point_predictors_container.__len__(), 1])), axis=1)
+    var_coeff = np.linalg.lstsq(var_a, var_data_select, rcond=None)[0]
+
+    # Define basemap
+    grid_basemap = np.ones(shape=[grid_geo_x.shape[0], grid_geo_y.shape[1]])
+    grid_basemap[:, :] = var_coeff[-1]
+
+    var_coeff_reduced = var_coeff[:-1]
+    for id, var_coeff_step in enumerate(var_coeff_reduced):
+        grid_basemap = grid_basemap + ref_grid_predictors_container[:, :, id] * var_coeff_step
+
+    # Filter data to avoid nan(s) and negative value(s)
+    grid_basemap[np.isnan(grid_basemap)] = -1
+    grid_basemap[grid_basemap < 0] = 0
+
+    var_point_map = grid_basemap[index_geo_x, index_geo_y]
+    var_point_map_select = np.delete(var_point_map, ref_index_nan)
+    var_point_res_select = var_point_map_select - var_data_select
+
+    # Interpolate point(s) data to grid
+    grid_data_res = interp_point2grid(var_point_res_select, var_point_x_select, var_point_y_select,
+                                      grid_geo_x, grid_geo_y,
+                                      epsg_code=ref_epsg,
+                                      interp_no_data=fx_nodata, interp_method=fx_interp_name,
+                                      interp_radius_x=fx_interp_radius_x,
+                                      interp_radius_y=fx_interp_radius_y)
+    # Calculate data grid
+    grid_data = grid_basemap + grid_data_res
+    grid_data[np.isnan(grid_data)] = var_missing_value
+    grid_data[np.isnan(ref_geo_z)] = var_fill_value
+    grid_data[ref_geo_z == ref_no_data] = np.nan
+
+    # Compute kernel data
+    grid_kernel = compute_kernel(ref_geo_z, ref_geo_x, ref_geo_y,
+                                 ref_cell_size, ref_cell_size,
+                                 index_geo_x, index_geo_y, fx_regression_radius_influence)
+    grid_kernel[np.isnan(grid_kernel)] = var_missing_value
+    grid_kernel[np.isnan(ref_geo_z)] = var_fill_value
+    grid_kernel[ref_geo_z == ref_no_data] = np.nan
+
+    grid_data = grid_data * grid_kernel
+
+    # Debug
+    # plt.figure()
+    # plt.imshow(grid_data)
+    # plt.colorbar()
+    # plt.clim([0, 50])
+    # plt.show()
+    # plt.figure()
+    # plt.imshow(grid_kernel)
+    # plt.colorbar()
+    # plt.clim([0, 1])
+    # plt.show()
+
+    return grid_data, grid_kernel
 # -------------------------------------------------------------------------------------

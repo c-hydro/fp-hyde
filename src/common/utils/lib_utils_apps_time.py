@@ -238,22 +238,16 @@ def correctTimeLength(sTime):
 
     sTimeUpd = None
     if len(sTime) == 12:
-
         sTimeUpd = sTime
-
+    elif len(sTime) == 16:
+        sTimeUpd = sTime
     elif 8 <= len(sTime) < 12:
-
         iTimeLength = len(sTime)
-
         iTimeLessDigits = 12 - iTimeLength
         sTimeLessFormat = '0' * iTimeLessDigits
         sTimeUpd = sTime + sTimeLessFormat
-
-    elif len(sTime) > 12:
-        log_stream.error(' =====> sTime has not allowed length (greater then 12 char). sTime cannot defined!')
-        raise TypeError
-    elif len(sTime) < 8:
-        log_stream.error(' =====> sTime has not allowed length (less then 8 char). sTime cannot defined!')
+    else:
+        log_stream.error(' =====> sTime has not allowed length. sTime cannot defined!')
         raise TypeError
 
     sTimeUpdFormat = defineTimeFormat(sTimeUpd)
@@ -286,6 +280,8 @@ def defineTimeFormat(sTime):
         sTimeFormat = '%Y%m%d%H'
     elif sTime.__len__() == 8:
         sTimeFormat = '%Y%m%d'
+    elif sTime.__len__() == 16:
+        sTimeFormat = '%Y-%m-%d %H:%M'
     elif sTime.__len__() == 19:
         sTimeFormat = '%Y-%m-%d %H:%M:%S'
     else:
@@ -377,9 +373,9 @@ def getTimeRun(sTimeNow='', sTimeArg='', sTimeType='GMT'):
         sTimeArgFormat = None
 
     if oTimeArg:
-        sTimeRun = oTimeArg.strftime(sTimeArgFormat)
+        sTimeRun = oTimeArg.strftime(sTimeFormat_Default)
     else:
-        sTimeRun = oTimeNow.strftime(sTimeNowFormat)
+        sTimeRun = oTimeNow.strftime(sTimeFormat_Default)
 
     return sTimeRun
 

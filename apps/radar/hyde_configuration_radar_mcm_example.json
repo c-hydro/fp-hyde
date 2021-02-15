@@ -1,0 +1,130 @@
+{
+  "algorithm":{
+    "flag": {
+      "update_static_data_ancillary": true,
+      "update_dynamic_data_ancillary": true,
+      "update_dynamic_data_destination": true,
+      "clean_temporary_data": false
+    },
+    "general": {
+      "title": "Radar - Precipitation MCM product",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.5.0 [20201206]",
+      "project-info": "HyDE - Hydrological Data Engines",
+      "algorithm": "Radar Precipitation MCM preprocessing tools"
+    },
+    "info": {
+      "domain" : "marche"
+    },
+    "template": {
+      "domain_name": "string_domain",
+      "source_datetime": "%Y%m%d%H%M00",
+      "source_sub_path_time": "%Y/%m/%d/",
+      "ancillary_datetime": "%Y%m%d%H%M",
+      "ancillary_sub_path_time": "%Y/%m/%d/",
+      "destination_datetime": "%Y%m%d%H%M",
+      "destination_sub_path_time": "%Y/%m/%d/"
+    }
+  },
+  "data": {
+    "colormap": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/",
+      "file_name": "HTML.Colormap.Rain_GP.txt"
+    },
+    "static": {
+      "source" : {
+        "terrain" : {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/",
+          "file_name": "marche.dem.txt"
+        }
+      },
+      "ancillary": {
+        "grid_reference": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/radar/",
+          "file_name": "radar_mcm_grid.workspace"
+        },
+        "geo_reference": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/radar/",
+          "file_name": "radar_mcm_geo.workspace"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_period": 3,
+        "time_frequency": "H",
+        "time_rounding": "H"
+      },
+      "source": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/radar/{source_sub_path_time}",
+        "file_name": "MCM_{source_datetime}.tif"
+      },
+      "ancillary": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/obs/radar/{ancillary_sub_path_time}",
+        "file_name": "radar_mcm_{domain_name}_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/obs/radar/{destination_sub_path_time}",
+        "file_name": "radar.mcm.{destination_datetime}.nc",
+        "file_compression": true
+      }
+    }
+  },
+  "tmp": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_tmp/radar/",
+    "file_name": null
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/radar/",
+    "file_name": "hyde_preprocessing_radar_mcm_log.txt",
+    "file_history": true
+  },
+  "time": {
+    "time_run": "2020-12-05 15:37",
+    "time_period": 1,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "variables": {
+    "source": {
+      "rain": {
+        "__comment__": "variable name in original tiff file: rain accumulated on time period",
+        "var_mode": true,
+        "var_name": "rain",
+        "var_method_compute": {
+          "name": "compute_rain",
+          "params": {
+            "interp_method": "nearest",
+            "no_data": -9999.0
+            },
+          "outcome": "rain"
+        },
+        "var_attributes": {
+          "long_name": "rain obtained using conditional merging",
+          "standard_name": "rain",
+          "missing_value": -9999.0,
+          "fill_value": -9999.0,
+          "scale_factor": 1,
+          "valid_range": [0, null],
+          "units": "mm/h"
+        }
+      }
+    },
+    "destination": {
+      "rain":{
+        "var_mode": true,
+        "var_name": "Rain",
+        "var_attributes": {
+          "long_name": "rain obtained using conditional merging",
+          "standard_name": "rain",
+          "missing_value": -9999.0,
+          "fill_value": -9999.0,
+          "scale_factor": 1,
+          "valid_range": [0, null],
+          "units": "mm/h"
+        }
+      }
+    }
+  }
+}

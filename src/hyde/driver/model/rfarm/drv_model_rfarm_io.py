@@ -16,14 +16,17 @@ import pandas as pd
 
 from src.common.zip.lib_data_zip_gzip import openZip, zipFile, closeZip
 from src.common.default.lib_default_conventions import oVarConventions as var_def_conventions
-from src.common.utils.lib_utils_apps_file import handleFileData
 from src.common.utils.lib_utils_op_dict import mergeDict
 
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import create_darray_3d, create_dset, write_dset
-from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import read_data_lami_2i
-from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import convert_data_lami_2i, convert_time_lami_2i
+
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import read_data_lami_2i, read_data_ecmwf_0100
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import adjust_data_lami_2i, adjust_data_ecmwf_0100
+from src.hyde.dataset.model.rfarm.lib_rfarm_variables import compute_rain_lami_2i, compute_rain_ecmwf_0100
+
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import read_data_wrf
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import convert_data_wrf, convert_time_wrf
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_json import read_data_expert_forecast, convert_time_expert_forecast
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import write_obj, read_obj
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
@@ -34,6 +37,8 @@ from src.common.utils.lib_utils_op_system import createTemp
 
 # Logging
 log_stream = logging.getLogger(logger_name)
+# Debug
+# import matplotlib.pylab as plt
 #################################################################################
 
 
@@ -53,7 +58,7 @@ class RFarmResult:
                  ensemble_zip=False, ext_zip_type='.gz',
                  folder_out=None, filename_out='rfarm_{ensemble}.nc',
                  var_name='Rain', var_dims='var3d', var_attrs=None,
-                 dim_x_name='X', dim_y_name='Y', write_engine='netcdf4'):
+                 dim_x_name='west_east', dim_y_name='south_north', write_engine='netcdf4'):
 
         if ensemble_n is None:
             ensemble_n = {'start': 1, 'end': 2}
@@ -218,7 +223,7 @@ class RFarmData:
 
     def __init__(self, folder_data_first, filename_data_first,
                  folder_data_list=None, filename_data_list=None,
-                 var_dims='var3d', var_type='istantaneous', var_name='Rain', var_units='mm',
+                 var_dims='var3d', var_type='istantaneous', var_name='Rain', var_units='mm', var_domain=None,
                  file_format=None, file_source=None,
                  folder_tmp=None, filename_tmp='rfarm_data.nc'
                  ):
@@ -230,6 +235,9 @@ class RFarmData:
         self.var_type_data = var_type
         self.var_name_data = var_name
         self.var_units_data = var_units
+        if var_domain is None:
+            var_domain = ['domain']
+        self.var_domain = var_domain
 
         self.file_format_data = file_format
         self.file_source_data = file_source
@@ -250,13 +258,16 @@ class RFarmData:
             self.found_data_first = False
 
         self.file_data_list = []
-        if self.var_dims_data == 'var2d':
+        if self.var_dims_data == 'var1d':
+            for folder_data_step, filename_data_step in zip(self.folder_data_list, self.filename_data_list):
+                self.file_data_list.append(os.path.join(folder_data_step, filename_data_step))
+        elif self.var_dims_data == 'var2d':
             for folder_data_step, filename_data_step in zip(self.folder_data_list, self.filename_data_list):
                 self.file_data_list.append(os.path.join(folder_data_step, filename_data_step))
         elif self.var_dims_data == 'var3d':
             self.file_data_list = None
         else:
-            raise NotImplementedError
+            raise NotImplementedError('Variable dimensions not allowed.')
 
         self.folder_tmp = folder_tmp
         self.filename_tmp = filename_tmp
@@ -285,72 +296,119 @@ class RFarmData:
         # Check file data availability
         if self.found_data_first:
 
-            [file_handle, file_drv, file_open] = handleFileData(self.file_data_first,
-                                                                file_type=self.file_format_data)
-            if file_open:
+            if self.file_format_data == 'grib':
 
-                if self.file_format_data == 'grib':
+                if self.file_source_data == 'lami_2i':
 
-                    if self.file_source_data == 'lami_2i':
+                    if self.var_dims_data == 'var2d':
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('NWP lami 2D dimensions datasets not implemented yet')
+                    elif self.var_dims_data == 'var3d':
 
-                        if self.var_dims_data == 'var2d':
-                            log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT IMPLEMENTED!')
-                            raise NotImplementedError
-                        elif self.var_dims_data == 'var3d':
+                        [var_da, time_da, geox_da, geoy_da] = read_data_lami_2i(
+                            self.file_data_first, data_var=self.var_name_data)
 
-                            [var_data_raw, var_time_idx,
-                             var_geox, var_geoy] = read_data_lami_2i(file_handle, file_drv, self.var_name_data)
+                        [var_data_adjust,  var_time, var_geox, var_geoy] = adjust_data_lami_2i(
+                            var_da, time_da, geox_da, geoy_da)
 
-                            var_time = convert_time_lami_2i(var_time_idx, file_time_data)
-                            var_data = convert_data_lami_2i(var_data_raw, self.var_units_data, self.var_type_data)
-
-                        else:
-                            log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT IMPLEMENTED!')
-                            raise NotImplementedError
-                    else:
-                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE LIBRARY NOT IMPLEMENTED!')
-                        raise NotImplementedError
-
-                elif self.file_format_data == 'netcdf':
-
-                    if self.file_source_data == 'wrf':
-
-                        if self.var_dims_data == 'var2d':
-
-                            if self.var_type_data == 'accumulated':
-                                file_data_list = [self.file_data_first] + self.file_data_list
-                            elif self.var_type_data == 'istantaneous':
-                                file_data_list = self.file_data_list
-                            else:
-                                log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT IMPLEMENTED!')
-                                raise NotImplementedError
-
-                            [var_data_raw, var_time_idx,
-                             var_geox, var_geoy] = read_data_wrf(file_data_list)
-
-                            var_time = convert_time_wrf(var_time_idx, file_time_data, self.var_type_data)
-                            var_data = convert_data_wrf(var_data_raw, self.var_units_data, self.var_type_data)
-
-                        elif self.var_dims_data == 'var3d':
-                            log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT IMPLEMENTED!')
-                            raise NotImplementedError
-                        else:
-                            log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT IMPLEMENTED!')
-                            raise NotImplementedError
+                        var_data_cmp = compute_rain_lami_2i(var_data_adjust)
 
                     else:
-                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE LIBRARY NOT IMPLEMENTED!')
-                        raise NotImplementedError
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('NWP lami case dimension datasets not implemented yet')
+
+                elif self.file_source_data == 'ecmwf0100':
+
+                    if self.var_dims_data == 'var2d':
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('NWP ecmwf0100 2D dimensions datasets not implemented yet')
+                    elif self.var_dims_data == 'var3d':
+
+                        [var_da, time_da, geox_da, geoy_da] = read_data_ecmwf_0100(
+                            self.file_data_first, data_var=self.var_name_data)
+
+                        [var_data_adjust,  var_time, var_geox, var_geoy] = adjust_data_ecmwf_0100(
+                            var_da, time_da, geox_da, geoy_da)
+
+                        var_data_cmp = compute_rain_ecmwf_0100(var_data_adjust)
+
+                    else:
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('NWP ecmwf0100 case dimension datasets not implemented yet')
 
                 else:
-                    log_stream.error(' ----> Get data ... FAILED! FILE TYPE LIBRARY NOT IMPLEMENTED!')
-                    raise NotImplementedError
+                    log_stream.error(' ----> Get data ... FAILED! FILE SOURCE LIBRARY NOT ALLOWED!')
+                    raise NotImplementedError('GRIB datasets type not implemented yet')
 
-                # Create data array
-                if var_data is not None:
-                    var_da = create_darray_3d(var_data, var_time, var_geox, var_geoy)
+            elif self.file_format_data == 'netcdf':
+
+                if self.file_source_data == 'wrf':
+
+                    if self.var_dims_data == 'var2d':
+
+                        if self.var_type_data == 'accumulated':
+                            file_data_list = [self.file_data_first] + self.file_data_list
+                        elif self.var_type_data == 'istantaneous':
+                            file_data_list = self.file_data_list
+                        else:
+                            log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT ALLOWED!')
+                            raise NotImplementedError('NWP WRF type datasets not implemented yet')
+
+                        [var_data_raw, var_time_idx,
+                         var_geox, var_geoy] = read_data_wrf(file_data_list)
+
+                        var_time = convert_time_wrf(var_time_idx, file_time_data, self.var_type_data)
+                        var_data_cmp = convert_data_wrf(var_data_raw, self.var_units_data, self.var_type_data)
+
+                    elif self.var_dims_data == 'var3d':
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('NWP WRF 3D dimensions datasets not implemented yet')
+                    else:
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('NWP WRF case dimension datasets not implemented yet')
+
+                else:
+                    log_stream.error(' ----> Get data ... FAILED! FILE SOURCE LIBRARY NOT IMPLEMENTED!')
+                    raise NotImplementedError('NetCDF datasets type not implemented yet')
+
+            elif self.file_format_data == 'csv':
+
+                if self.file_source_data == 'expert_forecast':
+                    if self.var_dims_data == 'var1d':
+
+                        if self.var_type_data == 'instantaneous':
+                            file_data_list = self.file_data_list
+                        else:
+                            log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT ALLOWED!')
+                            raise NotImplementedError('Expert Forecast type datasets not implemented yet')
+
+                        [var_data_cmp, var_time_idx] = read_data_expert_forecast(file_data_list)
+
+                        var_time = convert_time_expert_forecast(var_time_idx, var_time_freq='H', var_time_period=12)
+
+                        var_geox = None
+                        var_geoy = None
+
+                    else:
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
+                        raise NotImplementedError('CSV case dimension datasets not implemented yet')
+                else:
+                    log_stream.error(' ----> Get data ... FAILED! FILE SOURCE LIBRARY NOT IMPLEMENTED!')
+                    raise NotImplementedError('Expert Forecast  datasets type not implemented yet')
+
+            else:
+                log_stream.error(' ----> Get data ... FAILED! FILE TYPE LIBRARY NOT IMPLEMENTED!')
+                raise NotImplementedError('NWP datasets format not implemented yet')
+
+            # Create data array
+            if var_data_cmp is not None:
+
+                if self.var_dims_data == 'var2d' or self.var_dims_data == 'var3d':
+
+                    # Create darray for 2d or 3d variable(s)
+                    var_obj = create_darray_3d(var_data_cmp, var_time, var_geox, var_geoy)
                     # Dump tmp file
-                    write_obj(self.file_tmp, var_da)
+                    write_obj(self.file_tmp, var_obj)
 
                     # DEBUG STARY
                     # file_test = self.file_tmp.split()[0] + '.nc'
@@ -358,23 +416,27 @@ class RFarmData:
                     # dset_test.to_netcdf(path=file_test)
                     # DEBUG END
 
-                    # Ending info
-                    log_stream.info(' ----> Get data ... DONE')
-                else:
-                    # Ending info
-                    var_da = None
-                    log_stream.warning(' ----> Get data ... FAILED! DATA NOT AVAILABLE!')
+                elif self.var_dims_data == 'var1d':
+
+                    # Create dictionary for 1d variable(s)
+                    var_obj = {'data': var_data_cmp, 'time': var_time}
+
+                    # Dump tmp file
+                    write_obj(self.file_tmp, var_obj)
+
+                # Ending info
+                log_stream.info(' ----> Get data ... DONE')
 
             else:
                 # Ending info
-                var_da = None
-                log_stream.warning(' ----> Get data ... FAILED! FILE NOT CORRECTLY OPENED!')
+                var_obj = None
+                log_stream.warning(' ----> Get data ... FAILED! DATA NOT AVAILABLE!')
 
         else:
             # Ending info
-            var_da = None
+            var_obj = None
             log_stream.warning(' ----> Get data ... FAILED! FIRST FILE OF DATA NOT FOUND')
 
-        return var_da
+        return var_obj
 
 # -------------------------------------------------------------------------------------

@@ -1,0 +1,177 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_data": true,
+      "cleaning_dynamic_ancillary_in": true,
+      "cleaning_dynamic_ancillary_out": true,
+      "cleaning_dynamic_out": true,
+      "cleaning_dynamic_tmp": true,
+      "zipping_dynamic_out": true
+    },
+    "ancillary": {
+      "_comment_domain" : "regional_domain",
+      "domain" : {
+        "tag_domain_1": {"name": "alert_area_a",  "id": 1},
+        "tag_domain_2": {"name": "alert_area_b",  "id": 2},
+        "tag_domain_3": {"name": "alert_area_c",  "id": 3},
+        "tag_domain_4": {"name": "alert_area_d",  "id": 4},
+        "tag_domain_5": {"name": "alert_area_e",  "id": 5},
+        "tag_domain_6": {"name": "alert_area_f",  "id": 6}
+      },
+      "write_engine": "netcdf4",
+      "zip_format": ".gz",
+      "algorithm_mode": "exec_expert_forecast"
+    },
+    "general": {
+      "title": "RFarm Model",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "4.0.0 [20190902]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    },
+    "parameters": {
+      "__comment__" : "ratio_s: 4, ratio_t: 1, cs_sf: 4, ct_sf: 12,",
+      "ensemble": {"start": 1, "end": 3},
+      "ratio_s": 1,
+      "ratio_t": 12,
+      "slope_s": null,
+      "slope_t": null,
+      "cs_sf": 1,
+      "ct_sf": 12,
+      "multi_core": false,
+      "domain_extension": 0,
+      "tmp": true
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "terrain_data": {
+          "filename": "marche.dem.txt",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/"
+        },
+        "alert_area_data": {
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/",
+          "filename": "marche.alertarea_2017.txt"
+        },
+        "grid_data": {
+          "filename": "rfarm_expert_forecast_grid.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/rfarm/expert_forecast/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": null,
+          "folder" : "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "template": {
+        "datetime_input": "%Y%m%d0000",
+        "datetime_outcome": "%Y%m%d%H%M",
+        "sub_path_time": "%Y/%m/%d",
+        "ensemble": "{:03d}",
+        "domain": "string_domain"
+      },
+      "time": {
+        "time_forecast_period": 36,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 0,
+        "time_observed_frequency": "H",
+        "time_rounding": "H"
+      },
+      "input": {
+        "rain_input_data": {
+          "filename": "ef.rain.{datetime_input}_{domain}.csv",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/expert_forecast/{sub_path_time}/"
+        },
+        "rain_input_ancillary" : {
+          "filename" : "expert_forecast_precipitation_{datetime_input}.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/rfarm/expert_forecast/{sub_path_time}/"
+        }
+      },
+      "outcome": {
+        "rain_outcome_ancillary": {
+          "filename": "rfarm_expert_forecast_{datetime_outcome}_{ensemble}.workspace",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/rfarm/expert_forecast/{sub_path_time}/"
+        },
+        "rain_outcome_data": {
+          "filename": "rfarm.expert_forecast.{datetime_outcome}_{ensemble}.nc",
+          "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/rfarm/expert_forecast/{sub_path_time}/{ensemble}/"
+        }
+      }
+    },
+    "log": {
+        "filename": "rfarm_expert_forecast_log.txt",
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/rfarm/"
+    },
+    "temp": {
+        "filename": null,
+        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_tmp/rfarm/"
+    },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": "201812210000",
+    "time_period": 0,
+    "time_frequency": "D",
+    "time_rounding": "D"
+  },
+  "variables": {
+    "input": {
+      "rain_data": {
+        "id": {
+          "var_type": ["var1d", "instantaneous"],
+          "var_source": "expert_forecast",
+          "var_format": "csv",
+          "var_name": "slopes",
+          "var_file": "slope_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "slope",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "-",
+          "description": ""
+        }
+      }
+    },
+    "outcome": {
+      "rain_data":{
+        "id": {
+          "var_type": ["var3d", "accumulated"],
+          "var_source": null,
+          "var_format": "netcdf",
+          "var_name": "Rain",
+          "var_file": "rfarm_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "mm",
+          "description": ""
+        }
+      }
+    }
+  }
+}

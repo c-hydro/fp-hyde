@@ -24,9 +24,9 @@ log_stream = logging.getLogger(logger_name)
 
 # -------------------------------------------------------------------------------------
 # Method to run RF model (nwp mode)
-def execRF_NWP(X, xscale, tscale, cssf, ctsf,
-               f=None, celle3_rainfarm=None,
-               sx=None, st=None):
+def exec_nwp(X, xscale, tscale, cssf, ctsf,
+             f=None, celle3_rainfarm=None,
+             sx=None, st=None):
     '''
     x=rainfarm(X,sx,st,xscale,cssf,csst)
     INPUT
@@ -128,9 +128,9 @@ def execRF_NWP(X, xscale, tscale, cssf, ctsf,
 
 # --------------------------------------------------------------------------------
 # Method to run RF model (expert forecast mode)
-def execRF_ExpFor(X, xscale, tscale, cssf, ctsf,
-                          f=None, celle3_rainfarm=None,
-                          sx=None, st=None, nx=None, ny=None, nt=None):
+def exec_expert_forecast(X, xscale, tscale, cssf, ctsf,
+                         f=None, celle3_rainfarm=None,
+                         sx=None, st=None, nx=None, ny=None, nt=None):
 
     '''
     x=rainfarm(X,sx,st,xscale,cssf,csst)
@@ -157,13 +157,13 @@ def execRF_ExpFor(X, xscale, tscale, cssf, ctsf,
     log_stream.info(' ------> Run RF model (ExpertForecast Mode) ... ')
 
     # Nx and NY
-    if X != None:
+    if X is not None:
         if X.ndim == 2:
             nx, ny = X.shape
             nt = nt
         elif X.ndim == 3:
             nx, ny, nt = X.shape
-    elif X == None:
+    elif X is None:
         X = np.float64(1.0)
         nx = nx
         ny = ny

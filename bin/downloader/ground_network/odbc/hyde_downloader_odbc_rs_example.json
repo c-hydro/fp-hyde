@@ -1,0 +1,70 @@
+{
+  "flags": {
+    "update_static_data": false,
+    "update_dynamic_data_ancillary": false,
+    "update_dynamic_data_destination": true,
+    "clean_tmp_file": false
+  },
+  "info": {
+    "domain": "marche"
+  },
+  "template": {
+    "domain_name": "string_domain",
+    "ancillary_var_name": "string_var_source",
+    "destination_var_name": "string_var_destination",
+    "ancillary_datetime": "%Y%m%d%H%M",
+    "ancillary_sub_path_time": "%Y/%m/%d/",
+    "destination_datetime": "%Y%m%d%H%M",
+    "destination_sub_path_time": "%Y/%m/%d/"
+  },
+  "time": {
+    "time_now": "202006170000",
+    "time_period": 12,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "data":{
+    "static": {
+      "sections": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/shapefile/",
+        "file_name": "fp_sections_marche.shp"
+      }
+    },
+    "dynamic": {
+      "source": {
+        "server_mode": true,
+        "server_ip": "10.6.26.206",
+        "server_name": "SIRMIP",
+        "server_user": null,
+        "server_password": null
+      },
+      "ancillary": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/obs/river_stations/{ancillary_sub_path_time}",
+        "file_name": "{ancillary_var_name}_{domain_name}_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/river_stations/{destination_sub_path_time}",
+        "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
+        "fields": ["longitude", "latitude", "discharge", "time", "units", "catchment", "name", "tag", "type",
+          "code", "hmc_id_x", "hmc_id_y"]
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/river_stations/",
+    "file_name": "hyde_downloader_odbc_river_stations_log.txt",
+    "format": "%(asctime)s %(name)-12s %(levelname)-8s %(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s"
+  },
+  "variable": {
+    "discharge": {
+      "download": true,
+      "name": "discharge",
+      "units": "m^3/s",
+      "tag": "LV",
+      "type": "instantaneous",
+      "valid_range": [0, null],
+      "min_count": 1,
+      "scale_factor": 1
+    }
+  }
+}

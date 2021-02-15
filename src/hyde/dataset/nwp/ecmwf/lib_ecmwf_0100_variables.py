@@ -180,7 +180,7 @@ def computeRain(var_dset, var_name,
         var_units = 'mm'
 
     if var_units == 'm':
-        var_scale_factor = 1000
+        var_scale_factor = 0.001
     elif var_units == 'mm':
         var_scale_factor = 1
     else:

@@ -1,0 +1,217 @@
+{
+  "algorithm":{
+    "flag": {
+      "update_static_data_ancillary": false,
+      "update_dynamic_data_ancillary": false,
+      "update_dynamic_data_destination": true,
+      "clean_temporary_data": true
+    },
+    "general": {
+      "title": "MODIS - Snow MYD10A1 product",
+      "web-site": "https://modis.gsfc.nasa.gov/data/dataprod/mod10.php",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "3.5.0 [20201202]",
+      "project-info": "HyDE - Hydrological Data Engines",
+      "algorithm": "MODIS Snow preprocessing tools"
+    },
+    "info": {
+      "domain" : "marche"
+    },
+    "template": {
+      "domain_name": "string_domain",
+      "source_datetime": "%Y%m%d%H%M",
+      "source_sub_path_time": "%Y/%m/%d/",
+      "ancillary_datetime": "%Y%m%d%H%M",
+      "ancillary_sub_path_time": "%Y/%m/%d/",
+      "destination_datetime": "%Y%m%d%H%M",
+      "destination_sub_path_time": "%Y/%m/%d/"
+    }
+  },
+  "data": {
+    "static": {
+      "source" : {
+        "terrain" : {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/gridded/",
+          "file_name": "marche.dem.txt"
+        }
+      },
+      "ancillary": {
+        "grid_reference": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/modis/",
+          "file_name": "modis_snow_grid.workspace"
+        },
+        "geo_reference": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/modis/",
+          "file_name": "modis_snow_geo.workspace"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_period": 2,
+        "time_frequency": "D",
+        "time_rounding": "D"
+      },
+      "source": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/modis/{source_sub_path_time}",
+        "file_name": "MYD10A1_006_{source_datetime}_h18v04_h18v05_h19v04_h19v05.hdf4.gz",
+        "file_compression": true
+      },
+      "ancillary": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/obs/modis/{ancillary_sub_path_time}",
+        "file_name": "modis_snow_{domain_name}_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/obs/modis/{destination_sub_path_time}",
+        "file_name": "modis.snow.{destination_datetime}_{domain_name}.nc",
+        "file_compression": true
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/modis/",
+    "file_name": "hyde_preprocessing_modis_snow_log.txt",
+    "file_history": true
+  },
+  "time": {
+    "time_run": "2020-02-20 08:32",
+    "time_period": 1,
+    "time_frequency": "D",
+    "time_rounding": "D"
+  },
+  "variables": {
+    "source": {
+      "snow_cover": {
+        "var_mode": true,
+        "var_name": "NDSI_Snow_Cover",
+        "var_method_compute": {
+          "name": "mask_data",
+          "params": {
+            "flag_masks": ["0", "1", "-1", "-1", "-1", "-1", "-1", "-2", "-1", "-1"],
+            "flag_values":  ["0", ["1","100"], "200", "201", "211", "237", "239", "250", "254", "255"],
+            "flag_meanings":  ["no_snow", "NDSI_snow", "missing_data", "no_decision", "night",
+              "inland_water", "ocean", "cloud", "detector_satured", "fill"],
+            "pixel_size_aggregation": null
+          },
+          "outcome": "snow_cover"
+        },
+        "var_attributes": {
+          "long_name": "NDSI snow cover from best observation of the day",
+          "standard_name": "snow_cover",
+          "missing_value": -2,
+          "fill_value": -1,
+          "scale_factor": 1,
+          "valid_range": [0, 100],
+          "units": null
+        }
+      },
+      "snow_quality": {
+        "var_mode": true,
+        "var_name": "NDSI_Snow_Cover_Basic_QA",
+        "var_method_compute": {
+          "name": "mask_data",
+          "params": {
+            "flag_masks": ["0", "0", "0", "1", "1", "-1", "-1", "-1"],
+            "flag_values":  ["0", "1", "2", "3", "4", "211", "239", "255"],
+            "flag_meanings":  ["best", "good", "ok", "poor-not_used", "other-not_used",
+              "night", "ocean", "unusable_LIB_data_or_no_data"],
+            "pixel_size_aggregation": 100
+          },
+          "outcome": "snow_quality"
+        },
+        "var_attributes": {
+          "long_name": "NDSI snow cover general quality value",
+          "standard_name": "snow_quality",
+          "missing_value": -2,
+          "fill_value": -1,
+          "scale_factor": 1,
+          "valid_range": [0, 4],
+          "units": null
+        }
+      },
+      "snow_flags": {
+        "var_mode": true,
+        "var_name": "NDSI_Snow_Cover_Algorithm_Flags_QA",
+        "var_method_compute": {
+          "name": "mask_data",
+          "params": {
+            "flag_masks": ["0", "1", "2", "3", "4", "5", "6", "7"],
+            "flag_values":  ["0", "1", "2", "3", "4", "5", "6", "7"],
+            "flag_meanings":  ["inland_water_flag", "low_visible_screen_failed-reserved_snow_detection",
+              "low_NDSI_screen_failed-reserved_snow_detection",
+              "combined_temperature_and_height_screen_failed-snow_reserved_because_too_warm_and_too_low",
+              "too_high_swir_screen_and_applied_at_two_thresholds",
+              "spare", "spare", "solar_zenith_screen-indicates_increased_uncertainty_in_results"],
+            "pixel_size_aggregation": null
+          },
+          "outcome": "snow_flags"
+        },
+        "var_attributes": {
+          "long_name": "NDSI snow cover algorithm bit flags",
+          "standard_name": "snow_flags",
+          "missing_value": -2,
+          "fill_value": -1,
+          "scale_factor": 1,
+          "valid_range": [0, 7],
+          "units": null
+        }
+      },
+      "snow_albedo": {
+        "var_mode": true,
+        "var_name": "Snow_Albedo_Daily_Tile",
+        "var_method_compute": {
+          "name": "mask_data",
+          "params": {
+            "flag_masks": [["0","100"], "-1", "-1", "-1", "-3", "-3", "-2", "-1", "-1", "-1", "-1", "-1", "-1"],
+            "flag_values":  [["0","100"], "101", "111", "124", "137", "139", "150", "151",
+              "250", "251", "252", "253", "254"],
+            "flag_meanings":  ["snow_albedo", "no_decision", "night", "land", "inland_water", "ocean",
+              "cloud", "cloud_detected_as_snow", "missing", "self_shadowing",
+              "landmask_mismatch", "BRDF_failure", "non-production_mask"],
+            "pixel_size_aggregation": null
+          },
+          "outcome": "snow_albedo"
+        },
+        "var_attributes": {
+          "long_name": "Snow albedo of the corresponding snow cover observation",
+          "standard_name": "snow_albedo",
+          "missing_value": -6,
+          "fill_value": -1,
+          "scale_factor": 1,
+          "valid_range": [0, 100],
+          "units": null
+        }
+      }
+    },
+    "destination": {
+      "snow_cover": {
+        "var_mode": true,
+        "var_name": "snow_cover",
+        "var_attributes": {
+          "long_name": "NDSI snow cover from best observation of the day",
+          "standard_name": "snow_cover",
+          "missing_value": -2,
+          "fill_value": -1,
+          "scale_factor": 1,
+          "valid_range": [-2, 1],
+          "units": "-",
+          "description": "https://modis-snow-ice.gsfc.nasa.gov/?c=MOD10A1"
+        }
+      },
+      "snow_quality": {
+        "var_mode": true,
+        "var_name": "snow_quality",
+        "var_attributes": {
+          "long_name": "NDSI snow cover general quality value",
+          "standard_name": "snow_quality",
+          "missing_value": -1,
+          "fill_value": -1,
+          "scale_factor": 1,
+          "valid_range": [-1, 1],
+          "units": "-",
+          "description": "https://modis-snow-ice.gsfc.nasa.gov/?c=MOD10A1"
+        }
+      }
+    }
+  }
+}

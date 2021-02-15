@@ -1,17 +1,20 @@
 # -------------------------------------------------------------------------------------
 # Library
+import logging
 import rasterio
 import numpy as np
 
 import matplotlib.pylab as plt
+
+logging.getLogger('rasterio').setLevel(logging.WARNING)
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
-# Method to load a reference domain file
-def load_domain(filename_reference):
+# Method to read file raster
+def read_file_raster(file_name):
 
-    dset = rasterio.open(filename_reference)
+    dset = rasterio.open(file_name)
     bounds = dset.bounds
     res = dset.res
     transform = dset.transform
@@ -91,30 +94,4 @@ def clip_map(map, valid_range=None, missing_value=None):
     else:
         return map
 
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
-# Method to map data in geographical mode
-def data_2_map(data_values, data_geox, data_geoy, resolution='l'):
-
-    plt.figure(figsize=(8, 8))
-    m = Basemap(llcrnrlat=np.min(data_geoy), urcrnrlat=np.max(data_geoy),
-                llcrnrlon=np.min(data_geox), urcrnrlon=np.max(data_geox),
-                resolution=resolution)
-    m.drawcoastlines(color='gray')
-    m.drawcountries(color='gray')
-    plt.pcolormesh(data_geox, data_geoy, data_values)
-    plt.show()
-# -------------------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------------------
-# Method to show data in array mode
-def data_2_show(data):
-
-    plt.figure()
-    plt.imshow(data)
-    plt.colorbar()
-    plt.show()
 # -------------------------------------------------------------------------------------

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from src.hyde.dataset.nwp.wrf.OLD_lib_wrf_variables import computeRain
+from src.hyde.dataset.nwp.wrf.lib_wrf_variables import computeRain
 
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 

@@ -2,12 +2,60 @@
 Changelog
 =========
 
-Version 1.9.6 [2020-10-28]
+Version 1.9.6 [2021-01-13]
 **************************
+APP: **HYDE_DynamicData_EF_Rain.py**
+	- Release for Hyde package
+	    - Previous Version(s):
+	        - [2015-09-23] Previous final version
+
+APP: **HYDE_DynamicData_MODIS_Snow.py**
+	- Release for Hyde package
+	    - Previous Version(s):
+	        - [2018-09-10] Beta release for FloodProofs library
+            	- [2015-10-15] Updated codes, classes and methods
+            	- [2015-07-15] Added filter to compute quality index
+            	- [2015-05-14] Updated output file attributes
+            	- [2014-08-08] Refactor of functions and other stuff
+            	- [2014-08-07] Beta Release
+            
+APP: **HYDE_DynamicData_Radar_MCM.py**
+	- Release for Hyde package
+	    - Previous Version(s):
+	        - [2019-07-09] Beta release for FloodProofs library
+
+APP: **HYDE_DynamicData_GroundNetwork_RS.py**
+    - Release for Hyde package and refactor of the procedure to create the datasets of river stations observed discharges
+        - Previous Version(s):
+            - [2015-12-04] Latest operational version
+            
+APP: **HYDE_DynamicData_GroundNetwork_WS.py**
+    - Refactor of the procedure to create the datasets of weather stations observed variables
+    
+BIN: **hyde_downloader_modis_snow.py**
+	- Release for Hyde package and refactoring to python3
+
+BIN: **hyde_downloader_odbc_rs.py**
+	- Release for Hyde package
+
 BIN: **hyde_downloader_odbc_ws.py**
 	- Release for Hyde package
 
+FIX: **HYDE_DynamicData_NWP_ECMWF0100.py**
+    - Fix format of time argument passed by user
+	- Fix the orientation of latitude and values map(s)
 
+FIX: **HYDE_DynamicData_NWP_LAMI-2I.py**
+    - Fix format of settings file arguments
+    - Fix format of time argument passed by user
+	- Fix the settings of temporary folder to open file for multiprocessing application(s)
+	- Fix the name and the order of the dimensions in the output datasets
+
+FIX: **HYDE_Model_RFarm.py**
+    - Fix and update the data reader of the lami-2i nwp and the ecmwf0100 nwp
+    - Fix and update the data reader of the expert forecast datasets
+    - Fix and update the model application for the expert forecast case
+    
 Version 1.9.5 [2020-05-22]
 **************************
 APP: **HYDE_DynamicData_DroughtIndex_SSPI.py**

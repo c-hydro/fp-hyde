@@ -136,30 +136,34 @@ def agg_xyt(zi, nax, nay, nat):
     nat = int(nat)
 
     nx, ny, nt = zi.shape
-    if nay==nax and nat==nt:
+    if (nay == nax) and (nat == nt):
         sf = nx/nax
         xa = np.squeeze(np.nanmean(np.reshape(zi, (int(sf), int(nx*ny*nt/sf)),
                                               order='F'), 0))
         xz = np.reshape(np.nanmean(np.reshape(xa.T, (int(nx/sf), int(sf), int(ny/sf), nt),
-                                              order='F'), 1), (nax,nay,nt),
-                         order='F')
+                                              order='F'), 1), (nax, nay, nt), order='F')
     else:
-        xdim = int(nx/nax)
-        ydim = int(ny/nay)
-        tdim = int(nt/nat)
+
+        xdim = int(nx / nax)
+        ydim = int(ny / nay)
+        tdim = int(nt / nat)
         rx = np.arange(0, nx, xdim)
         ry = np.arange(0, ny, ydim)
         rt = np.arange(0, nt, tdim)
         xz = np.zeros((nax, nay, nat))
-        for i in range(0, xdim):
-            for j in range(0, ydim):
-                for k in range(0, tdim):
-                    xz = xz + zi[np.ix_(i+rx, j+ry, k+rt)]
-                
-            
-        
-        xz = xz/(xdim*ydim*tdim)
-        
+
+        if rx != 0 and ry != 0 and rt != 0:
+
+            for i in range(0, xdim):
+                for j in range(0, ydim):
+                    for k in range(0, tdim):
+                        xz = xz + zi[np.ix_(i + rx, j + ry, k + rt)]
+
+        elif rx == 0 and ry == 0 and rt == 0:
+            xz = np.nansum(zi)
+
+        xz = xz / (xdim * ydim * tdim)
+
     return xz
 
 

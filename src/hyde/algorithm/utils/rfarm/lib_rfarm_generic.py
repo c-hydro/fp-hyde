@@ -1,6 +1,26 @@
-# -------------------------------------------------------------------------------------
+"""
+Library Features:
+
+Name:          lib_rfarm_generic
+Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
+Date:          '20201202'
+Version:       '1.0.0'
+"""
+
+#######################################################################################
 # Library
+import os
+
+import numpy as np
 from datetime import datetime
+#######################################################################################
+
+
+# -------------------------------------------------------------------------------------
+# Method to make folder
+def make_folder(path_folder):
+    if not os.path.exists(path_folder):
+        os.makedirs(path_folder)
 # -------------------------------------------------------------------------------------
 
 
@@ -40,4 +60,55 @@ def fill_tags2string(string_raw, tags_format=None, tags_filling=None):
         return string_filled
     else:
         return string_raw
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to get dictionary values using a key
+def get_dict_values(d, key, value=[]):
+
+    for k, v in iter(d.items()):
+
+        if isinstance(v, dict):
+            if k == key:
+
+                for kk, vv in iter(v.items()):
+                    temp = [kk, vv]
+                    value.append(temp)
+
+            else:
+                vf = get_dict_values(v, key, value)
+
+                if isinstance(vf, list):
+                    if vf:
+                        vf_end = vf[0]
+                    else:
+                        vf_end = None
+
+                elif isinstance(vf, np.ndarray):
+                    vf_end = vf.tolist()
+                else:
+                    vf_end = vf
+
+                if vf_end not in value:
+                    if vf_end:
+
+                        if isinstance(value, list):
+                            value.append(vf_end)
+                        elif isinstance(value, str):
+                            value = [value, vf_end]
+
+                    else:
+                        pass
+                else:
+                    pass
+
+        else:
+            if k == key:
+
+                if isinstance(v, np.ndarray):
+                    value = v
+                else:
+                    value = v
+    return value
 # -------------------------------------------------------------------------------------

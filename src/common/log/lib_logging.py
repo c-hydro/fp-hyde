@@ -11,7 +11,7 @@ Version:       '2.0.8'
 # Library
 import logging
 import logging.config
-import progressbar
+# import progressbar
 import glob
 
 from os.path import exists, split, join
@@ -34,7 +34,7 @@ def setLoggingFile(sLoggerFile=sLoggerFile_Default, sLoggerName=sLoggerName_Defa
                    bLoggerHistory=False, iLoggerHistory=12):
 
     # Set to flush progressbar output in logging stream handle
-    progressbar.streams.wrap_stderr()
+    # progressbar.streams.wrap_stderr()
 
     # Save old logger file (to check run in the past)
     if bLoggerHistory:
