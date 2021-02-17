@@ -174,11 +174,21 @@ class DriverAlgorithm:
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
+    # Set algorithm default values (for backward compatibility)
+    @staticmethod
+    def set_algorithm_default(algorithm_settings):
+        if 'algorithm_mode' not in list(algorithm_settings['algorithm']['ancillary'].keys()):
+            algorithm_settings['algorithm']['ancillary']['algorithm_mode'] = 'exec_nwp'
+        return algorithm_settings
+    # -------------------------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------------------
     # Method to set algorithm info
     def set_algorithm_info(self):
 
         # Get data settings
         algorithm_settings = self.algorithm_settings
+        algorithm_settings = self.set_algorithm_default(algorithm_settings)
 
         # Set algorithm root path(s)
         algorithm_generic_paths = self.select_data(algorithm_settings, self.tag_folder_name)

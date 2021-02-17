@@ -89,11 +89,11 @@ class DataGeo:
                 raise FileNotFoundError('File ' + self.file_path_terrain + ' not found')
 
             logging.info(' ----> Alert area datasets ... ')
-            if os.path.exists(self.file_path_alert_area):
+            if (self.file_path_alert_area is not None) and (os.path.exists(self.file_path_alert_area)):
                 alert_area_obj = read_file_raster(self.file_path_alert_area)
                 logging.info(' ----> Alert area datasets ... DOME')
             else:
-                logging.info(' ----> Alert area datasets ... SKIPPED! File not found.')
+                logging.info(' ----> Alert area datasets ... SKIPPED! File not defined or not found.')
                 alert_area_obj = None
 
             # Create geo collections

@@ -152,15 +152,23 @@ def agg_xyt(zi, nax, nay, nat):
         rt = np.arange(0, nt, tdim)
         xz = np.zeros((nax, nay, nat))
 
-        if rx != 0 and ry != 0 and rt != 0:
+        rx_len = rx.__len__()
+        ry_len = ry.__len__()
+        rt_len = rt.__len__()
+
+        if rx_len > 1 and ry_len > 1 and rt_len > 1:
 
             for i in range(0, xdim):
                 for j in range(0, ydim):
                     for k in range(0, tdim):
                         xz = xz + zi[np.ix_(i + rx, j + ry, k + rt)]
 
-        elif rx == 0 and ry == 0 and rt == 0:
+        elif rx_len == 1 and ry_len == 1 and rt_len == 1:
+
             xz = np.nansum(zi)
+
+        else:
+            raise NotImplementedError('Aggregation XYT case not implemented yet')
 
         xz = xz / (xdim * ydim * tdim)
 
