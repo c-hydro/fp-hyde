@@ -2,6 +2,21 @@
 Changelog
 =========
 
+Version 1.9.7 [2021-03-01]
+**************************
+BIN: **hyde_downloader_nwp_gfs_nomads.py**
+	- Release for Hyde package
+	
+BIN: **hyde_downloader_nwp_gfs_ftp.py**
+	- Release for Hyde package
+
+BIN: **hyde_downloader_satellite_gsmap_nowcasting.py**
+	- Release for Hyde package
+	
+BIN: **hyde_downloader_satellite_gsmap_obs.py**
+	- Release for Hyde package
+
+
 Version 1.9.6 [2021-01-13]
 **************************
 APP: **HYDE_DynamicData_EF_Rain.py**
