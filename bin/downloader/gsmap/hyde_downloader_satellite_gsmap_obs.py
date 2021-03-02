@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 """
-HyDE Downloading Tool - SATELLITE GSMAP
+HyDE Downloading Tool - SATELLITE GSMAP REAL TIME
 
-__date__ = '20200427'
-__version__ = '1.0.1'
+__date__ = '20210301'
+__version__ = '2.0.1'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -13,9 +13,13 @@ __author__ =
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_satellite_gsmap.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
+python3 hyde_downloader_satellite_gsmap_obs.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
+20210301 (2.0.1) --> Manage exception due to the absence of the gsmap_gauge folder on server between 00:00 and 6:00 UTC
+20210223 (2.0.0) --> Implemented quasi-real-time integration of gsmap_gauge and gsmap_gauge_now.
+                     Change data sources to long-term ftp for allowing historical runs with gsmap_gauge.
+                     Dropped gsmap_nwp support.
 20200427 (1.0.1) --> Add list of remote files using folder name to avoid bad request of un-existing files
 20200313 (1.0.0) --> Beta release
 """
@@ -43,6 +47,7 @@ from datetime import datetime
 from os import makedirs
 from os.path import join, exists, split
 from argparse import ArgumentParser
+
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
@@ -52,6 +57,8 @@ alg_version = '1.0.0'
 alg_release = '2020-03-13'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
+
+
 # -------------------------------------------------------------------------------------
 
 
@@ -85,44 +92,55 @@ class FTPDriver:
         ftp_file = data_list[1]
         dst_file = data_list[2]
 
-        if ftp_folder not in self.ftp_folder_check:
-            self.ftp_file_available = self.ftp_utils.listdir(ftp_folder)
-            self.ftp_folder_check.append(ftp_folder)
+        try:
 
-        logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... ')
+            if ftp_folder not in self.ftp_folder_check:
+                self.ftp_file_available = self.ftp_utils.listdir(ftp_folder)
+                self.ftp_folder_check.append(ftp_folder)
 
-        if ftp_file in self.ftp_file_available:
-            logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... ')
-            try:
-                self.ftp_handle.cwd(ftp_folder)  # got to ftp dataset dir
-                self.ftp_handle.retrbinary("RETR " + ftp_file, open(dst_file, 'wb').write)
+            logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... ')
 
-                os.popen("chmod g+rxX " + dst_file).readline()
+            if ftp_file in self.ftp_file_available:
+                logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... ')
+                try:
+                    self.ftp_handle.cwd(ftp_folder)  # got to ftp dataset dir
+                    self.ftp_handle.retrbinary("RETR " + ftp_file, open(dst_file, 'wb').write)
 
-                self.ftp_file_downloaded.append([ftp_folder, ftp_file])
+                    os.popen("chmod g+rxX " + dst_file).readline()
 
-                logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... DONE')
-                logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... DONE')
+                    self.ftp_file_downloaded.append([ftp_folder, ftp_file])
 
-            except ConnectionError:
-                self.ftp_file_error.append([ftp_folder, ftp_file])
+                    logging.info(' :: FTP request for downloading: ' + ftp_file + ' ... DONE')
+                    logging.info(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... DONE')
 
-                logging.warning(' :: FTP request for downloading: ' + ftp_file + ' ... FAILED')
-                logging.warning(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... FAILED')
+                except ConnectionError:
+                    self.ftp_file_error.append([ftp_folder, ftp_file])
 
-        else:
+                    logging.warning(' :: FTP request for downloading: ' + ftp_file + ' ... FAILED')
+                    logging.warning(' :: Outcome data will be dumped in: ' + split(dst_file)[1] + ' ... FAILED')
+                missing_steps = False
+            else:
+                logging.info(' :: FTP request for downloading: ' + ftp_file +
+                             ' ... SKIPPED. File not available in folder ' + ftp_folder)
+                missing_steps = True
+
+        except ftputil.error.PermanentError:
             logging.info(' :: FTP request for downloading: ' + ftp_file +
-                         ' ... SKIPPED. File not available in folder ' + ftp_folder)
+                         ' ... SKIPPED. Folder ' + ftp_folder + ' does not exist on the server')
+            missing_steps = True
+
+        return missing_steps
 
     def close(self):
         self.ftp_handle.quit()
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Script Main
 def main():
-
     # -------------------------------------------------------------------------------------
     # Get algorithm settings
     alg_settings, alg_time = get_args()
@@ -153,6 +171,10 @@ def main():
     # Starting info
     logging.info(' --> TIME RUN: ' + str(time_run))
 
+    products = {}
+    for idx, data_type in enumerate(data_settings['algorithm']['ancillary']['type']):
+        products[data_type] = idx
+
     # Iterate over time steps
     for time_run_step in time_run_range:
 
@@ -162,85 +184,106 @@ def main():
         # Get data time range
         time_data_range = set_data_time(time_run_step, data_settings['data']['dynamic']['time'])
 
-        # Set data sources
-        data_ftp, root_ftp, folder_ftp, file_ftp = set_data_ftp(
-            time_run_step, time_data_range,
-            data_settings['data']['dynamic']['ftp'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'])
+        for data_type in products.items():
 
-        # Set data source
-        data_source = set_data_source(time_run_step, time_data_range,
-                                      data_settings['data']['dynamic']['source'],
-                                      data_settings['data']['static']['bounding_box'],
-                                      data_settings['algorithm']['ancillary'],
-                                      data_settings['algorithm']['template'],
-                                      type_data=data_settings['algorithm']['ancillary']['type'])
+            # Set data outcome domain
+            data_outcome_domain = set_data_outcome(
+                time_run_step, time_data_range,
+                data_settings['data']['dynamic']['outcome']['domain'],
+                data_settings['data']['static']['bounding_box'],
+                data_settings['algorithm']['ancillary'],
+                data_settings['algorithm']['template'],
+                type_data=data_type,
+                flag_updating=False)
 
-        # Set data ancillary global
-        data_ancillary_global = set_data_ancillary_global(
-            time_run_step, time_data_range,
-            data_settings['data']['dynamic']['ancillary']['global'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'])
+            time_data_range_todo = [time_data_range[i] for i in np.arange(1, len(time_data_range), 1) if
+                                    not os.path.isfile(data_outcome_domain[i]) or os.path.isfile(
+                                        data_outcome_domain[i] + '.tmp')]
 
-        # Set data ancillary ctl
-        data_ancillary_ctl = set_data_ancillary_ctl(
-            time_run_step, time_data_range,
-            data_settings['data']['dynamic']['ancillary']['ctl'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'],
-            flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ctl'])
+            if len(time_data_range_todo) > 0:
+                # Set data sources
+                data_ftp, root_ftp, folder_ftp, file_ftp = set_data_ftp(
+                    time_run_step, time_data_range_todo,
+                    data_settings['data']['dynamic']['ftp'],
+                    data_settings['data']['static']['bounding_box'],
+                    data_settings['algorithm']['ancillary'],
+                    data_settings['algorithm']['template'],
+                    type_data=data_type)
 
-        # Set data outcome global
-        data_outcome_global = set_data_outcome(
-            time_run_step, time_data_range,
-            data_settings['data']['dynamic']['outcome']['global'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'],
-            flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_global'])
-        # Set data outcome domain
-        data_outcome_domain = set_data_outcome(
-            time_run_step, time_data_range,
-            data_settings['data']['dynamic']['outcome']['domain'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'],
-            flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_domain'])
+                # Set data source
+                data_source = set_data_source(time_run_step, time_data_range_todo,
+                                              data_settings['data']['dynamic']['source'],
+                                              data_settings['data']['static']['bounding_box'],
+                                              data_settings['algorithm']['ancillary'],
+                                              data_settings['algorithm']['template'],
+                                              type_data=data_type)
 
-        # Retrieve and save data (in sequential or multiprocessing mode)
-        if data_settings['algorithm']['flags']['downloading_mp']:
-            retrieve_data_source_mp(
-                data_ftp, root_ftp, folder_ftp, file_ftp, data_source,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'],
-                process_n=data_settings['algorithm']['ancillary']['process_mp'],
-            )
-        else:
-            retrieve_data_source_seq(
-                data_ftp, root_ftp, folder_ftp, file_ftp, data_source,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'])
+                # Set data ancillary global
+                data_ancillary_global = set_data_ancillary_global(
+                    time_run_step, time_data_range_todo,
+                    data_settings['data']['dynamic']['ancillary']['global'],
+                    data_settings['data']['static']['bounding_box'],
+                    data_settings['algorithm']['ancillary'],
+                    data_settings['algorithm']['template'],
+                    type_data=data_type)
 
-        # Merge and mask data ancillary to data outcome
-        arrange_data_outcome(time_data_range,
-                             data_source, data_outcome_global, data_outcome_domain, data_ancillary_ctl,
-                             tags_template=data_settings['algorithm']['template'],
-                             data_bbox=data_settings['data']['static']['bounding_box'],
-                             cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
-                             cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'])
+                # Set data ancillary ctl
+                data_ancillary_ctl = set_data_ancillary_ctl(
+                    time_run_step, time_data_range_todo,
+                    data_settings['data']['dynamic']['ancillary']['ctl'],
+                    data_settings['data']['static']['bounding_box'],
+                    data_settings['algorithm']['ancillary'],
+                    data_settings['algorithm']['template'],
+                    type_data=data_type)
 
-        # Clean data tmp (such as ancillary and outcome global)
-        clean_data_tmp(
-            data_ancillary_ctl, data_outcome_global,
-            flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
+                # Set data outcome global
+                data_outcome_global = set_data_outcome(
+                    time_run_step, time_data_range_todo,
+                    data_settings['data']['dynamic']['outcome']['global'],
+                    data_settings['data']['static']['bounding_box'],
+                    data_settings['algorithm']['ancillary'],
+                    data_settings['algorithm']['template'],
+                    type_data=data_type,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_global'])
+
+                # Set data outcome domain
+                data_outcome_domain = set_data_outcome(
+                    time_run_step, time_data_range_todo,
+                    data_settings['data']['dynamic']['outcome']['domain'],
+                    data_settings['data']['static']['bounding_box'],
+                    data_settings['algorithm']['ancillary'],
+                    data_settings['algorithm']['template'],
+                    type_data=data_type,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_domain'])
+
+                if data_settings['algorithm']['flags']['downloading_mp']:
+                    missingSteps = retrieve_data_source_mp(
+                        data_ftp, root_ftp, folder_ftp, file_ftp, data_source, data_type, time_data_range_todo,
+                        flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'],
+                        process_n=data_settings['algorithm']['ancillary']['process_mp'],
+                    )
+                else:
+                    missingSteps = retrieve_data_source_seq(
+                        data_ftp, root_ftp, folder_ftp, file_ftp, data_source, data_type, time_data_range_todo,
+                        flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'])
+
+                time_data_range_done = [i for i, b in zip(time_data_range_todo, missingSteps) if b is False]
+
+                # Merge and mask data ancillary to data outcome
+                arrange_data_outcome(time_data_range_done, data_type,
+                                     data_source, data_outcome_global, data_outcome_domain, data_ancillary_ctl,
+                                     tags_template=data_settings['algorithm']['template'],
+                                     data_bbox=data_settings['data']['static']['bounding_box'],
+                                     cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
+                                     cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'])
+
+                # Clean data tmp (such as ancillary and outcome global)
+                clean_data_tmp(data_ancillary_ctl, data_outcome_global,
+                               flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
+                if data_settings['algorithm']['flags']['cleaning_all_sources']:
+                    for data_value in data_source:
+                        if os.path.exists(data_value):
+                            os.remove(data_value)
 
         # Ending info
         logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... DONE')
@@ -258,13 +301,13 @@ def main():
     logging.info(' ============================================================================ ')
     # -------------------------------------------------------------------------------------
 
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to fill data ancillary ctl
 def fill_data_ancillary_ctl(time_step, file_source, ctl_template, tags_template, tag_dset='dset', tag_tdef='tdef'):
-
     folder_source, filename_source = os.path.split(file_source)
 
     hour_step = time_step.strftime('%H:00')
@@ -282,6 +325,8 @@ def fill_data_ancillary_ctl(time_step, file_source, ctl_template, tags_template,
         ctl_template_filled[template_ctl_key] = template_ctl_content_fill
 
     return ctl_template_filled
+
+
 # -------------------------------------------------------------------------------------
 
 
@@ -293,6 +338,8 @@ def write_data_ancillary_ctl(filename_ctl, template_ctl):
         ctl_handle.write(line_content)
         ctl_handle.write("\n")
     ctl_handle.close()
+
+
 # -------------------------------------------------------------------------------------
 
 
@@ -300,23 +347,21 @@ def write_data_ancillary_ctl(filename_ctl, template_ctl):
 # Method to clean tmp data such as ancillary or global (if domain is set)
 def clean_data_tmp(data_ancillary, data_outcome_global,
                    flag_cleaning_tmp=False):
-
     if flag_cleaning_tmp:
-        for data_key, data_value in data_ancillary.items():
-            for data_step in data_value:
-                if os.path.exists(data_step):
-                    os.remove(data_step)
-        for data_key, data_value in data_outcome_global.items():
-            for data_step in data_value:
-                if os.path.exists(data_step):
-                    os.remove(data_step)
+        for data_value in data_ancillary[0]:
+            if os.path.exists(data_value):
+                os.remove(data_value)
+        for data_value in data_outcome_global:
+            if os.path.exists(data_value):
+                os.remove(data_value)
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to unzip data source file
 def unzip_data_source(filename_zip, filename_unzip):
-
     if os.path.exists(filename_zip):
         input = gzip.GzipFile(filename_zip, 'rb')
         data = input.read()
@@ -325,16 +370,17 @@ def unzip_data_source(filename_zip, filename_unzip):
         output.write(data)
         output.close()
     else:
-        logging.warning(' ===> Zip file does not exist. Checy your datasets.')
+        logging.warning(' ===> Zip file does not exist. Check your datasets.')
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to arrange outcome dataset(s)
-def arrange_data_outcome(time_range, src_data, dst_data_global, dst_data_domain, ctl_data_ancillary,
+def arrange_data_outcome(time_range, type_data, src_data, dst_data_global, dst_data_domain, ctl_data_ancillary,
                          tags_template=None,
                          data_bbox=None, cdo_exec=None, cdo_deps=None):
-
     logging.info(' ----> Dumping data ... ')
 
     if data_bbox is not None:
@@ -342,8 +388,8 @@ def arrange_data_outcome(time_range, src_data, dst_data_global, dst_data_domain,
         bbox_lon_left = str(data_bbox['lon_left'])
         bbox_lat_top = str(data_bbox['lat_top'])
         bbox_lat_bottom = str(data_bbox['lat_bottom'])
-
-        bbox_points = [bbox_lon_right, bbox_lon_left, bbox_lat_bottom, bbox_lat_top]
+		
+		bbox_points = [bbox_lon_left, bbox_lon_right, bbox_lat_bottom, bbox_lat_top]
         bbox_cdo = ','.join(bbox_points)
     else:
         bbox_cdo = None
@@ -354,84 +400,83 @@ def arrange_data_outcome(time_range, src_data, dst_data_global, dst_data_domain,
 
     for cdo_dep in cdo_deps:
         os.environ['LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH:' + cdo_dep
+        #os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
+
     cdo = Cdo()
     cdo.setCdo(cdo_exec)
 
-    for (src_key_step, src_file_list), \
-        (dst_key_global_step, dst_file_global_list), \
-        (dst_key_domain_step, dst_file_domain_list),\
-        (ctl_key_step, ctl_data_list) in zip(src_data.items(),
-                                             dst_data_global.items(),
-                                             dst_data_domain.items(),
-                                             ctl_data_ancillary.items()):
+    logging.info(' -----> Type ' + type_data[0] + ' ... ')
 
-        logging.info(' -----> Type ' + src_key_step + ' ... ')
+    ctl_file_list = ctl_data_ancillary[0]
+    ctl_template_raw = ctl_data_ancillary[1]
 
-        ctl_file_list = ctl_data_list[0]
-        ctl_template_raw = ctl_data_list[1]
+    src_file_list = deepcopy(src_data)
+    dst_file_global_list = deepcopy(dst_data_global)
+    dst_file_domain_list = deepcopy(dst_data_domain)
 
-        src_file_list.sort()
-        dst_file_global_list.sort()
-        dst_file_domain_list.sort()
-        ctl_file_list.sort()
+    for time_step, src_file_step_zip, \
+        dst_file_global_step, dst_file_domain_step, \
+        ctl_file_step in zip(time_range, src_file_list,
+                             dst_file_global_list, dst_file_domain_list,
+                             ctl_file_list):
 
-        for time_step, src_file_step_zip, \
-            dst_file_global_step, dst_file_domain_step, \
-            ctl_file_step in zip(time_range, src_file_list,
-                                 dst_file_global_list, dst_file_domain_list,
-                                 ctl_file_list):
+        logging.info(' ------> TimeStep ' + str(time_step) + ' ... ')
 
-            logging.info(' ------> TimeStep ' + str(time_step) + ' ... ')
+        logging.info(' ------> Convert and project global data ... ')
+        if not os.path.exists(dst_file_global_step):
 
-            logging.info(' ------> Convert and project global data ... ')
-            if not os.path.exists(dst_file_global_step):
+            folder_global_step, filename_global_step = os.path.split(dst_file_global_step)
+            tmp_file_global_step = create_filename_tmp(folder=folder_global_step, suffix='.nc')
 
-                folder_global_step, filename_global_step = os.path.split(dst_file_global_step)
-                tmp_file_global_step = create_filename_tmp(folder=folder_global_step, suffix='.nc')
-
-                src_file_step_unzip = os.path.splitext(src_file_step_zip)[0]
-                ctl_template_step = fill_data_ancillary_ctl(time_step, src_file_step_unzip,
+            src_file_step_unzip = os.path.splitext(src_file_step_zip)[0]
+            ctl_template_step = fill_data_ancillary_ctl(time_step, src_file_step_unzip,
                                                         ctl_template_raw, tags_template)
 
-                unzip_data_source(src_file_step_zip, src_file_step_unzip)
+            unzip_data_source(src_file_step_zip, src_file_step_unzip)
 
-                write_data_ancillary_ctl(ctl_file_step, ctl_template_step)
+            write_data_ancillary_ctl(ctl_file_step, ctl_template_step)
 
-                cdo.import_binary(input=ctl_file_step, output=tmp_file_global_step, options='-f nc')
-                cdo.sellonlatbox('-180,180,-90,90', input=tmp_file_global_step, output=dst_file_global_step)
+            cdo.import_binary(input=ctl_file_step, output=tmp_file_global_step, options='-f nc')
+            cdo.sellonlatbox('-180,180,-90,90', input=tmp_file_global_step, output=dst_file_global_step)
 
-                if os.path.exists(src_file_step_unzip):
-                    os.remove(src_file_step_unzip)
-                if os.path.exists(tmp_file_global_step):
-                    os.remove(tmp_file_global_step)
+            if os.path.exists(src_file_step_unzip):
+                os.remove(src_file_step_unzip)
+            if os.path.exists(tmp_file_global_step):
+                os.remove(tmp_file_global_step)
 
-                logging.info(' ------> Convert and project global data ... DONE')
+            logging.info(' ------> Convert and project global data ... DONE')
+        else:
+            logging.info(' ------> Convert and project global data ... SKIPPED. Data already available')
+
+        logging.info(' ------> Mask global data over defined domain ...  ')
+        if not os.path.exists(dst_file_domain_step):
+            if bbox_cdo is not None:
+                cdo.sellonlatbox(bbox_cdo, input=dst_file_global_step, output=dst_file_domain_step)
+                logging.info(' ------> Mask global data over defined domain ...  DONE')
+                if type_data[0] == 'gsmap_gauge':
+                    if os.path.exists(dst_file_domain_step + '.tmp'):
+                        os.remove(dst_file_domain_step + '.tmp')
+                if type_data[0] == 'gsmap_gauge_now':
+                    os.system('touch ' + dst_file_domain_step + '.tmp')
             else:
-                logging.info(' ------> Convert and project global data ... SKIPPED. Data already available')
+                logging.info(' ------> Mask global data over defined domain ...  SKIPPED. '
+                             'Domain bounding box not defined.')
+        else:
+            logging.info(' ------> Mask global data over defined domain ...  SKIPPED. Data already masked.')
 
-            logging.info(' ------> Mask global data over defined domain ...  ')
-            if not os.path.exists(dst_file_domain_step):
-                if bbox_cdo is not None:
-                    cdo.sellonlatbox(bbox_cdo, input=dst_file_global_step, output=dst_file_domain_step)
-                    logging.info(' ------> Mask global data over defined domain ...  DONE')
-                else:
-                    logging.info(' ------> Mask global data over defined domain ...  SKIPPED. '
-                                 'Domain bounding box not defined.')
-            else:
-                logging.info(' ------> Mask global data over defined domain ...  SKIPPED. Data already masked.')
+        logging.info(' ------> TimeStep ' + str(time_step) + ' ... DONE')
 
-            logging.info(' ------> TimeStep ' + str(time_step) + ' ... DONE')
-
-        logging.info(' -----> Type ' + src_key_step + ' ... DONE')
+    logging.info(' -----> Type ' + type_data[0] + ' ... DONE')
 
     logging.info(' ----> Dumping data ... DONE')
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to drop data
 def select_time_steps(info_file, id_start=2, id_end=None, id_period=2):
-
     if id_end is None:
         id_end = int(info_file[-1].split()[0])
 
@@ -451,28 +496,30 @@ def select_time_steps(info_file, id_start=2, id_end=None, id_period=2):
     ids_box = '/'.join(ids_info)
 
     return var_box, ids_box
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to create a tmp name
 def create_filename_tmp(prefix='gfs_tmp_', suffix='.grib2', folder=None):
-
     if folder is None:
         folder = '/tmp'
 
     with tempfile.NamedTemporaryFile(dir=folder, prefix=prefix, suffix=suffix, delete=False) as tmp:
         temp_file_name = tmp.name
     return temp_file_name
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to retrieve and store data (multiprocess)
 def retrieve_data_source_mp(src_data, src_root, src_folder, src_file,
-                            dst_data,
+                            dst_data, data_type, time_data_range,
                             flag_updating=False, process_n=20, process_max=None):
-
     logging.info(' ----> Downloading data in multiprocessing mode ... ')
 
     if process_max is None:
@@ -484,43 +531,41 @@ def retrieve_data_source_mp(src_data, src_root, src_folder, src_file,
 
     data_list = []
     data_check = []
-    for (src_data_key, src_data_list), \
-        (src_root_key, src_root_list), (src_folder_key, src_folder_list), (src_file_key, src_file_list), \
-        (dst_data_key, dst_data_list) in zip(
-        src_data.items(),
-        src_root.items(), src_folder.items(), src_file.items(),
-        dst_data.items()):
 
-        logging.info(' -----> DataType: ' + src_data_key + ' ... ')
+    logging.info(' -----> DataType: ' + data_type[0] + ' ... ')
 
-        for src_step_ftp, \
-            src_step_root, src_step_folder, src_step_file, dst_step_path in zip(
-            src_data_list, src_root_list, src_folder_list, src_file_list, dst_data_list):
+    for src_step_ftp, \
+        src_step_root, src_step_folder, src_step_file, dst_step_path, step_time_step in zip(
+        src_data, src_root, src_folder, src_file, dst_data, time_data_range):
 
-            dst_step_root, dst_step_file = split(dst_step_path)
-            make_folder(dst_step_root)
+        dst_step_root, dst_step_file = split(dst_step_path)
+        make_folder(dst_step_root)
 
-            if exists(dst_step_path) and flag_updating:
-                flag_updating = True
-            elif (not exists(dst_step_path)) and flag_updating:
-                flag_updating = True
-            elif (not exists(dst_step_path)) and (not flag_updating):
-                flag_updating = True
-            if flag_updating:
-                data_list.append([src_step_folder, src_step_file, dst_step_path])
+        if exists(dst_step_path) and flag_updating:
+            flag_updating = True
+        elif (not exists(dst_step_path)) and flag_updating:
+            flag_updating = True
+        elif (not exists(dst_step_path)) and (not flag_updating):
+            flag_updating = True
+        if flag_updating:
+            data_list.append([src_step_folder, src_step_file, dst_step_path, step_time_step])
 
-            data_check.append([src_step_folder, src_step_file, dst_step_path])
+        data_check.append([src_step_folder, src_step_file, dst_step_path, step_time_step])
 
-        logging.info(' -----> DataType: ' + src_data_key + ' ... SET-UP')
+    logging.info(' -----> DataType: ' + data_type[0] + ' ... SET-UP')
 
     with Pool(processes=process_n, maxtasksperchild=1) as process_pool:
-        _ = process_pool.map(wrap_download_file, data_list, chunksize=1)
+        missing_steps = process_pool.map(wrap_download_file, data_list, chunksize=1)
         process_pool.close()
         process_pool.join()
 
     find_data_corrupted(data_check)
 
     logging.info(' ----> Downloading data in multiprocessing mode ... DONE')
+
+    return missing_steps
+
+
 # -------------------------------------------------------------------------------------
 
 
@@ -528,32 +573,32 @@ def retrieve_data_source_mp(src_data, src_root, src_folder, src_file,
 # Method to wrap file downloader for mp process
 def wrap_download_file(data_list):
     ftp_drv = FTPDriver()
-    ftp_drv.download_file(data_list)
+    missing_steps = ftp_drv.download_file(data_list)
+    return missing_steps
+
+
 # -------------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------------
 # Method to find outliers and to retry for downloading data again
 def find_data_corrupted(data_list, data_perc_min=5, data_size_min=100000):
-
-    logging.info(' -----> Checking for corrupted or unavailable data  ... ')
+    logging.info(' -----> Checking for corrupted data  ... ')
 
     data_size = []
     idx_nodata = []
     for dst_id, dst_step_path in enumerate(data_list):
-        if os.path.exists(dst_step_path[1]):
-            dst_step_size = os.path.getsize(dst_step_path[1])
+        if os.path.exists(dst_step_path[2]):
+            dst_step_size = os.path.getsize(dst_step_path[2])
         else:
-            dst_step_size = 0
+            dst_step_size = np.nan
             idx_nodata.append(dst_id)
         data_size.append(dst_step_size)
     data_size = np.asarray(data_size)
 
-    data_p_min = np.percentile(data_size, data_perc_min)
+    data_p_min = np.nanpercentile(data_size, data_perc_min)
 
-    idx_false = np.where(data_size < min([data_size_min, data_p_min]))[0]
-    idx_nodata = np.asarray(idx_nodata, int)
-    idx_retry = np.unique(np.concatenate((idx_false, idx_nodata), axis=0))
+    idx_retry = np.where(data_size < min([data_size_min, data_p_min]))[0]
 
     ftp_drv = None
     for idx_step in idx_retry:
@@ -572,14 +617,15 @@ def find_data_corrupted(data_list, data_perc_min=5, data_size_min=100000):
         logging.info(' ------> Downloading data ' + split(data_false[1])[1] + ' ... DONE')
 
     logging.info(' -----> Checking for corrupted or unavailable data  ... DONE')
+
+
 # ------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to retrieve and store data (sequential)
 def retrieve_data_source_seq(src_data, src_root, src_folder, src_file,
-                             dst_data, flag_updating=False):
-
+                             dst_data, data_type, time_data_range, flag_updating=False):
     logging.info(' ----> Downloading data in sequential mode ... ')
 
     # Set the ftp driver
@@ -587,47 +633,45 @@ def retrieve_data_source_seq(src_data, src_root, src_folder, src_file,
 
     data_list = []
     data_check = []
-    for (src_data_key, src_data_list), \
-        (src_root_key, src_root_list), (src_folder_key, src_folder_list), (src_file_key, src_file_list), \
-        (dst_data_key, dst_data_list) in zip(
-            src_data.items(),
-            src_root.items(), src_folder.items(), src_file.items(),
-            dst_data.items()):
+    missing_steps = []
 
-        logging.info(' -----> DataType: ' + src_data_key + ' ... ')
+    for src_step_ftp, \
+        src_step_root, src_step_folder, src_step_file, dst_step_path, step_time_step in zip(
+        src_data, src_root, src_folder, src_file, dst_data, time_data_range):
 
-        for src_step_ftp, \
-            src_step_root, src_step_folder, src_step_file, dst_step_path in zip(
-            src_data_list, src_root_list, src_folder_list, src_file_list, dst_data_list):
+        dst_step_root, dst_step_file = split(dst_step_path)
+        make_folder(dst_step_root)
 
-            dst_step_root, dst_step_file = split(dst_step_path)
-            make_folder(dst_step_root)
+        if exists(dst_step_path) and flag_updating:
+            flag_updating = True
+        elif (not exists(dst_step_path)) and flag_updating:
+            flag_updating = True
+        elif (not exists(dst_step_path)) and (not flag_updating):
+            flag_updating = True
+        if flag_updating:
+            data_list.append([src_step_folder, src_step_file, dst_step_path, step_time_step])
 
-            logging.info(' ------> Save data in file: ' + str(dst_step_file) + ' ... ')
-            if exists(dst_step_path) and flag_updating:
-                flag_updating = True
-            elif (not exists(dst_step_path)) and flag_updating:
-                flag_updating = True
-            elif (not exists(dst_step_path)) and (not flag_updating):
-                flag_updating = True
+        if flag_updating:
 
-            if flag_updating:
+            missing = ftp_drv.download_file([src_step_folder, src_step_file, dst_step_path])
 
-                ftp_drv.download_file([src_step_folder, src_step_file, dst_step_path])
+            data_list.append([src_step_folder, src_step_file, dst_step_path])
+            logging.info(' ------> Save data in file: ' + str(dst_step_file) + ' ... DONE')
+        else:
+            logging.info(' ------> Save data in file: ' + str(dst_step_file) +
+                         ' ... SKIPPED. File saved previously')
 
-                data_list.append([src_step_folder, src_step_file, dst_step_path])
-                logging.info(' ------> Save data in file: ' + str(dst_step_file) + ' ... DONE')
-            else:
-                logging.info(' ------> Save data in file: ' + str(dst_step_file) +
-                             ' ... SKIPPED. File saved previously')
+        data_check.append([src_step_folder, src_step_file, dst_step_path])
+        missing_steps.append(missing)
 
-            data_check.append([src_step_folder, src_step_file, dst_step_path])
-
-        logging.info(' -----> DataType: ' + src_data_key + ' ... DONE')
+    logging.info(' -----> DataType: ' + data_type[0] + ' ... DONE')
 
     find_data_corrupted(data_check)
 
     logging.info(' ----> Downloading data in sequential mode ... DONE')
+    return missing_steps
+
+
 # -------------------------------------------------------------------------------------
 
 
@@ -635,12 +679,11 @@ def retrieve_data_source_seq(src_data, src_root, src_folder, src_file,
 # Method to create data outcome list
 def set_data_outcome(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
                      type_data=None, flag_updating=True):
-
     if type_data is None:
         type_data = ["surface"]
 
-    folder_list = data_def['folder']
-    filename_list = data_def['filename']
+    folder_list = [data_def['folder']]
+    filename_list = [data_def['filename']]
 
     lon_right = geo_def['lon_right']
     lon_left = geo_def['lon_left']
@@ -652,6 +695,7 @@ def set_data_outcome(time_run, time_range, data_def, geo_def, ancillary_def, tag
     hour_run = time_run.hour
     datetime_run = time_run.to_pydatetime()
     file_ws = {}
+
     for folder_raw, filename_raw, type_step in zip(folder_list, filename_list, type_data):
         file_list = []
         for time_id, time_step in enumerate(time_range):
@@ -671,7 +715,7 @@ def set_data_outcome(time_run, time_range, data_def, geo_def, ancillary_def, tag
 
             path_step = join(folder_step, filename_step)
 
-            if flag_updating:
+            if flag_updating == True and not type_data[0] == "gsmap_gauge_now":
                 if os.path.exists(path_step):
                     os.remove(path_step)
 
@@ -680,9 +724,10 @@ def set_data_outcome(time_run, time_range, data_def, geo_def, ancillary_def, tag
 
             file_list.append(path_step)
 
-        file_ws[type_step] = file_list
+        # file_ws[type_step[0]] = file_list
 
-    return file_ws
+    return file_list
+
 
 # -------------------------------------------------------------------------------------
 
@@ -691,7 +736,6 @@ def set_data_outcome(time_run, time_range, data_def, geo_def, ancillary_def, tag
 # Method to create data ancillary ctl list
 def set_data_ancillary_ctl(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
                            type_data=None, flag_updating=True):
-
     if type_data is None:
         type_data = ["surface"]
 
@@ -709,36 +753,41 @@ def set_data_ancillary_ctl(time_run, time_range, data_def, geo_def, ancillary_de
     hour_run = time_run.hour
     datetime_run = time_run.to_pydatetime()
     file_ws = {}
-    for folder_raw, filename_raw, template_raw, type_step in zip(folder_list, filename_list, template_list, type_data):
-        file_list = []
-        for time_id, time_step in enumerate(time_range):
-            datetime_step = time_step.to_pydatetime()
-            tags_values_step = {"domain": domain,
-                                "ancillary_sub_path_time": datetime_step, "ancillary_datetime": datetime_step,
-                                "run_hour": hour_run, "run_step": time_id,
-                                "run_datetime": datetime_run,
-                                "run_lon_right": str(lon_right),
-                                "run_lon_left": str(lon_left),
-                                "run_lat_bottom": str(lat_bottom),
-                                "run_lat_top": str(lat_top)}
 
-            folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
-            filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
+    folder_raw = folder_list[type_data[1]]
+    filename_raw = filename_list[type_data[1]]
+    template_raw = template_list[type_data[1]]
 
-            path_step = join(folder_step, filename_step)
+    file_list = []
+    for time_id, time_step in enumerate(time_range):
+        datetime_step = time_step.to_pydatetime()
+        tags_values_step = {"domain": domain,
+                            "ancillary_sub_path_time": datetime_step, "ancillary_datetime": datetime_step,
+                            "run_hour": hour_run, "run_step": time_id,
+                            "run_datetime": datetime_run,
+                            "run_lon_right": str(lon_right),
+                            "run_lon_left": str(lon_left),
+                            "run_lat_bottom": str(lat_bottom),
+                            "run_lat_top": str(lat_top)}
 
-            if flag_updating:
-                if os.path.exists(path_step):
-                    os.remove(path_step)
+        folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
+        filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
 
-            if not os.path.exists(folder_step):
-                make_folder(folder_step)
+        path_step = join(folder_step, filename_step)
 
-            file_list.append(path_step)
+        if flag_updating:
+            if os.path.exists(path_step):
+                os.remove(path_step)
 
-        file_ws[type_step] = [file_list, template_raw]
+        if not os.path.exists(folder_step):
+            make_folder(folder_step)
+
+        file_list.append(path_step)
+
+    file_ws = [file_list, template_raw]
 
     return file_ws
+
 
 # -------------------------------------------------------------------------------------
 
@@ -747,7 +796,6 @@ def set_data_ancillary_ctl(time_run, time_range, data_def, geo_def, ancillary_de
 # Method to create data ancillary global list
 def set_data_ancillary_global(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
                               type_data=None):
-
     if type_data is None:
         type_data = ["surface"]
 
@@ -764,30 +812,31 @@ def set_data_ancillary_global(time_run, time_range, data_def, geo_def, ancillary
     hour_run = time_run.hour
     datetime_run = time_run.to_pydatetime()
     file_ws = {}
-    for folder_raw, filename_raw, type_step in zip(folder_list, filename_list, type_data):
-        file_list = []
-        for time_id, time_step in enumerate(time_range):
 
-            datetime_step = time_step.to_pydatetime()
-            tags_values_step = {"domain": domain,
-                                "ancillary_sub_path_time": datetime_run, "ancillary_datetime": datetime_step,
-                                "run_hour": hour_run, "run_step": time_id,
-                                "run_datetime": datetime_run,
-                                "run_lon_right": str(lon_right),
-                                "run_lon_left": str(lon_left),
-                                "run_lat_bottom": str(lat_bottom),
-                                "run_lat_top": str(lat_top)}
+    folder_raw = folder_list[type_data[1]]
+    filename_raw = filename_list[type_data[1]]
 
-            folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
-            filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
+    file_list = []
+    for time_id, time_step in enumerate(time_range):
+        datetime_step = time_step.to_pydatetime()
+        tags_values_step = {"domain": domain,
+                            "ancillary_sub_path_time": datetime_run, "ancillary_datetime": datetime_step,
+                            "run_hour": hour_run, "run_step": time_id,
+                            "run_datetime": datetime_run,
+                            "run_lon_right": str(lon_right),
+                            "run_lon_left": str(lon_left),
+                            "run_lat_bottom": str(lat_bottom),
+                            "run_lat_top": str(lat_top)}
 
-            path_step = join(folder_step, filename_step)
+        folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
+        filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
 
-            file_list.append(path_step)
+        path_step = join(folder_step, filename_step)
 
-        file_ws[type_step] = file_list
+        file_list.append(path_step)
 
-    return file_ws
+    return file_list
+
 
 # -------------------------------------------------------------------------------------
 
@@ -796,7 +845,6 @@ def set_data_ancillary_global(time_run, time_range, data_def, geo_def, ancillary
 # Method to create data source list
 def set_data_source(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
                     type_data=None):
-
     if type_data is None:
         type_data = ["surface"]
 
@@ -812,32 +860,31 @@ def set_data_source(time_run, time_range, data_def, geo_def, ancillary_def, tags
 
     datetime_run = time_run.to_pydatetime()
     file_ws = {}
-    for folder_raw, filename_raw, type_step in zip(folder_list, filename_list, type_data):
-        file_list = []
-        for time_id, time_step in enumerate(time_range):
 
-            datetime_step = time_step.to_pydatetime()
-            tags_values_step = {"domain": domain,
-                                "source_sub_path_time_gauge_now": datetime_run,
-                                "source_datetime_gauge_now": datetime_step,
-                                "source_sub_path_time_rnc": datetime_run,
-                                "source_datetime_rnc": datetime_step,
-                                "run_datetime": datetime_run,
-                                "run_lon_right": str(lon_right),
-                                "run_lon_left": str(lon_left),
-                                "run_lat_bottom": str(lat_bottom),
-                                "run_lat_top": str(lat_top)}
+    folder_raw = folder_list[type_data[1]]
+    filename_raw = filename_list[type_data[1]]
 
-            folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
-            filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
+    file_list = []
+    for time_id, time_step in enumerate(time_range):
+        datetime_step = time_step.to_pydatetime()
+        tags_values_step = {"domain": domain,
+                            "source_sub_path_time_gauge": datetime_step,
+                            "source_datetime_gauge": datetime_step,
+                            "run_datetime": datetime_run,
+                            "run_lon_right": str(lon_right),
+                            "run_lon_left": str(lon_left),
+                            "run_lat_bottom": str(lat_bottom),
+                            "run_lat_top": str(lat_top)}
 
-            path_step = join(folder_step, filename_step)
+        folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
+        filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
 
-            file_list.append(path_step)
+        path_step = join(folder_step, filename_step)
 
-        file_ws[type_step] = file_list
+        file_list.append(path_step)
 
-    return file_ws
+    return file_list
+
 
 # -------------------------------------------------------------------------------------
 
@@ -845,8 +892,7 @@ def set_data_source(time_run, time_range, data_def, geo_def, ancillary_def, tags
 # -------------------------------------------------------------------------------------
 # Method to create data ftp list
 def set_data_ftp(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
-                    type_data=None):
-
+                 type_data=None):
     if type_data is None:
         type_data = ["surface"]
 
@@ -862,55 +908,47 @@ def set_data_ftp(time_run, time_range, data_def, geo_def, ancillary_def, tags_te
     domain = ancillary_def['domain']
 
     datetime_run = time_run.to_pydatetime()
-    ftp_list_ws = {}
-    ftp_root_ws = {}
-    ftp_folder_ws = {}
-    ftp_file_ws = {}
-    for ftp_root_raw, ftp_folder_raw, ftp_file_raw, type_step in zip(
-            ftp_root_list, ftp_folder_list, ftp_file_list, type_data):
 
-        ftp_list_type = []
-        ftp_root_type = []
-        ftp_folder_type = []
-        ftp_file_type = []
-        for time_id, time_step in enumerate(time_range):
+    ftp_root_raw = ftp_root_list[type_data[1]]
+    ftp_folder_raw = ftp_folder_list[type_data[1]]
+    ftp_file_raw = ftp_file_list[type_data[1]]
 
-            datetime_step = time_step.to_pydatetime()
-            tags_values_step = {"domain": domain,
-                                "ftp_sub_path_time_gauge_now": datetime_run,
-                                "ftp_datetime_gauge_now": datetime_step,
-                                "ftp_sub_path_time_rnc": datetime_run,
-                                "ftp_datetime_rnc": datetime_step,
-                                "run_datetime": datetime_run,
-                                "run_lon_right": str(lon_right),
-                                "run_lon_left": str(lon_left),
-                                "run_lat_bottom": str(lat_bottom),
-                                "run_lat_top": str(lat_top)}
+    ftp_list_type = []
+    ftp_root_type = []
+    ftp_folder_type = []
+    ftp_file_type = []
 
-            ftp_root_step = fill_tags2string(ftp_root_raw, tags_template, tags_values_step)
-            ftp_folder_step = fill_tags2string(ftp_folder_raw, tags_template, tags_values_step)
-            ftp_file_step = fill_tags2string(ftp_file_raw, tags_template, tags_values_step)
+    for time_id, time_step in enumerate(time_range):
+        datetime_step = time_step.to_pydatetime()
+        tags_values_step = {"domain": domain,
+                            "ftp_sub_path_time_gauge": datetime_step,
+                            "ftp_datetime_gauge": datetime_step,
+                            "run_datetime": datetime_run,
+                            "run_lon_right": str(lon_right),
+                            "run_lon_left": str(lon_left),
+                            "run_lat_bottom": str(lat_bottom),
+                            "run_lat_top": str(lat_top)}
 
-            ftp_step = ftp_root_step + ftp_folder_step + ftp_file_step
+        ftp_root_step = fill_tags2string(ftp_root_raw, tags_template, tags_values_step)
+        ftp_folder_step = fill_tags2string(ftp_folder_raw, tags_template, tags_values_step)
+        ftp_file_step = fill_tags2string(ftp_file_raw, tags_template, tags_values_step)
 
-            ftp_list_type.append(ftp_step)
-            ftp_root_type.append(ftp_root_step)
-            ftp_folder_type.append(ftp_folder_step)
-            ftp_file_type.append(ftp_file_step)
+        ftp_step = ftp_root_step + ftp_folder_step + ftp_file_step
 
-        ftp_list_ws[type_step] = ftp_list_type
-        ftp_root_ws[type_step] = ftp_root_type
-        ftp_folder_ws[type_step] = ftp_folder_type
-        ftp_file_ws[type_step] = ftp_file_type
+        ftp_list_type.append(ftp_step)
+        ftp_root_type.append(ftp_root_step)
+        ftp_folder_type.append(ftp_folder_step)
+        ftp_file_type.append(ftp_file_step)
 
-    return ftp_list_ws, ftp_root_ws, ftp_folder_ws, ftp_file_ws
+    return ftp_list_type, ftp_root_type, ftp_folder_type, ftp_file_type
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to add time in a unfilled string (path or filename)
 def fill_tags2string(string_raw, tags_format=None, tags_filling=None):
-
     apply_tags = False
     if string_raw is not None:
         for tag in list(tags_format.keys()):
@@ -948,33 +986,29 @@ def fill_tags2string(string_raw, tags_format=None, tags_filling=None):
         return string_filled
     else:
         return string_raw
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to define data time range
 def set_data_time(time_step, time_settings):
-
     time_period_obs = time_settings['time_observed_period']
-    time_period_for = time_settings['time_forecast_period']
     time_freq_obs = time_settings['time_observed_frequency']
-    time_freq_for = time_settings['time_forecast_frequency']
 
     time_step_obs = time_step
-    time_range_obs = pd.date_range(end=time_step_obs, periods=time_period_obs, freq=time_freq_obs)
-
-    time_step_for = pd.date_range([time_step][0], periods=2, freq=time_freq_for)[-1]
-    time_range_for = pd.date_range(start=time_step_for, periods=time_period_for, freq=time_freq_for)
-
-    time_range_data = time_range_obs.union(time_range_for)
+    time_range_data = pd.date_range(end=time_step_obs, periods=time_period_obs, freq=time_freq_obs)
 
     return time_range_data
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to check time validity
-def check_time_limit(time_alg, time_name='time_step', time_limit_period='2D'):
+def check_time_limit(time_alg, time_name='time_step', time_limit_period='10000D'):
     time_day = pd.Timestamp.today()
     time_limit_upper = time_day.floor('H')
     time_limit_lower = pd.date_range(end=time_limit_upper, periods=2, freq=time_limit_period)[0]
@@ -987,13 +1021,14 @@ def check_time_limit(time_alg, time_name='time_step', time_limit_period='2D'):
         raise IOError(time_name + ' is not correctly defined! Check your settings or algorithm args!')
     else:
         pass
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to define run time range
 def set_run_time(time_alg, time_settings):
-
     time_set = time_settings['time_now']
     time_freq = time_settings['time_frequency']
     time_round = time_settings['time_rounding']
@@ -1026,6 +1061,7 @@ def set_run_time(time_alg, time_settings):
         check_time_limit(time_range[1], time_name='time_run_to')
     return time_now_round, time_range
 
+
 # -------------------------------------------------------------------------------------
 
 
@@ -1034,13 +1070,14 @@ def set_run_time(time_alg, time_settings):
 def make_folder(path_folder):
     if not exists(path_folder):
         makedirs(path_folder)
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to read file json
 def read_file_json(file_name):
-
     env_ws = {}
     for env_item, env_value in os.environ.items():
         env_ws[env_item] = env_value
@@ -1067,6 +1104,8 @@ def read_file_json(file_name):
                 json_block = []
 
     return json_dict
+
+
 # -------------------------------------------------------------------------------------
 
 
@@ -1089,13 +1128,14 @@ def get_args():
         alg_time = None
 
     return alg_settings, alg_time
+
+
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to set logging information
 def set_logging(logger_file='log.txt', logger_format=None):
-
     if logger_format is None:
         logger_format = '%(asctime)s %(name)-12s %(levelname)-8s ' \
                         '%(filename)s:[%(lineno)-6s - %(funcName)20s()] %(message)s'
@@ -1124,6 +1164,7 @@ def set_logging(logger_file='log.txt', logger_format=None):
     # Add handle to logging
     logging.getLogger('').addHandler(logger_handle_1)
     logging.getLogger('').addHandler(logger_handle_2)
+
 
 # -------------------------------------------------------------------------------------
 

@@ -12,7 +12,7 @@ __author__ =
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_nwp_gfs.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
+python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
 20200429 (1.6.0) --> Add checking url request(s)
