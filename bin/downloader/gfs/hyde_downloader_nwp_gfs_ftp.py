@@ -144,7 +144,7 @@ def main():
                 temp = deepcopy(varFilled)*3600
                 varFilled = temp.cumsum(dim=temp.dims[0], keep_attrs=True)
 
-            outName = data_settings["algorithm"]["ancillary"]["domain"] + "gfs.t" + timeRun.strftime('%H') + "z.0p25." + timeRun.strftime('%Y%m%d') + "_" + codHeight + "_" + varHMC + ".nc"
+            outName = data_settings["algorithm"]["ancillary"]["domain"] + "_gfs.t" + timeRun.strftime('%H') + "z.0p25." + timeRun.strftime('%Y%m%d') + "_" + codHeight + "_" + varHMC + ".nc"
 
             try:
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='a')
