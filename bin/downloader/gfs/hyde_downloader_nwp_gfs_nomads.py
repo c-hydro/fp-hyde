@@ -276,7 +276,7 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
         bbox_lat_top = str(data_bbox['lat_top'])
         bbox_lat_bottom = str(data_bbox['lat_bottom'])
 
-        bbox_points = [bbox_lon_right, bbox_lon_left, bbox_lat_bottom, bbox_lat_top]
+        bbox_points = [bbox_lon_left, bbox_lon_right, bbox_lat_bottom, bbox_lat_top]
         bbox_cdo = ','.join(bbox_points)
     else:
         bbox_cdo = None
