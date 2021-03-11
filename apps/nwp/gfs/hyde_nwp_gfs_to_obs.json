@@ -1,18 +1,18 @@
 {
   "algorithm": {
     "general": {
-      "title": "GroundNetwork - Weather stations product",
+      "title": "HyDE Processing Tool - NWP GFS to OBS",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "3.0.0 [20201102]",
+      "history": "1.1.0 [20210311]",
       "project-info": "HyDE - Hydrological Data Engines",
       "algorithm": "Weather stations preprocessing tools"
     },
     "info": {
-      "domain": "igad"
+      "domain": "guyana"
     },
     "template": {
-      "domain_name": "igad",
+      "domain_name": "guyana",
       "source_run_date": "%Y%m%d",
       "source_sub_path_time": "%Y/%m/%d/",
       "destination_datetime": "%Y%m%d%H%M",
@@ -29,38 +29,37 @@
       "source": {
         "rain_data": {
           "compute": false,
-          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/weather_stations/{source_sub_path_time}",
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
           "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_srf_rain.nc",
           "var_name": "tp"
         },
         "air_temperature_data": {
           "compute": true,
-          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs/outcomes/{source_sub_path_time}",
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
           "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_2m_temperature.nc",
-          "var_name": "2t"
+          "var_name": "2t_C"
         },
         "incoming_radiation_data": {
           "compute": true,
-          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs/outcomes/{source_sub_path_time}",
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
           "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_srf_radiation.nc",
           "var_name": "dswrf"
         },
         "wind_data": {
           "compute": true,
-          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs/outcomes/{source_sub_path_time}",
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
           "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_10m_wind.nc",
-          "var_name_u": "10u",
-          "var_name_v": "10v"
+          "var_name": "10wind"
         },
         "relative_humidity_data": {
           "compute": true,
-          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs/outcomes/{source_sub_path_time}",
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
           "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_2m_relative_humidity.nc",
           "var_name": "2r"
         }
       },
       "destination": {
-        "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs/outcomes/{destination_sub_path_time}",
+        "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/obs_gfs_025/{destination_sub_path_time}",
         "file_name": "hmc.forcing-grid.{destination_datetime}.nc",
         "file_compression": false
       }

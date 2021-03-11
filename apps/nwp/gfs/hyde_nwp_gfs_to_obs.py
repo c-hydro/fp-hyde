@@ -1,8 +1,8 @@
 """
 HyDE Processing Tool - NWP GFS to OBS
 
-__date__ = '20210302'
-__version__ = '1.0.0'
+__date__ = '20210311'
+__version__ = '1.1.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org'
@@ -12,6 +12,7 @@ General command line:
 python hyde_nwp_gfs_to_obs.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20210311 (1.1.0) --> Updated input gfs format to be Continuum-compliant
 20210302 (1.0.0) --> Beta release for hyde package
 """
 # -------------------------------------------------------------------------------------
@@ -30,8 +31,8 @@ import datetime
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HyDE Processing Tool - nwp gfs to obs'
-alg_version = '1.0.0'
-alg_release = '2021-03-02'
+alg_version = '1.1.0'
+alg_release = '2021-03-11'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -97,21 +98,24 @@ def main():
                                               data_settings['data']['dynamic']['source'][var]['file_name']).format(
                 **template_time_step)
 
-            file_open = xr.open_dataset(file_time_step).sel(time=timeNow, method='backfill')
+            if os.path.isfile(file_time_step) == False:
+                # If the forecast related to the timeNow time step does not exist I search for timeNow in the precedent time step
+                template_time_step = fill_template_time_step(data_settings['algorithm']['template'], timeNow - pd.Timedelta('1D'))
+                file_time_step = os.path.join(data_settings['data']['dynamic']['source'][var]['folder_name'],
+                                             data_settings['data']['dynamic']['source'][var]['file_name']).format(**template_time_step)
+                # And then re-generate the timeNow templates for the output templates
+                template_time_step = fill_template_time_step(data_settings['algorithm']['template'], timeNow)
 
-            if not var=='wind_data':
-                inMaps[var] = np.squeeze(file_open[data_settings['data']['dynamic']['source'][var]['var_name']])
-            else:
-                inMaps[var] = np.squeeze(np.sqrt(file_open[data_settings['data']['dynamic']['source'][var]['var_name_u']]**2 + file_open[data_settings['data']['dynamic']['source'][var]['var_name_v']]**2 ))
+            file_open = xr.open_dataset(file_time_step).sel(time=timeNow, method='backfill')
+            inMaps[var] = np.squeeze(file_open[data_settings['data']['dynamic']['source'][var]['var_name']])
 
             if timeNow == timeRange[0] and var ==varIn[0]:
                 logging.info(" ---> Read geographic references")
-                grid_model = xr.open_rasterio(file_time_step)
-                nrows = len(grid_model.y)
-                ncols = len(grid_model.x)
-                xll = grid_model.transform[2]
-                yll = grid_model.transform[5]
-                res = abs(grid_model.transform[0])
+                nrows = len(file_open.lat)
+                ncols = len(file_open.lon)
+                res = float(abs(file_open.lat[1]-file_open.lat[0]))
+                xll = float(min(file_open.lon)) - res/2
+                yll = float(min(file_open.lat)) - res/2
 
                 attributes_dict = {'ncols': ncols,
                                    'nrows': nrows,
@@ -120,8 +124,8 @@ def main():
                                    'yllcorner': yll,
                                    'cellsize': res}
 
-                geo_x_values = np.sort(grid_model.x.values)
-                geo_y_values = np.sort(grid_model.y.values)
+                geo_x_values = np.sort(file_open.lon)
+                geo_y_values = np.sort(file_open.lat)
                 geo_data_values = -9999
 
 

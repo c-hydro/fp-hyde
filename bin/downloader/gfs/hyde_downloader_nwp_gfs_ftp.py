@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25 backup procedure UCAR server
 
-__date__ = '20210212'
-__version__ = '1.0.0'
+__date__ = '20210311'
+__version__ = '1.1.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -15,6 +15,7 @@ General command line:
 python3 hyde_downloader_nwp_gfs_ftp.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20210311 (1.1.0) --> Add conversion to wind and temperature Continuum complient
 20210212 (1.0.0) --> Beta release
 """
 # -------------------------------------------------------------------------------------
@@ -33,14 +34,15 @@ from copy import deepcopy
 import os
 import time
 import json
+import numpy as np
 
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS BACKUP PROCEDURE'
-alg_version = '1.0.0'
-alg_release = '2021-02-12'
+alg_version = '1.1.0'
+alg_release = '2021-03-11'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -150,7 +152,37 @@ def main():
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='a')
             except:
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='w')
-            logging.info(' ----> Compute ' + varGFS + ' variable...OK')
+
+        if data_settings['data']['dynamic']['vars_standards']['convert2standard_continuum_format'] is True:
+            if varHMC == 'temperature':
+                if data_settings['data']['dynamic']['vars_standards']['source_temperature_mesurement_unit'] == 'C':
+                    pass
+                elif data_settings['data']['dynamic']['vars_standards']['source_temperature_mesurement_unit'] == 'K':
+                    logging.info(' ------> Convert temperature to C ... ')
+                    out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, outName)))
+                    os.remove(os.path.join(outFolder, outName))
+                    out_file['2t_C'] = out_file['2t'] - 273.15
+                    out_file['2t_C'].attrs['long_name'] = '2 metre temperature'
+                    out_file['2t_C'].attrs['units'] = 'C'
+                    out_file['2t_C'].attrs['standard_name'] = "air_temperature"
+                    out_file = out_file.rename({'2t': '2t_K'})
+                    out_file.to_netcdf(os.path.join(outFolder, outName))
+                    logging.info(' ------> Convert temperature to C ... DONE')
+                else:
+                    raise NotImplementedError
+
+            if varHMC == 'wind' and data_settings['data']['dynamic']['vars_standards']['source_wind_separate_components'] is True:
+                logging.info(' ------> Combine wind component ... ')
+                out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, outName)))
+                os.remove(os.path.join(outFolder, outName))
+                out_file['10wind'] = np.sqrt(out_file['10u'] ** 2 + out_file['10v'] ** 2)
+                out_file['10wind'].attrs['long_name'] = '10 m wind'
+                out_file['10wind'].attrs['units'] = 'm s**-1'
+                out_file['10wind'].attrs['standard_name'] = "wind"
+                out_file.to_netcdf(os.path.join(outFolder, outName))
+                logging.info(' ------> Combine wind component ... DONE')
+
+        logging.info(' ----> Compute ' + varGFS + ' variable...OK')
         logging.info(' ---> Elaborate ' + varHMC + ' file...OK')
 
     # -------------------------------------------------------------------------------------

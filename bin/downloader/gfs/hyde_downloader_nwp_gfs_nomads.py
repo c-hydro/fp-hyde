@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25
 
-__date__ = '20200429'
-__version__ = '1.6.0'
+__date__ = '20210311'
+__version__ = '1.7.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -15,6 +15,7 @@ General command line:
 python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20210311 (1.7.0) --> Add conversion to wind and temperature Continuum complient
 20200429 (1.6.0) --> Add checking url request(s)
 20200313 (1.5.0) --> Add filtering of time-steps for accumulated variables (tp)
 20200312 (1.4.0) --> Add shifting of longitudes from [0,360] to [-180,180];
@@ -34,6 +35,7 @@ import time
 import json
 import urllib.request
 import tempfile
+import xarray as xr
 
 import numpy as np
 import pandas as pd
@@ -53,8 +55,8 @@ from argparse import ArgumentParser
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS'
-alg_version = '1.6.0'
-alg_release = '2020-04-29'
+alg_version = '1.7.0'
+alg_release = '2021-03-11'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -157,7 +159,8 @@ def main():
             arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
                                  data_bbox=data_settings['data']['static']['bounding_box'],
                                  cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
-                                 cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'])
+                                 cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'],
+                                 source_standards=data_settings['data']['dynamic']['source']['vars_standards'])
 
             # Clean data tmp (such as ancillary and outcome global)
             clean_data_tmp(
@@ -266,7 +269,7 @@ def clean_data_tmp(data_ancillary, data_outcome_global,
 # -------------------------------------------------------------------------------------
 # Method to merge and mask outcome dataset(s)
 def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
-                         data_bbox=None, cdo_exec=None, cdo_deps=None):
+                         data_bbox=None, cdo_exec=None, cdo_deps=None, source_standards=None):
 
     logging.info(' ----> Dumping data ... ')
 
@@ -287,6 +290,9 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
 
     for cdo_dep in cdo_deps:
         os.environ['LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH:' + cdo_dep
+    #temp for local debug
+    os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
+
     cdo = Cdo()
     cdo.setCdo(cdo_exec)
 
@@ -335,6 +341,37 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
 
             cdo.copy(input=tmp_data_global_step_seltimestep, output=tmp_data_global_step_convert, options="-f nc4")
             cdo.sellonlatbox('-180,180,-90,90', input=tmp_data_global_step_convert, output=dst_data_global_step)
+
+            if not source_standards == None:
+
+                if source_standards['convert2standard_continuum_format'] == True:
+                    if src_key_step == 'heightAboveGround_2m_temperature':
+                        if source_standards['source_temperature_mesurement_unit'] == 'C':
+                            pass
+                        elif source_standards['source_temperature_mesurement_unit'] == 'K':
+                            logging.info(' ------> Convert temperature to C ... ')
+                            out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                            os.remove(dst_data_global_step)
+                            out_file['2t_C'] = out_file['2t'] - 273.15
+                            out_file['2t_C'].attrs['long_name'] = '2 metre temperature'
+                            out_file['2t_C'].attrs['units'] = 'C'
+                            out_file['2t_C'].attrs['standard_name'] = "air_temperature"
+                            out_file = out_file.rename({'2t': '2t_K'})
+                            out_file.to_netcdf(dst_data_global_step)
+                            logging.info(' ------> Convert temperature to C ... DONE')
+                        else:
+                            raise NotImplementedError
+
+                    if src_key_step == 'heightAboveGround_10m_wind' and source_standards['source_wind_separate_components'] is True:
+                            logging.info(' ------> Combine wind component ... ')
+                            out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                            os.remove(dst_data_global_step)
+                            out_file['10wind'] = np.sqrt(out_file['10u']**2 + out_file['10v']**2)
+                            out_file['10wind'].attrs['long_name'] = '10 m wind'
+                            out_file['10wind'].attrs['units'] = 'm s**-1'
+                            out_file['10wind'].attrs['standard_name'] = "wind"
+                            out_file.to_netcdf(dst_data_global_step)
+                            logging.info(' ------> Combine wind component ... DONE')
 
             if os.path.exists(tmp_data_global_step_cat):
                 os.remove(tmp_data_global_step_cat)
