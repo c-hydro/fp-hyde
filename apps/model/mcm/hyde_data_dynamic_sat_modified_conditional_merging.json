@@ -1,0 +1,103 @@
+{
+  "algorithm": {
+    "flags": {
+      "sources": {
+        "use_drops2": false,
+        "use_timeseries": false,
+        "use_point_data": true
+      },
+      "mcm": {
+        "fixed_correlation": true,
+        "dynamic_correlation": false
+      },
+      "save_griso_ancillary_maps": true,
+      "compressed_gridded_input": false,
+      "compress_output": false,
+      "overwrite_existing": true
+    },
+    "general": {
+      "title": "Modified Coonditional Merging",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.2.0 [20201209]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Data dynamic tool developed by CIMA Research Foundation"
+    },
+    "template": {
+      "source_gridded_sub_path_time": "%Y/%m/%d/",
+      "source_gridded_datetime": "%Y%m%d%H%M",
+      "source_point_sub_path_time": "%Y/%m/%d/",
+      "source_point_datetime": "%Y%m%d%H%M",
+      "outcome_sub_path_time": "%Y/%m/%d/",
+      "outcome_datetime": "%Y%m%d%H%M"
+    },
+    "settings": {
+      "radius_GRISO_km": 50
+    }
+  },
+  "data": {
+    "dynamic": {
+      "time": {
+        "time_observed_period": 3,
+        "time_forecast_period": 0,
+        "time_frequency": "H"
+      },
+      "source_gridded": {
+        "filename": "marche_gsmap_gauge_{source_gridded_datetime}.nc",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/outcome/obs/satellite/gsmap_gauge_rt/domain/{source_gridded_sub_path_time}",
+        "var_name": "precip",
+        "lat_name": "lat",
+        "lon_name": "lon"
+      },
+      "source_stations": {
+        "drops2": {
+          "DropsAddress": "",
+          "DropsUser": "",
+          "DropsPwd": "",
+          "DropsSensor": "PLUVIOMETRO",
+          "DropsGroup": "",
+          "lon_left": 12.0,
+          "lon_right": 14.0,
+          "lat_top": 44.0,
+          "lat_bottom": 42.5,
+          "codes_not_valid": []
+        },
+        "time_series": {
+          "coordinates_file": {
+            "filename" : "coordinates.txt",
+            "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/outcome/obs/time_series/",
+            "delimiter": ",",
+            "station_name_col": 0,
+            "lat_col": 1,
+            "lon_col": 2
+          },
+          "data_files": {
+            "filename" : "{station_name}.txt",
+            "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/outcome/obs/time_series/data/",
+            "delimiter": ",",
+            "datetime_col": 0,
+            "data_col": 1
+          }
+        },
+        "point_files":{
+          "filename" : "rain_marche_{source_point_datetime}.csv",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/weather_stations/{source_point_sub_path_time}"
+        }
+      }
+    },
+    "ancillary": {
+      "filename": "marche_griso_stations_ts_{outcome_datetime}.nc",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
+    },
+    "outcome": {
+      "format": "tif",
+      "filename": "marche_gsmap_cm_ts_{outcome_datetime}.tif",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/results/{outcome_sub_path_time}"
+    },
+    "log": {
+      "filename": "hyde_conditional_merging.txt",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT_Various/CM/"
+    }
+  }
+}
+
