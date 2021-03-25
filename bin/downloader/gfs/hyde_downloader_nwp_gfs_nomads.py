@@ -16,6 +16,7 @@ python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -tim
 
 Version(s):
 20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant files
+                     Set reindex with "nearest" approach for filling the time range at the correct frequency.
                      Setting file template modified for supporting GFS v16
 20210311 (1.7.0) --> Add conversion to wind and temperature Continuum complient
 20200429 (1.6.0) --> Add checking url request(s)
@@ -389,7 +390,7 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
 
                     # Reindex time axis by padding last available map over the time range (not for surface rain cause it is not an instantaneous value)
                     if not src_key_step == "surface_rain":
-                        out_file=out_file.reindex(time=data_range, method='pad')
+                        out_file=out_file.reindex(time=data_range, method='nearest')
                     out_file.to_netcdf(dst_data_global_step)
 
             if os.path.exists(tmp_data_global_step_cat):

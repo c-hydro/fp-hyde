@@ -15,7 +15,8 @@ General command line:
 python3 hyde_downloader_nwp_gfs_ftp.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
-20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant - Version number alligned to nomads function
+20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant
+                     Set reindex with "nearest" approach for filling the time range. Version number alligned to nomads function.
 20210311 (1.1.0) --> Add conversion to wind and temperature Continuum compliant
 20210212 (1.0.0) --> Beta release
 """
@@ -141,7 +142,7 @@ def main():
                 print('Problem in data shape for variable ' + varGFS)
 
             timeRange = pd.date_range(timeRun + pd.Timedelta(variables[varHMC][varGFS]["freq"]), timeEnd + pd.Timedelta(variables[varHMC][varGFS]["freq"]), freq=variables[varHMC][varGFS]["freq"])
-            varFilled = varIn.reindex({'time': timeRange}, method='bfill')
+            varFilled = varIn.reindex({'time': timeRange}, method='nearest')
 
             if varGFS=="Precipitation_rate_surface_Mixed_intervals_Average":
                 temp = deepcopy(varFilled)*3600
