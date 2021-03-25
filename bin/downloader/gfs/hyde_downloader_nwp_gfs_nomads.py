@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25
 
-__date__ = '20210311'
-__version__ = '1.7.0'
+__date__ = '20200325'
+__version__ = '1.8.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -15,6 +15,8 @@ General command line:
 python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant files
+                     Setting file template modified for supporting GFS v16
 20210311 (1.7.0) --> Add conversion to wind and temperature Continuum complient
 20200429 (1.6.0) --> Add checking url request(s)
 20200313 (1.5.0) --> Add filtering of time-steps for accumulated variables (tp)
@@ -55,8 +57,8 @@ from argparse import ArgumentParser
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS'
-alg_version = '1.7.0'
-alg_release = '2021-03-11'
+alg_version = '1.8.0'
+alg_release = '2021-03-25'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -372,6 +374,15 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
                             out_file['10wind'].attrs['standard_name'] = "wind"
                             out_file.to_netcdf(dst_data_global_step)
                             logging.info(' ------> Combine wind component ... DONE')
+
+                    out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                    os.remove(dst_data_global_step)
+                    try:
+                        out_file = out_file.squeeze(dim="height", drop=True)
+                        logging.info(' ------> Remove height dimensions ... ')
+                    except:
+                        pass
+                    out_file.to_netcdf(dst_data_global_step)
 
             if os.path.exists(tmp_data_global_step_cat):
                 os.remove(tmp_data_global_step_cat)

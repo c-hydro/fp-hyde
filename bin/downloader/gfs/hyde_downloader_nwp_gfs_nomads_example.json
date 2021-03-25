@@ -53,7 +53,7 @@
     },
     "dynamic": {
       "time": {
-        "time_forecast_period": 24,
+        "time_forecast_period": 3,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
@@ -102,11 +102,11 @@
         ],
         "url_loc" :
         [
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}"
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos"
         ],
         "vars_standards":{
           "source_temperature_mesurement_unit": "K",

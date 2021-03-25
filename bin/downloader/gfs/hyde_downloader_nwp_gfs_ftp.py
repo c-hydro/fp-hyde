@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25 backup procedure UCAR server
 
-__date__ = '20210311'
-__version__ = '1.1.0'
+__date__ = '20200325'
+__version__ = '1.8.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -15,7 +15,8 @@ General command line:
 python3 hyde_downloader_nwp_gfs_ftp.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
-20210311 (1.1.0) --> Add conversion to wind and temperature Continuum complient
+20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant - Version number alligned to nomads function
+20210311 (1.1.0) --> Add conversion to wind and temperature Continuum compliant
 20210212 (1.0.0) --> Beta release
 """
 # -------------------------------------------------------------------------------------
@@ -41,8 +42,8 @@ import numpy as np
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS BACKUP PROCEDURE'
-alg_version = '1.1.0'
-alg_release = '2021-03-11'
+alg_version = '1.8.0'
+alg_release = '2021-03-25'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -181,6 +182,15 @@ def main():
                 out_file['10wind'].attrs['standard_name'] = "wind"
                 out_file.to_netcdf(os.path.join(outFolder, outName))
                 logging.info(' ------> Combine wind component ... DONE')
+
+            out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, outName)))
+            os.remove(os.path.join(outFolder, outName))
+            try:
+                out_file = out_file.squeeze(dim="height", drop=True)
+                logging.info(' ------> Remove height dimensions ... ')
+            except:
+                pass
+            out_file.to_netcdf(os.path.join(outFolder, outName))
 
         logging.info(' ----> Compute ' + varGFS + ' variable...OK')
         logging.info(' ---> Elaborate ' + varHMC + ' file...OK')
