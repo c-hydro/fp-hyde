@@ -131,6 +131,7 @@ def main():
             data_settings['algorithm']['template'],
             type_data=data_settings['algorithm']['ancillary']['type'],
             flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_global'])
+
         # Set data outcome domain
         data_outcome_domain = set_data_outcome(
             time_run_step,
@@ -162,7 +163,8 @@ def main():
                                  data_bbox=data_settings['data']['static']['bounding_box'],
                                  cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
                                  cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'],
-                                 source_standards=data_settings['data']['dynamic']['source']['vars_standards'])
+                                 source_standards=data_settings['data']['dynamic']['source']['vars_standards'],
+                                 data_range=time_data_range)
 
             # Clean data tmp (such as ancillary and outcome global)
             clean_data_tmp(
@@ -271,7 +273,7 @@ def clean_data_tmp(data_ancillary, data_outcome_global,
 # -------------------------------------------------------------------------------------
 # Method to merge and mask outcome dataset(s)
 def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
-                         data_bbox=None, cdo_exec=None, cdo_deps=None, source_standards=None):
+                         data_bbox=None, cdo_exec=None, cdo_deps=None, source_standards=None, data_range=None):
 
     logging.info(' ----> Dumping data ... ')
 
@@ -293,7 +295,7 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
     for cdo_dep in cdo_deps:
         os.environ['LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH:' + cdo_dep
     #temp for local debug
-    #os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
+    os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
 
     cdo = Cdo()
     cdo.setCdo(cdo_exec)
@@ -377,11 +379,17 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
 
                     out_file = deepcopy(xr.open_dataset(dst_data_global_step))
                     os.remove(dst_data_global_step)
+
+                    # Check if file has "heigth" dimension and remove it
                     try:
                         out_file = out_file.squeeze(dim="height", drop=True)
                         logging.info(' ------> Remove height dimensions ... ')
                     except:
                         pass
+
+                    # Reindex time axis by padding last available map over the time range (not for surface rain cause it is not an instantaneous value)
+                    if not src_key_step == "surface_rain":
+                        out_file=out_file.reindex(time=data_range, method='pad')
                     out_file.to_netcdf(dst_data_global_step)
 
             if os.path.exists(tmp_data_global_step_cat):

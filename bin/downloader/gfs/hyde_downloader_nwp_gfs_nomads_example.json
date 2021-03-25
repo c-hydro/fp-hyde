@@ -53,7 +53,7 @@
     },
     "dynamic": {
       "time": {
-        "time_forecast_period": 3,
+        "time_forecast_period": 48,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
