@@ -367,16 +367,27 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
                         else:
                             raise NotImplementedError
 
+                    if src_key_step == 'surface_rain' and source_standards['source_precipitation_is_cumulated'] is True:
+                        logging.info(' ------> Decumulate precipitation ... ')
+                        out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                        os.remove(dst_data_global_step)
+                        out_file['tp'].values = np.diff(out_file['tp'].values, n=1, axis=0, prepend=0)
+                        out_file['tp'].attrs['long_name'] = 'hourly precipitation depth'
+                        out_file['tp'].attrs['units'] = 'mm'
+                        out_file['tp'].attrs['standard_name'] = "precipitation"
+                        out_file.to_netcdf(dst_data_global_step)
+                        logging.info(' ------> Decumulate precipitation ... DONE')
+
                     if src_key_step == 'heightAboveGround_10m_wind' and source_standards['source_wind_separate_components'] is True:
-                            logging.info(' ------> Combine wind component ... ')
-                            out_file = deepcopy(xr.open_dataset(dst_data_global_step))
-                            os.remove(dst_data_global_step)
-                            out_file['10wind'] = np.sqrt(out_file['10u']**2 + out_file['10v']**2)
-                            out_file['10wind'].attrs['long_name'] = '10 m wind'
-                            out_file['10wind'].attrs['units'] = 'm s**-1'
-                            out_file['10wind'].attrs['standard_name'] = "wind"
-                            out_file.to_netcdf(dst_data_global_step)
-                            logging.info(' ------> Combine wind component ... DONE')
+                        logging.info(' ------> Combine wind component ... ')
+                        out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                        os.remove(dst_data_global_step)
+                        out_file['10wind'] = np.sqrt(out_file['10u']**2 + out_file['10v']**2)
+                        out_file['10wind'].attrs['long_name'] = '10 m wind'
+                        out_file['10wind'].attrs['units'] = 'm s**-1'
+                        out_file['10wind'].attrs['standard_name'] = "wind"
+                        out_file.to_netcdf(dst_data_global_step)
+                        logging.info(' ------> Combine wind component ... DONE')
 
                     out_file = deepcopy(xr.open_dataset(dst_data_global_step))
                     os.remove(dst_data_global_step)

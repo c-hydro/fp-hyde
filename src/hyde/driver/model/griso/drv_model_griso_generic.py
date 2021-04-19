@@ -55,3 +55,13 @@ def averageCells(rPluvio,cPluvio,values):
     cPluvio=unq_coo[:,1]
 
     return rPluvio,cPluvio,average_values
+
+# ---------------------------------------------------
+# Linear to polar coordinates
+def cart2pol(x, y):
+    import math
+
+    r = (x ** 2 + y ** 2) ** .5
+    theta = np.degrees(np.arctan2(y,x))
+    return r, theta
+

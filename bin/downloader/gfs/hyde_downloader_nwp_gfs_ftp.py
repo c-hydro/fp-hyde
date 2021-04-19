@@ -145,14 +145,17 @@ def main():
             varFilled = varIn.reindex({'time': timeRange}, method='nearest')
 
             if varGFS=="Precipitation_rate_surface_Mixed_intervals_Average":
-                temp = deepcopy(varFilled)*3600
-                varFilled = temp.cumsum(dim=temp.dims[0], keep_attrs=True)
+                if not data_settings['data']['dynamic']['vars_standards']['convert2standard_continuum_format']:
+                    temp = deepcopy(varFilled)*3600
+                    varFilled = temp.cumsum(dim=temp.dims[0], keep_attrs=True)
+                else:
+                    varFilled = deepcopy(varFilled)*3600
 
             outName = data_settings["algorithm"]["ancillary"]["domain"] + "_gfs.t" + timeRun.strftime('%H') + "z.0p25." + timeRun.strftime('%Y%m%d') + "_" + codHeight + "_" + varHMC + ".nc"
 
-            try:
+            if os.path.isfile(os.path.join(outFolder, outName)):
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='a')
-            except:
+            else:
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='w')
 
         if data_settings['data']['dynamic']['vars_standards']['convert2standard_continuum_format'] is True:

@@ -38,50 +38,50 @@
           "Temperature_height_above_ground": {
             "height": 2,
             "varName": "2t",
-            "freq": "H"
+            "freq": "1H"
           }
         },
         "relative_humidity": {
           "Relative_humidity_height_above_ground": {
             "height": 2,
             "varName": "2r",
-            "freq": "H"
+            "freq": "1H"
           }
         },
         "rain": {
           "Precipitation_rate_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "tp",
-            "freq": "H"
+            "freq": "1H"
           }
         },
         "wind": {
           "u-component_of_wind_height_above_ground": {
             "height": 10,
             "varName": "10u",
-            "freq": "H"
+            "freq": "1H"
           },
           "v-component_of_wind_height_above_ground": {
             "height": 10,
             "varName": "10v",
-            "freq": "H"
+            "freq": "1H"
           }
         },
         "radiation": {
           "Downward_Short-Wave_Radiation_Flux_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "dswrf",
-            "freq": "H"
+            "freq": "1H"
           },
           "Downward_Long-Wave_Radp_Flux_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "dlwrf",
-            "freq": "H"
+            "freq": "1H"
           },
           "Albedo_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "al",
-            "freq": "H"
+            "freq": "1H"
           }
         }
       },
@@ -91,7 +91,7 @@
           "convert2standard_continuum_format": true
       },
       "outcome": {
-        "folder": "/home/andrea/Desktop/meteoData/source/gfs_0p25/{outcome_datetime}"
+        "folder": "/home/andrea/Desktop/meteoData/source/gfs_0p25_bkp/{outcome_datetime}"
       }
     },
     "log": {

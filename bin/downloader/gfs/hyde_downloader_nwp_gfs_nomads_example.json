@@ -45,15 +45,15 @@
   "data": {
     "static": {
       "bounding_box": {
-        "lon_right": -55,
-        "lon_left": -65,
-        "lat_bottom": 0,
-        "lat_top": 10
+        "lon_right": -50,
+        "lon_left": -70,
+        "lat_bottom": -5,
+        "lat_top": 15
       }
     },
     "dynamic": {
       "time": {
-        "time_forecast_period": 48,
+        "time_forecast_period": 12,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
@@ -111,6 +111,7 @@
         "vars_standards":{
           "source_temperature_mesurement_unit": "K",
           "source_wind_separate_components": true,
+          "source_precipitation_is_cumulated": true,
           "convert2standard_continuum_format": true
         }
       },
