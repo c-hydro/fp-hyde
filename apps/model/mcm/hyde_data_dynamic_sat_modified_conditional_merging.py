@@ -268,8 +268,8 @@ def main():
             axs[1, 1].set_title("MCM")
             fig.colorbar(MCM, ax=axs[1, 1])
 
-            plt.show(block=True)
             plt.suptitle(timeNow.strftime("%Y-%m-%d %H:%M"))
+            #plt.show(block=True)
 
             plt.tight_layout()
             plt.savefig(os.path.join(os.path.dirname(ancillary_out_time_step), 'figure_mcm_' + timeNow.strftime("%Y%m%d_%H%M" + '.png')))
