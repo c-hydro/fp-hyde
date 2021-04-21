@@ -1,7 +1,7 @@
 """
 HyDE Processing Tool - Modified Conditional Merging with GRISO
-__date__ = '20210312'
-__version__ = '1.2.0'
+__date__ = '20210425'
+__version__ = '2.0.0'
 __author__ =
         'Flavio Pignone (flavio.pignone@cimafoundation.org',
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -10,6 +10,9 @@ __library__ = 'hyde'
 General command line:
 ### python op_conditional_merging_GRISO.py -time "YYYY-MM-DD HH:MM"
 Version(s):
+20210425 (2.0.0) --> Dynamic radius for GRISO implemented
+                     Added support to point rain files (for FloodProofs compatibility)
+                     Script structure fully revised and bug fixes
 20210312 (1.5.0) --> Geotiff output implementation, script structure updates, various bug fixes and improvements
 20201209 (1.2.0) --> Integrated with local station data configuration. Settings file implemented.
 20200716 (1.1.0) --> Integrated with drops2 libraries. Updates and bug fixes.
@@ -31,17 +34,19 @@ import xarray as xr
 import pandas as pd
 import json
 import time
+import matplotlib.pyplot as plt
 
-from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoExec
-from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_netcdf, write_geotiff
+from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoPreproc
+from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_geotiff
 # -------------------------------------------------------------------------------------
 # Script Main
 def main():
+
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
     alg_name = 'HyDE Processing Tool - Modified Conditional Merging with GRISO '
-    alg_version = '1.5.0'
-    alg_release = '2021-03-12'
+    alg_version = '2.0.0'
+    alg_release = '2021-04-25'
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -75,28 +80,46 @@ def main():
     # Time algorithm information
     start_time = time.time()
 
-    if data_settings['algorithm']['flags']['mcm']['dynamic_correlation']:
-        logging.error(' ---> ERROR! MCM with dynamic correlation has not been implemented yet!')
-        raise NotImplementedError
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Check computation setting
+    logging.info(' --> Check computational settings')
+
+    # Griso correlation type
+    computation_settings = [data_settings['algorithm']['flags']["mcm"]['fixed_correlation'], data_settings['algorithm']['flags']["mcm"]['dynamic_correlation']]
+    if len([x for x in computation_settings if x]) > 1 or len([x for x in computation_settings if x]) == 0:
+        logging.error(' ----> ERROR! Please choose if use fixed or dynamic correlation!')
+        raise ValueError("Correlation type settings are mutually exclusive!")
+
+    if data_settings['algorithm']['flags']["mcm"]['fixed_correlation']:
+        corr_type = 'fixed'
+    else:
+        corr_type = 'dynamic'
+    logging.info(' --> Griso correlation type: ' + corr_type)
+
+    # Gauge data sources
     computation_settings = [data_settings['algorithm']['flags']["sources"]['use_timeseries'], data_settings['algorithm']['flags']["sources"]['use_drops2'], data_settings['algorithm']['flags']["sources"]['use_point_data']]
-    if len([x for x in computation_settings if x]) > 1:
+    if len([x for x in computation_settings if x]) > 1 or len([x for x in computation_settings if x]) == 0:
         logging.error(' ----> ERROR! Please choose if use local data or download stations trough drops2!')
         raise ValueError("Data sources flags are mutually exclusive!")
 
     # Import data for drops and time series setup
-    if data_settings['algorithm']['flags']["sources"]['use_drops2'] == True:
+    if data_settings['algorithm']['flags']["sources"]['use_drops2']:
+        logging.info(' --> Station data source: drops2 database')
         dfData, dfStations = importDropsData(drops_settings=data_settings['data']['dynamic']['source_stations']['drops2'], start_time=startRun, end_time=dateRun, time_frequency= data_settings['data']['dynamic']['time']['time_frequency'])
-
-    if data_settings['algorithm']['flags']["sources"]['use_timeseries'] == True:
+    elif data_settings['algorithm']['flags']["sources"]['use_timeseries']:
+        logging.info(' --> Station data source: station time series')
         dfData, dfStations = importTimeSeries(timeseries_settings=data_settings['data']['dynamic']['source_stations']['time_series'], start_time=startRun, end_time=dateRun, time_frequency= data_settings['data']['dynamic']['time']['time_frequency'])
+    else:
+        logging.info(' --> Station data source: station point files')
 
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
+    corrFin = data_settings['algorithm']['settings']['radius_GRISO_km'] * 2
+    logging.info(' --> Final correlation: ' + str(corrFin) + ' km')
+
     # Loop across time steps
     for timeNow in pd.date_range(start=startRun, end=endRun, freq=data_settings['data']['dynamic']['time']['time_frequency']):
         logging.info(' ---> Computing time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
@@ -139,7 +162,7 @@ def main():
 
         # Import point gauge data for point_data setup
         try:
-            if data_settings['algorithm']['flags']["sources"]['use_point_data'] is True:
+            if data_settings['algorithm']['flags']["sources"]['use_point_data']:
                 logging.info(' ----> Load time step point data ...')
                 dfStations = pd.read_csv(point_in_time_step, usecols=['code','name','latitude','longitude'], index_col=['code']).rename(columns={'latitude':'lat','longitude':'lon'})
                 data = pd.read_csv(point_in_time_step, usecols=['data']).squeeze()
@@ -149,58 +172,134 @@ def main():
                     raise ValueError
         except:
         # If no data available for the actual time step just copy the input
-            logging.warning(' ----> WARNING! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
-            sat_out = copy.deepcopy(sat)
-            sat_out.to_netcdf(file_out_time_step)
-            continue
+            if not data_settings['algorithm']['flags']['raise_error_if_no_station_available']:
+                logging.warning(' ----> WARNING! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
+                sat_out = copy.deepcopy(sat)
+                sat_out.to_netcdf(file_out_time_step)
+                continue
+            else:
+                logging.error(' ----> ERROR! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
+                raise FileNotFoundError
 
         # Extract gridded product values at point locations
         sat_gauge = np.array([sat['precip'].sel({'lon':Lon, 'lat':Lat}, method='nearest').values for Lon,Lat in zip(dfStations.lon.astype(np.float),dfStations.lat.astype(np.float))])
 
+        ##  Save txt with station data - FOR DEBUGGING
+        #os.makedirs(os.path.dirname(ancillary_out_time_step), exist_ok=True)
+        #temp = np.vstack((dfStations.lon.astype(np.float),dfStations.lat.astype(np.float) , data)).T
+        #np.savetxt(os.path.join(os.path.dirname(ancillary_out_time_step), 'rainfall_' + timeNow.strftime("%Y%m%d_%H%M" + '.txt')), temp)
+        #temp2 = np.vstack((dfStations.lon.astype(np.float),dfStations.lat.astype(np.float) , np.squeeze(sat_gauge))).T
+        #np.savetxt(os.path.join(os.path.dirname(ancillary_out_time_step), 'grid_value_' + timeNow.strftime("%Y%m%d_%H%M" + '.txt')), temp2)
+
+        # Data preprocessing for GRISO
+        logging.info(' ---> GRISO: Data preprocessing...')
+        point_data, a2dPosizioni, grid_rain, grid, passoKm = GrisoPreproc(corrFin,dfStations.lon.astype(np.float),dfStations.lat.values.astype(np.float), data, sat_gauge, Grid=sat)
+        logging.info(' ---> GRISO: Data preprocessing... DONE')
+
+        # Calculate GRISO correlation features
+        logging.info(' ---> GRISO: Calculate correlation...')
+        correl_features = GrisoCorrel(point_data["rPluvio"], point_data["cPluvio"], corrFin, grid_rain, passoKm, a2dPosizioni, grid.shape[0], grid.shape[1], point_data["gauge_value"], corr_type= corr_type)
+        logging.info(' ---> GRISO: Data preprocessing...DONE')
+
         # GRISO interpolator on observed data
-        logging.info(' ---> Performing GRISO on observed data')
-        griso_obs = GrisoExec(data_settings['algorithm']['settings']['radius_GRISO_km'],dfStations.lon.astype(np.float),dfStations.lat.values.astype(np.float),data,sat)
+        logging.info(' ---> GRISO: Observed data interpolation...')
+        griso_obs = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["gauge_value"], correl_features["CorrStimata"], corrFin, passoKm, correl_features["FinestraPosizioniExt"])
+
+        griso_out = copy.deepcopy(sat)
+        try:
+            griso_out.precip.values = griso_obs
+        except:
+            griso_out.precip.values[0,:,:] = griso_obs
 
         # Save ancillary griso maps
         if data_settings['algorithm']['flags']['save_griso_ancillary_maps']:
             os.makedirs(os.path.dirname(ancillary_out_time_step), exist_ok=True)
-            griso_out = copy.deepcopy(sat)
-            griso_out.precip.values[0, :, :] = griso_obs
+            os.system('rm ' + ancillary_out_time_step)
             griso_out.to_netcdf(ancillary_out_time_step)
             if data_settings['algorithm']['flags']['compress_output']:
                 os.system('gzip ' + ancillary_out_time_step)
+        logging.info(' ---> GRISO: Data preprocessing...DONE')
 
         # GRISO interpolator on satellite data
-        logging.info(' ---> Performing GRISO on GSMAP data')
-        griso_sat = GrisoExec(data_settings['algorithm']['settings']['radius_GRISO_km'],dfStations.lon.astype(np.float),dfStations.lat.values.astype(np.float),sat_gauge,sat)
+        logging.info(' ---> GRISO: Gridded data interpolation...')
+        griso_sat = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["grid_value"], correl_features["CorrStimata"], corrFin, passoKm, correl_features["FinestraPosizioniExt"])
+        logging.info(' ---> GRISO: Gridded data interpolation...DONE')
+
+        ##  Save griso of gridded field - FOR DEBUGGING
+        #os.makedirs(os.path.dirname(ancillary_out_time_step), exist_ok=True)
+        #griso_sat_out = copy.deepcopy(sat)
+        #griso_sat_out.precip.values[0, :, :] = griso_sat
+        #griso_sat_out.to_netcdf(os.path.join(os.path.dirname(ancillary_out_time_step), 'griso_sat_' + timeNow.strftime("%Y%m%d_%H%M" + '.nc')))
 
         # Modified Conditional Merging
-        logging.info(' ---> Performing Modified Conditional Merging')
-        error_sat = sat.precip.values[0, :, :] - griso_sat
-        conditioned_sat = xr.DataArray(griso_obs + error_sat)
-        conditioned_sat.values[conditioned_sat.values < 0] = 0
+        logging.info(' ---> Perform Modified Conditional Merging...')
+        error_sat = np.squeeze(grid_rain) - griso_sat
+
+        conditioned_sat = griso_obs + error_sat
+        conditioned_sat[conditioned_sat < 0] = 0
+        mcm_out = check_and_write_dataarray(conditioned_sat, sat, var_name='precip', lat_var_name='lat',
+                                  lon_var_name='lon')
+        logging.info(' ---> Perform Modified Conditional Merging...DONE')
+
+        # Plot output and save figure
+        logging.info(' ---> Make and save figure...')
+        if data_settings['algorithm']['flags']['save_figures']:
+            os.makedirs(os.path.dirname(ancillary_out_time_step), exist_ok=True)
+
+            fig, axs = plt.subplots(2,2)
+
+            maxVal = np.max(np.concatenate((sat["precip"].values.flatten(),griso_out["precip"].values.flatten(), conditioned_sat.flatten(), data)))
+            griso_out["precip"].plot(x="lon", y="lat", cmap='gray', ax=axs[0, 0], alpha=0.4, add_colorbar = False)
+            OB = axs[0, 0].scatter(dfStations.lon.astype(np.float),dfStations.lat.astype(np.float) ,10, c=data, vmin=0, vmax=maxVal)
+            axs[0, 0].set_title("OBS")
+            fig.colorbar(OB, ax=axs[0, 0])
+
+            SAT = sat["precip"].plot(x="lon", y="lat", ax=axs[0, 1], add_colorbar = False, vmin=0, vmax=maxVal)
+            axs[0, 1].set_title("SAT")
+            fig.colorbar(SAT, ax=axs[0, 1])
+
+            GR = griso_out["precip"].plot(x="lon", y="lat", ax=axs[1, 0], add_colorbar = False, vmin=0, vmax=maxVal)
+            axs[1, 0].set_title("GRISO")
+            fig.colorbar(GR, ax=axs[1, 0])
+
+            MCM = mcm_out.plot(x="lon", y="lat", ax=axs[1, 1], add_colorbar = False, vmin=0, vmax=maxVal)
+            axs[1, 1].set_xlabel("longitude [degrees_east]")
+            axs[1, 1].set_ylabel("latitude [degrees_north]")
+            axs[1, 1].set_title("MCM")
+            fig.colorbar(MCM, ax=axs[1, 1])
+
+            plt.show(block=True)
+            plt.suptitle(timeNow.strftime("%Y-%m-%d %H:%M"))
+
+            plt.tight_layout()
+            plt.savefig(os.path.join(os.path.dirname(ancillary_out_time_step), 'figure_mcm_' + timeNow.strftime("%Y%m%d_%H%M" + '.png')))
+        logging.info(' ---> Make and save figure...DONE')
+
+        # Save output
+        logging.info(' ---> Save output map in ' + data_settings['data']['outcome'][
+            'format'].lower() + ' format')
 
         if data_settings['data']['outcome']['format'].lower() == 'netcdf' or data_settings['data']['outcome'][
             'format'].lower() == 'nc':
 
             logging.info(' ---> Saving outfile in netcdf format ' + os.path.basename(file_out_time_step))
-            check_and_write_netcdf(griso_obs, sat, file_out_time_step, var_name='precip', lat_var_name='lat',
-                                   lon_var_name='lon')
+            mcm_out.to_netcdf(file_out_time_step)
 
         elif data_settings['data']['outcome']['format'].lower() == 'tif' or data_settings['data']['outcome'][
             'format'].lower() == 'tiff' or data_settings['data']['outcome']['format'].lower() == 'gtiff':
             logging.info(' ---> Saving outfile in GTiff format ' + os.path.basename(file_out_time_step))
 
             grid = xr.open_rasterio(gridded_in_time_step)
-            write_geotiff(griso_obs, grid, file_out_time_step)
+            write_geotiff(conditioned_sat, grid, file_out_time_step)
 
         else:
             logging.error('ERROR! Unknown or unsupported output format! ')
             raise ValueError("Supported output formats are netcdf and GTiff")
 
-
         if data_settings['algorithm']['flags']['compress_output']:
             os.system('gzip -f ' + file_out_time_step)
+
+        logging.info(' ---> Saving outfile...DONE')
 
     # -------------------------------------------------------------------------------------
     # Info algorithm

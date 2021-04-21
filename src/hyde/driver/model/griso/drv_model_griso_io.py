@@ -103,7 +103,9 @@ def importTimeSeries(timeseries_settings, start_time, end_time, time_frequency):
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
-def check_and_write_netcdf(variable, grid, file_out, var_name='precip', lat_var_name='lat', lon_var_name='lon'):
+# Check dataarray orientation and eventually flip it
+
+def check_and_write_dataarray(variable, grid, var_name='precip', lat_var_name='lat', lon_var_name='lon'):
     Lat = grid[lat_var_name]
     Lon = grid[lon_var_name]
 
@@ -112,13 +114,14 @@ def check_and_write_netcdf(variable, grid, file_out, var_name='precip', lat_var_
         variable = np.flipud(variable)
 
     var_out = xr.DataArray(data=variable, dims=["south_north", "east_weast"],
-                           coords=dict(lat=("south_north", Lat), lon=("east_weast", Lon)), name=var_name)
+                           coords=dict(lat=("south_north", Lat), lon=("east_weast", Lon.values)) , name=var_name)
 
-    var_out.to_netcdf(file_out)
-
-# -------------------------------------------------------------------------------------
+    return var_out
 
 # -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+# Write ogeotiff
 
 def write_geotiff(variable, grid, file_out):
     with rio.open(file_out, 'w', driver='GTiff',

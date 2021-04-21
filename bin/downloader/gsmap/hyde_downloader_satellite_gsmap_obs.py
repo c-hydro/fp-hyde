@@ -400,7 +400,7 @@ def arrange_data_outcome(time_range, type_data, src_data, dst_data_global, dst_d
 
     for cdo_dep in cdo_deps:
         os.environ['LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH:' + cdo_dep
-        #os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
+        os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
 
     cdo = Cdo()
     cdo.setCdo(cdo_exec)

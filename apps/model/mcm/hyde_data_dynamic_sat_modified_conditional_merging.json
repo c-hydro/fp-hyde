@@ -2,15 +2,16 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": false,
+        "use_drops2": true,
         "use_timeseries": false,
-        "use_point_data": true
+        "use_point_data": false
       },
       "mcm": {
         "fixed_correlation": true,
         "dynamic_correlation": false
       },
       "save_griso_ancillary_maps": true,
+      "save_figures": true,
       "raise_error_if_no_station_available": false,
       "compressed_gridded_input": false,
       "compress_output": false,
@@ -33,7 +34,7 @@
       "outcome_datetime": "%Y%m%d%H%M"
     },
     "settings": {
-      "radius_GRISO_km": 50
+      "radius_GRISO_km": 60
     }
   },
   "data": {
@@ -52,11 +53,11 @@
       },
       "source_stations": {
         "drops2": {
-          "DropsAddress": "",
+          "DropsAddress": "http://dds.cimafoundation.org/dds/rest",
           "DropsUser": "",
           "DropsPwd": "",
           "DropsSensor": "PLUVIOMETRO",
-          "DropsGroup": "",
+          "DropsGroup": "Dewetra%default",
           "lon_left": 12.0,
           "lon_right": 14.0,
           "lat_top": 44.0,
@@ -91,8 +92,8 @@
       "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
     },
     "outcome": {
-      "format": "tif",
-      "filename": "marche_gsmap_cm_ts_{outcome_datetime}.tif",
+      "format": "netcdf",
+      "filename": "marche_gsmap_cm_ts_{outcome_datetime}.nc",
       "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/results/{outcome_sub_path_time}"
     },
     "log": {

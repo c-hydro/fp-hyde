@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25
 
-__date__ = '20200325'
-__version__ = '1.8.0'
+__date__ = '20200419'
+__version__ = '2.0.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -15,6 +15,7 @@ General command line:
 python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20200419 (2.0.0) --> Fix time accumulation for Continuum forcing compatibility
 20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant files
                      Set reindex with "nearest" approach for filling the time range at the correct frequency.
                      Setting file template modified for supporting GFS v16
@@ -58,8 +59,8 @@ from argparse import ArgumentParser
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS'
-alg_version = '1.8.0'
-alg_release = '2021-03-25'
+alg_version = '2.0.0'
+alg_release = '2021-04-19'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------

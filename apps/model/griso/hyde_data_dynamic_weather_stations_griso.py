@@ -1,7 +1,7 @@
 """
 HyDE Processing Tool - GRISO interpolator
-__date__ = '20210312'
-__version__ = '1.5.0'
+__date__ = '20210425'
+__version__ = '2.0.0'
 __author__ =
         'Flavio Pignone (flavio.pignone@cimafoundation.org',
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -10,6 +10,8 @@ __library__ = 'hyde'
 General command line:
 ### python op_conditional_merging_GRISO.py -time "YYYY-MM-DD HH:MM"
 Version(s):
+20210425 (2.0.0) --> Added support to point rain files (for FloodProofs compatibility)
+                     Script structure fully revised and bug fixes
 20210312 (1.5.0) --> Geotiff output implementation, script structure updates, various bug fixes and improvements
 20200326 (1.0.0) --> Beta release for FloodProofs Bolivia
 """
@@ -31,16 +33,16 @@ import json
 import time
 import rasterio as rio
 
-from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoExec
-from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_netcdf, write_geotiff
+from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoPreproc
+from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_geotiff
 # -------------------------------------------------------------------------------------
 # Script Main
 def main():
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
     alg_name = 'HyDE Processing Tool - GRISO Interpolator '
-    alg_version = '1.5.0'
-    alg_release = '2021-03-12'
+    alg_version = '2.0.0'
+    alg_release = '2021-04-25'
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -78,6 +80,9 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Check computation setting
+    logging.info(' --> Check computational settings')
+
+    # Gauge data sources
     computation_settings = [data_settings['algorithm']['flags']["sources"]['use_timeseries'],
                             data_settings['algorithm']['flags']["sources"]['use_drops2'],
                             data_settings['algorithm']['flags']["sources"]['use_point_data']]
@@ -86,20 +91,26 @@ def main():
         raise ValueError("Data sources flags are mutually exclusive!")
 
     # Import data for drops and time series setup
-    if data_settings['algorithm']['flags']["sources"]['use_drops2'] == True:
+    if data_settings['algorithm']['flags']["sources"]['use_drops2']:
+        logging.info(' --> Station data source: drops2 database')
         dfData, dfStations = importDropsData(
             drops_settings=data_settings['data']['dynamic']['source_stations']['drops2'], start_time=startRun,
             end_time=dateRun, time_frequency=data_settings['data']['dynamic']['time']['time_frequency'])
-
-    if data_settings['algorithm']['flags']["sources"]['use_timeseries'] == True:
+    elif data_settings['algorithm']['flags']["sources"]['use_timeseries']:
+        logging.info(' --> Station data source: station time series')
         dfData, dfStations = importTimeSeries(
             timeseries_settings=data_settings['data']['dynamic']['source_stations']['time_series'],
             start_time=startRun, end_time=dateRun,
             time_frequency=data_settings['data']['dynamic']['time']['time_frequency'])
+    else:
+        logging.info(' --> Station data source: station point files')
 
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
+    corrFin = data_settings['algorithm']['settings']['radius_GRISO_km'] * 2
+    logging.info(' --> Final correlation: ' + str(corrFin) + ' km')
+
     # Loop across time steps
     for timeNow in pd.date_range(start=startRun, end=endRun, freq=data_settings['data']['dynamic']['time']['time_frequency']):
         logging.info(' ---> Computing time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
@@ -122,9 +133,11 @@ def main():
         # Make output dir
         os.makedirs(os.path.dirname(file_out_time_step), exist_ok=True)
 
+        logging.info(' ---> Import grid data...')
         #import grid
-        grid = xr.open_rasterio(os.path.join(data_settings['data']['static']['folder'],data_settings['data']['static']['filename']))
-        grid = grid.rename({'x':'lon', 'y':'lat'})
+        grid_in = xr.open_rasterio(os.path.join(data_settings['data']['static']['folder'],data_settings['data']['static']['filename']))
+        grid_in = grid_in.rename({'x':'lon', 'y':'lat'})
+        logging.info(' ---> Import grid data...DONE')
 
         # Import point gauge data for point_data setup
         try:
@@ -140,20 +153,35 @@ def main():
             logging.warning(' ----> Skip time step' + timeNow.strftime("%Y-%m-%d %H:00:00"))
             continue
 
-        # GRISO on observed data
-        logging.info(' ---> Performing GRISO on observed data')
-        griso_obs = GrisoExec(data_settings['algorithm']['settings']['radius_GRISO_km'],dfStations.lon.astype(np.float),dfStations.lat.values.astype(np.float),data,grid)
+        # Data preprocessing for GRISO
+        logging.info(' ---> GRISO: Data preprocessing...')
+        point_data, a2dPosizioni, grid_rain, grid, passoKm = GrisoPreproc(corrFin, dfStations.lon.astype(np.float),
+                                                                          dfStations.lat.values.astype(np.float), data, Grid=grid_in)
+        logging.info(' ---> GRISO: Data preprocessing... DONE')
+
+        # Calculate GRISO correlation features
+        logging.info(' ---> GRISO: Calculate correlation...')
+        correl_features = GrisoCorrel(point_data["rPluvio"], point_data["cPluvio"], corrFin, grid_rain, passoKm,
+                                      a2dPosizioni, grid.shape[0], grid.shape[1], point_data["gauge_value"],
+                                      corr_type='fixed')
+        logging.info(' ---> GRISO: Data preprocessing...DONE')
+
+        # GRISO interpolation
+        logging.info(' ---> GRISO: Observed data interpolation...')
+        griso_obs = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["gauge_value"],
+                                   correl_features["CorrStimata"], corrFin, passoKm,
+                                   correl_features["FinestraPosizioniExt"])
+        logging.info(' ---> GRISO: Observed data interpolation...DONE')
 
         if data_settings['data']['outcome']['format'].lower() == 'netcdf' or data_settings['data']['outcome']['format'].lower() == 'nc':
 
             logging.info(' ---> Saving outfile in netcdf format ' + os.path.basename(file_out_time_step))
-            check_and_write_netcdf(griso_obs, grid, file_out_time_step, var_name='precip', lat_var_name='lat', lon_var_name='lon')
+            griso_out = check_and_write_dataarray(griso_obs, grid_in, 'precip', lat_var_name='lat', lon_var_name='lon')
+            griso_out.to_netcdf(file_out_time_step)
 
         elif data_settings['data']['outcome']['format'].lower() == 'tif' or data_settings['data']['outcome']['format'].lower() == 'tiff' or data_settings['data']['outcome']['format'].lower() == 'gtiff':
             logging.info(' ---> Saving outfile in GTiff format ' + os.path.basename(file_out_time_step))
-
-            write_geotiff(griso_obs, grid, file_out_time_step)
-
+            write_geotiff(griso_obs, grid_in, file_out_time_step)
         else:
             logging.error('ERROR! Unknown or unsupported output format! ')
             raise ValueError("Supported output formats are netcdf and GTiff")

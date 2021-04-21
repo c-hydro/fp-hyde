@@ -2,9 +2,9 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": false,
+        "use_drops2": true,
         "use_timeseries": false,
-        "use_point_data": true
+        "use_point_data": false
       },
       "compressed_gridded_input": false,
       "compress_output": false,
@@ -27,7 +27,7 @@
       "outcome_datetime": "%Y%m%d%H%M"
     },
     "settings": {
-      "radius_GRISO_km": 50
+      "radius_GRISO_km": 30
     }
   },
   "data": {
@@ -37,7 +37,7 @@
     },
     "dynamic": {
       "time": {
-        "time_observed_period": 23,
+        "time_observed_period": 3,
         "time_forecast_period": 0,
         "time_frequency": "H"
       },
@@ -47,10 +47,10 @@
           "DropsUser": "",
           "DropsPwd": "",
           "DropsSensor": "PLUVIOMETRO",
-          "DropsGroup": "",
-          "lon_left": 12,
-          "lon_right": 14,
-          "lat_top": 44,
+          "DropsGroup": "Dewetra%default",
+          "lon_left": 12.0,
+          "lon_right": 14.0,
+          "lat_top": 44.0,
           "lat_bottom": 42.5,
           "codes_not_valid": []
         },
@@ -76,10 +76,6 @@
           "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/weather_stations/{source_point_sub_path_time}"
         }
       }
-    },
-    "ancillary": {
-      "filename": "marche_griso_stations_ts_{outcome_datetime}.nc",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt/domain/{outcome_sub_path_time}"
     },
     "outcome": {
       "format": "netcdf",
