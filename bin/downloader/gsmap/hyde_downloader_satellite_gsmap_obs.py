@@ -388,7 +388,6 @@ def arrange_data_outcome(time_range, type_data, src_data, dst_data_global, dst_d
         bbox_lon_left = str(data_bbox['lon_left'])
         bbox_lat_top = str(data_bbox['lat_top'])
         bbox_lat_bottom = str(data_bbox['lat_bottom'])
-
         bbox_points = [bbox_lon_left, bbox_lon_right, bbox_lat_bottom, bbox_lat_top]
         bbox_cdo = ','.join(bbox_points)
     else:
@@ -787,7 +786,6 @@ def set_data_ancillary_ctl(time_run, time_range, data_def, geo_def, ancillary_de
     file_ws = [file_list, template_raw]
 
     return file_ws
-
 
 # -------------------------------------------------------------------------------------
 
