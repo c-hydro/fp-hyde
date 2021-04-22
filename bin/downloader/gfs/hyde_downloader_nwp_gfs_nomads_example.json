@@ -16,14 +16,14 @@
         "heightAboveGround_2m_temperature",
         "heightAboveGround_2m_relative_humidity",
         "surface_radiation"],
-      "cdo_exec": "/home/fabio/Desktop/Apps/cdo-1.9.6_nc-4.6.0_hdf-1.8.17_eccodes-2.16.0/bin/cdo",
-      "cdo_deps": ["/home/fabio/Desktop/Library/eccodes-2.16.0/lib/"]
+      "cdo_exec": "/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/cdo",
+      "cdo_deps": ["/home/andrea/FP_libs/fp_libs_cdo/eccodes2.17.0/lib/"]
     },
     "general": {
       "title": "NWP GFS 0.25 degree",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.6.0 [20200429]",
+      "history": "1.7.0 [20210311]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Downloading tool developed by CIMA Research Foundation"
     },
@@ -45,15 +45,15 @@
   "data": {
     "static": {
       "bounding_box": {
-        "lon_right": -65,
-        "lon_left": -55,
-        "lat_bottom": 0,
-        "lat_top": 10
+        "lon_right": -50,
+        "lon_left": -70,
+        "lat_bottom": -5,
+        "lat_top": 15
       }
     },
     "dynamic": {
       "time": {
-        "time_forecast_period": 120,
+        "time_forecast_period": 12,
         "time_forecast_frequency": "H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
@@ -102,12 +102,18 @@
         ],
         "url_loc" :
         [
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}"
-        ]
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
+          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos"
+        ],
+        "vars_standards":{
+          "source_temperature_mesurement_unit": "K",
+          "source_wind_separate_components": true,
+          "source_precipitation_is_cumulated": true,
+          "convert2standard_continuum_format": true
+        }
       },
       "ancillary": {
         "filename":
@@ -120,11 +126,11 @@
         ],
         "folder":
         [
-          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
-          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
-          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
-          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}",
-          "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/ancillary/gfs_025/{ancillary_sub_path_time}"
+          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}",
+          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}"
         ]
       },
       "outcome": {
@@ -137,11 +143,11 @@
             "gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_radiation.nc"
           ],
           "folder": [
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}"
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}"
           ]
         },
         "domain" : {
@@ -153,18 +159,18 @@
             "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_radiation.nc"
           ],
           "folder": [
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}",
-            "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dynamic/source/gfs_025/{outcome_sub_path_time}"
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
+            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}"
           ]
         }
       }
     },
     "log": {
         "filename": "hyde_downloader_nwp_gfs_025_local_log.txt",
-        "folder": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/log/gfs_025/"
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/source/gfs_025/log/gfs_025/"
       },
     "library": {
       "filename": "",

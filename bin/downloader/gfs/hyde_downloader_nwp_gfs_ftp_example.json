@@ -7,7 +7,7 @@
       "title": "NWP GFS 0.25 degree - backup procedure",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.0.0 [20210212]",
+      "history": "1.1.0 [20210311]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Downloading tool developed by CIMA Research Foundation"
     },
@@ -59,34 +59,39 @@
           "u-component_of_wind_height_above_ground": {
             "height": 10,
             "varName": "10u",
-            "freq": "2H"
+            "freq": "1H"
           },
           "v-component_of_wind_height_above_ground": {
             "height": 10,
             "varName": "10v",
-            "freq": "2H"
+            "freq": "1H"
           }
         },
         "radiation": {
           "Downward_Short-Wave_Radiation_Flux_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "dswrf",
-            "freq": "3H"
+            "freq": "1H"
           },
           "Downward_Long-Wave_Radp_Flux_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "dlwrf",
-            "freq": "3H"
+            "freq": "1H"
           },
           "Albedo_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "al",
-            "freq": "3H"
+            "freq": "1H"
           }
         }
       },
+      "vars_standards":{
+          "source_temperature_mesurement_unit": "K",
+          "source_wind_separate_components": true,
+          "convert2standard_continuum_format": true
+      },
       "outcome": {
-        "folder": "/home/andrea/Desktop/meteoData/source/gfs_0p25/{outcome_datetime}"
+        "folder": "/home/andrea/Desktop/meteoData/source/gfs_0p25_bkp/{outcome_datetime}"
       }
     },
     "log": {
