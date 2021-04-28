@@ -38,50 +38,58 @@
           "Temperature_height_above_ground": {
             "height": 2,
             "varName": "2t",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           }
         },
         "relative_humidity": {
           "Relative_humidity_height_above_ground": {
             "height": 2,
             "varName": "2r",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           }
         },
         "rain": {
           "Precipitation_rate_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "tp",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "srf_rain"
           }
         },
         "wind": {
           "u-component_of_wind_height_above_ground": {
             "height": 10,
             "varName": "10u",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           },
           "v-component_of_wind_height_above_ground": {
             "height": 10,
             "varName": "10v",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           }
         },
         "radiation": {
           "Downward_Short-Wave_Radiation_Flux_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "dswrf",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           },
           "Downward_Long-Wave_Radp_Flux_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "dlwrf",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           },
           "Albedo_surface_Mixed_intervals_Average": {
             "height": 0,
             "varName": "al",
-            "freq": "1H"
+            "freq": "1H",
+            "out_group": "other_variables"
           }
         }
       },

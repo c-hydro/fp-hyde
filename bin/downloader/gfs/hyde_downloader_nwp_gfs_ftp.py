@@ -3,7 +3,7 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25 backup procedure UCAR server
 
-__date__ = '20200419'
+__date__ = '20200428'
 __version__ = '2.0.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -15,9 +15,10 @@ General command line:
 python3 hyde_downloader_nwp_gfs_ftp.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
-20200419 (2.0.0) --> Fix time accumulation for Continuum forcing compatibility
-20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant
-                     Set reindex with "nearest" approach for filling the time range. Version number alligned to nomads downloader.
+20200428 (2.0.0) --> Change output format according to Nomads update.
+20200325 (1.8.0) --> Fix time accumulation for Continuum forcing compatibility
+                     Add check on the output dimension "heigth" for producing Continuum compliant
+                     Set reindex with "nearest" approach for filling the time range. Version number alligned to Nomads downloader.
 20210311 (1.1.0) --> Add conversion to wind and temperature Continuum compliant
 20210212 (1.0.0) --> Beta release
 """
@@ -45,7 +46,7 @@ import numpy as np
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS BACKUP PROCEDURE'
 alg_version = '2.0.0'
-alg_release = '2021-04-19'
+alg_release = '2021-04-28'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -125,6 +126,8 @@ def main():
     data = xr.open_dataset(NetCDF4DataStore(data))
     logging.info(' ---> Download forecast file ... OK ')
 
+    output_list = []
+
     # Merge and reformat downloaded file to be consistent with the outcomes of the NOMADS gfs download procedure
     logging.info(' ---> Compute output files ... ')
     for varHMC in variables.keys():
@@ -152,53 +155,53 @@ def main():
                 else:
                     varFilled = deepcopy(varFilled)*3600
 
-            outName = data_settings["algorithm"]["ancillary"]["domain"] + "_gfs.t" + timeRun.strftime('%H') + "z.0p25." + timeRun.strftime('%Y%m%d') + "_" + codHeight + "_" + varHMC + ".nc"
+            if "height" in [i for i in varIn.dims]:
+                varFilled = varFilled.squeeze(dim="height", drop=True)
+
+            outName = data_settings["algorithm"]["ancillary"]["domain"] + "_gfs.t" + timeRun.strftime('%H') + "z.0p25." + timeRun.strftime('%Y%m%d') + "_" + variables[varHMC][varGFS]["out_group"] + ".nc"
 
             if os.path.isfile(os.path.join(outFolder, outName)):
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='a')
             else:
                 varFilled.to_dataset(name=variables[varHMC][varGFS]["varName"]).to_netcdf(path= os.path.join(outFolder, outName), mode='w')
 
-        if data_settings['data']['dynamic']['vars_standards']['convert2standard_continuum_format'] is True:
-            if varHMC == 'temperature':
+            output_list.append(outName)
+            logging.info(' ----> Compute ' + varGFS + ' variable...OK')
+
+    output_list = np.unique(output_list)
+
+    if data_settings['data']['dynamic']['vars_standards']['convert2standard_continuum_format'] is True:
+        logging.info(' ----> Elaborate output file for being Continuum complient...')
+        for out_file_name in output_list:
+            out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
+            if '2t' in out_file.variables.mapping.keys():
                 if data_settings['data']['dynamic']['vars_standards']['source_temperature_mesurement_unit'] == 'C':
                     pass
                 elif data_settings['data']['dynamic']['vars_standards']['source_temperature_mesurement_unit'] == 'K':
                     logging.info(' ------> Convert temperature to C ... ')
-                    out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, outName)))
-                    os.remove(os.path.join(outFolder, outName))
+                    out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
+                    os.remove(os.path.join(outFolder, out_file_name))
                     out_file['2t_C'] = out_file['2t'] - 273.15
                     out_file['2t_C'].attrs['long_name'] = '2 metre temperature'
                     out_file['2t_C'].attrs['units'] = 'C'
                     out_file['2t_C'].attrs['standard_name'] = "air_temperature"
                     out_file = out_file.rename({'2t': '2t_K'})
-                    out_file.to_netcdf(os.path.join(outFolder, outName))
+                    out_file.to_netcdf(os.path.join(outFolder, out_file_name))
                     logging.info(' ------> Convert temperature to C ... DONE')
                 else:
                     raise NotImplementedError
 
-            if varHMC == 'wind' and data_settings['data']['dynamic']['vars_standards']['source_wind_separate_components'] is True:
+            if '10u' in out_file.variables.mapping.keys() and data_settings['data']['dynamic']['vars_standards']['source_wind_separate_components'] is True:
                 logging.info(' ------> Combine wind component ... ')
-                out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, outName)))
-                os.remove(os.path.join(outFolder, outName))
+                out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
+                os.remove(os.path.join(outFolder, out_file_name))
                 out_file['10wind'] = np.sqrt(out_file['10u'] ** 2 + out_file['10v'] ** 2)
                 out_file['10wind'].attrs['long_name'] = '10 m wind'
                 out_file['10wind'].attrs['units'] = 'm s**-1'
                 out_file['10wind'].attrs['standard_name'] = "wind"
-                out_file.to_netcdf(os.path.join(outFolder, outName))
+                out_file.to_netcdf(os.path.join(outFolder, out_file_name))
                 logging.info(' ------> Combine wind component ... DONE')
-
-            out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, outName)))
-            os.remove(os.path.join(outFolder, outName))
-            try:
-                out_file = out_file.squeeze(dim="height", drop=True)
-                logging.info(' ------> Remove height dimensions ... ')
-            except:
-                pass
-            out_file.to_netcdf(os.path.join(outFolder, outName))
-
-        logging.info(' ----> Compute ' + varGFS + ' variable...OK')
-        logging.info(' ---> Elaborate ' + varHMC + ' file...OK')
+        logging.info(' ----> Elaborate output file for being Continuum complient...DONE')
 
     # -------------------------------------------------------------------------------------
     # Info algorithm

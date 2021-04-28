@@ -17,8 +17,11 @@ APP: **hyde_data_dynamic_sat_modified_conditional_merging.py**
 	        - [2020-03-26] Beta release for FloodProofs Bolivia with GSMAP
 	        
 BIN: **hyde_downloader_nwp_gfs_nomads.py**
-	- Release for Hyde package
-	
+    - Added hit per minute limit for new NOAA policy compatibility
+    - Previous version(s):
+	        - [2021-03-25] Setting file template modified for supporting GFS v16. Added checks for granting Continuum compatibility.
+            - [2021-02-12] Release for Hyde package from previous "hyde_downloader_nwp.py"
+
 BIN: **hyde_downloader_nwp_gfs_ftp.py**
 	- Release for Hyde package
 
