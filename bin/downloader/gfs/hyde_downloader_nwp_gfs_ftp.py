@@ -145,7 +145,7 @@ def main():
             else:
                 print('Problem in data shape for variable ' + varGFS)
 
-            timeRange = pd.date_range(timeRun + pd.Timedelta(variables[varHMC][varGFS]["freq"]), timeEnd + pd.Timedelta(variables[varHMC][varGFS]["freq"]), freq=variables[varHMC][varGFS]["freq"])
+            timeRange = pd.date_range(timeRun + pd.Timedelta(variables[varHMC][varGFS]["freq"]), timeEnd, freq=variables[varHMC][varGFS]["freq"])
             varFilled = varIn.reindex({'time': timeRange}, method='nearest')
 
             if varGFS=="Precipitation_rate_surface_Mixed_intervals_Average":
@@ -174,33 +174,39 @@ def main():
         logging.info(' ----> Elaborate output file for being Continuum complient...')
         for out_file_name in output_list:
             out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
+            is_edit = False
             if '2t' in out_file.variables.mapping.keys():
                 if data_settings['data']['dynamic']['vars_standards']['source_temperature_mesurement_unit'] == 'C':
                     pass
                 elif data_settings['data']['dynamic']['vars_standards']['source_temperature_mesurement_unit'] == 'K':
                     logging.info(' ------> Convert temperature to C ... ')
-                    out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
+                    #out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
                     os.remove(os.path.join(outFolder, out_file_name))
                     out_file['2t_C'] = out_file['2t'] - 273.15
                     out_file['2t_C'].attrs['long_name'] = '2 metre temperature'
                     out_file['2t_C'].attrs['units'] = 'C'
                     out_file['2t_C'].attrs['standard_name'] = "air_temperature"
                     out_file = out_file.rename({'2t': '2t_K'})
-                    out_file.to_netcdf(os.path.join(outFolder, out_file_name))
+                    #out_file.to_netcdf(os.path.join(outFolder, out_file_name))
                     logging.info(' ------> Convert temperature to C ... DONE')
+                    is_edit = True
                 else:
                     raise NotImplementedError
 
             if '10u' in out_file.variables.mapping.keys() and data_settings['data']['dynamic']['vars_standards']['source_wind_separate_components'] is True:
                 logging.info(' ------> Combine wind component ... ')
-                out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
+                #out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
                 os.remove(os.path.join(outFolder, out_file_name))
                 out_file['10wind'] = np.sqrt(out_file['10u'] ** 2 + out_file['10v'] ** 2)
                 out_file['10wind'].attrs['long_name'] = '10 m wind'
                 out_file['10wind'].attrs['units'] = 'm s**-1'
                 out_file['10wind'].attrs['standard_name'] = "wind"
-                out_file.to_netcdf(os.path.join(outFolder, out_file_name))
+                #out_file.to_netcdf(os.path.join(outFolder, out_file_name))
                 logging.info(' ------> Combine wind component ... DONE')
+                is_edit = True
+
+            if is_edit:
+                out_file.to_netcdf(os.path.join(outFolder, out_file_name))
         logging.info(' ----> Elaborate output file for being Continuum complient...DONE')
 
     # -------------------------------------------------------------------------------------

@@ -19,10 +19,10 @@
       "cdo_deps": ["/home/andrea/FP_libs/fp_libs_cdo/eccodes2.17.0/lib/"]
     },
     "general": {
-      "title": "NWP GFS 0.25 degree",
+      "title": "NWP GFS 0.25 degree NOMADS",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.7.0 [20210311]",
+      "history": "2.0.0 [20200428]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Downloading tool developed by CIMA Research Foundation"
     },

@@ -3,8 +3,8 @@ Library Features:
 
 Name:          drv_model_rfarm_apps
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20190903'
-Version:       '1.0.0'
+Date:          '20200503'
+Version:       '1.1.0'
 """
 #################################################################################
 # Library
@@ -25,7 +25,7 @@ from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_grib import adjust_data_lami
 from src.hyde.dataset.model.rfarm.lib_rfarm_variables import compute_rain_lami_2i, compute_rain_ecmwf_0100
 
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import read_data_wrf
-from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import convert_data_wrf, convert_time_wrf
+from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import convert_data_wrf, convert_time_wrf, read_data_gfs_025
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_json import read_data_expert_forecast, convert_time_expert_forecast
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import write_obj, read_obj
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
@@ -367,6 +367,16 @@ class RFarmData:
                         log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT ALLOWED!')
                         raise NotImplementedError('NWP WRF case dimension datasets not implemented yet')
 
+                elif self.file_source_data == 'gfs025':
+
+                    if self.var_dims_data == 'var2d':
+                        log_stream.error(' ----> Get data ... FAILED! FILE SOURCE DIMS NOT IMPLEMENTED!')
+                        raise NotImplementedError
+
+                    elif self.var_dims_data == 'var3d':
+
+                        [var_data_cmp, var_time, var_geox, var_geoy] = read_data_gfs_025(self.file_data_first,
+                                                                                     var_step_type=self.var_type_data)
                 else:
                     log_stream.error(' ----> Get data ... FAILED! FILE SOURCE LIBRARY NOT IMPLEMENTED!')
                     raise NotImplementedError('NetCDF datasets type not implemented yet')
