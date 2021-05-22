@@ -101,6 +101,12 @@ def main():
         time_frequency=data_algorithm_settings['time']['time_frequency'],
         time_rounding=data_algorithm_settings['time']['time_rounding'])
     data_algorithm_time = driver_algorithm_time.getDataTime()
+    try:
+        data_time_label = data_algorithm_settings['data']['dynamic']['time']['time_coordinate_label']
+        if data_time_label is None:
+            data_time_label = 'Time'
+    except:
+            data_time_label = 'Time'
     log_stream.info(' --> Set algorithm time ... DONE')
     # -------------------------------------------------------------------------------------
 
@@ -153,6 +159,7 @@ def main():
             file_out_write_engine=data_algorithm_settings['algorithm']['ancillary']['write_engine'],
             file_out_mode_zipping=data_algorithm_flags['zipping_dynamic_product'],
             file_out_ext_zipping=data_algorithm_settings['algorithm']['ancillary']['zip_format'],
+            coord_time = data_time_label
         )
         log_stream.info(' --> Initialize product driver ... DONE')
 

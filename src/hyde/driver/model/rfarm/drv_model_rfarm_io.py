@@ -1,7 +1,7 @@
 """
 Library Features:
 
-Name:          drv_model_rfarm_apps
+Name:          drv_model_rfarm_io
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
 Date:          '20200503'
 Version:       '1.1.0'

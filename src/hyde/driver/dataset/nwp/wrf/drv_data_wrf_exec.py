@@ -153,6 +153,7 @@ class DataComposer:
                 var_da_masked = driver_var_cmp.configure_data(var_data_raw,
                                                               var_time_period_raw, var_time_period_expected)
 
+                var_da_masked = var_da_masked.isel(time=slice(0,len(var_time_period_expected)))
                 log_stream.info(' ----> Compose variable: ' + info_key + ' ... DONE')
 
             else:

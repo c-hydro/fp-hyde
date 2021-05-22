@@ -4,6 +4,9 @@ Changelog
 
 Version 1.9.7 [2021-03-01]
 **************************
+DRV: **drv_model_rfarm_io.py**
+    - RainFarm now supports gfs025
+
 APP: **hyde_data_dynamic_weather_stations_griso.py**
 	- Release for Hyde package
 	    - Previous version(s):

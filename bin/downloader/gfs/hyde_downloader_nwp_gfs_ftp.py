@@ -196,7 +196,8 @@ def main():
             if '10u' in out_file.variables.mapping.keys() and data_settings['data']['dynamic']['vars_standards']['source_wind_separate_components'] is True:
                 logging.info(' ------> Combine wind component ... ')
                 #out_file = deepcopy(xr.open_dataset(os.path.join(outFolder, out_file_name)))
-                os.remove(os.path.join(outFolder, out_file_name))
+                if os.path.isfile(os.path.join(outFolder, out_file_name)):
+                    os.remove(os.path.join(outFolder, out_file_name))
                 out_file['10wind'] = np.sqrt(out_file['10u'] ** 2 + out_file['10v'] ** 2)
                 out_file['10wind'].attrs['long_name'] = '10 m wind'
                 out_file['10wind'].attrs['units'] = 'm s**-1'

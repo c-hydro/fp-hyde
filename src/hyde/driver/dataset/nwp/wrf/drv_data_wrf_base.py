@@ -136,7 +136,7 @@ class DataProductBuilder:
                  file_ancillary_out_updating=True,
                  file_ancillary_tmp_cleaning=False,
                  file_out_updating=None, file_out_mode_zipping=False, file_out_ext_zipping='.gz',
-                 file_out_write_engine='netcdf4'):
+                 file_out_write_engine='netcdf4', coord_time='XTIME'):
 
         # Info
         log_stream.info(' ---> TimeStep: ' + str(time_run))
@@ -162,7 +162,7 @@ class DataProductBuilder:
 
         self.file_tag_coord_geo_x = 'XLONG'
         self.file_tag_coord_geo_y = 'XLAT'
-        self.file_tag_coord_time = 'Time'
+        self.file_tag_coord_time = coord_time
 
         self.file_tag_dim_geo_x = 'west_east'
         self.file_tag_dim_geo_y = 'south_north'
@@ -225,10 +225,34 @@ class DataProductBuilder:
             folder_name_list = []
             file_name_list = []
             path_name_list = []
-            for time_step in time_range:
 
-                data_tags_in_values = {'datetime_source': time_step, 'runtime_source': time_step,
-                                       'sub_path_time_source': time_step, 'domain': self.data_domain}
+            if variable_info_in[file_key_step]['id']['var_dims'][0] == 'var2d':
+                for time_step in time_range:
+
+                    data_tags_in_values = {'datetime_source': time_step, 'runtime_source': time_step,
+                                           'sub_path_time_source': time_step, 'domain': self.data_domain}
+
+                    for path_name_raw in file_path_step:
+                        if path_name_raw is not None:
+                            path_name_fill = fill_tags2string(path_name_raw, self.data_tags_template, data_tags_in_values)
+                            folder_name_fill, file_name_fill = os.path.split(path_name_fill)
+                        else:
+                            file_name_fill = None
+                            folder_name_fill = None
+                            path_name_fill = None
+
+                        path_name_list.append(path_name_fill)
+                        folder_name_list.append(folder_name_fill)
+                        file_name_list.append(file_name_fill)
+
+                self.path_name_in[file_key_step] = path_name_list
+                self.file_name_in[file_key_step] = file_name_list
+                self.folder_name_in[file_key_step] = folder_name_list
+
+            if variable_info_in[file_key_step]['id']['var_dims'][0] == 'var3d':
+
+                data_tags_in_values = {'datetime_source': time_run, 'runtime_source': time_run,
+                                       'sub_path_time_source': time_run, 'domain': self.data_domain}
 
                 for path_name_raw in file_path_step:
                     if path_name_raw is not None:
@@ -452,6 +476,7 @@ class DataProductBuilder:
         log_stream.info(' ---> Collect datasets ... ')
 
         time_range = self.time_range
+        time_run = self.time_run
 
         # Check data availability
         if self.file_availability:
@@ -464,7 +489,7 @@ class DataProductBuilder:
                 self.file_ancillary_in_updating = True
 
             if self.file_ancillary_in_updating:
-                data_obj = self.driver_data_reader.organize_obj(time_range)
+                data_obj = self.driver_data_reader.organize_obj(time_range, time_run)
                 # Ending info
                 log_stream.info(' ---> Collect datasets ... DONE')
             else:
