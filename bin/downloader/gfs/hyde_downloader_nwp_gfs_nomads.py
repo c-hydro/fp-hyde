@@ -3,7 +3,7 @@
 """
 HyDE Downloading Tool - NWP GFS 0.25
 
-__date__ = '20200428'
+__date__ = '20200419'
 __version__ = '2.0.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -15,14 +15,11 @@ General command line:
 python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
-20200428 (2.0.0) --> Add hit per minute limit for new NOAA policy compatibility
-                     Fix time step problems. Modified output format for decreasing number of hits to the server.
-20200325 (1.8.0) --> Fix time accumulation for Continuum forcing compatibility
-                     Add check on the output dimension "heigth" for producing Continuum compliant files
+20200419 (2.0.0) --> Fix time accumulation for Continuum forcing compatibility
+20200325 (1.8.0) --> Add check on the output dimension "heigth" for producing Continuum compliant files
                      Set reindex with "nearest" approach for filling the time range at the correct frequency.
                      Setting file template modified for supporting GFS v16
-20210212 (1.7.0) --> Add conversion to wind and temperature Continuum compliant
-                     Derived from hyde_downloader_nwp_gfs.py
+20210311 (1.7.0) --> Add conversion to wind and temperature Continuum complient
 20200429 (1.6.0) --> Add checking url request(s)
 20200313 (1.5.0) --> Add filtering of time-steps for accumulated variables (tp)
 20200312 (1.4.0) --> Add shifting of longitudes from [0,360] to [-180,180];
@@ -63,7 +60,7 @@ from argparse import ArgumentParser
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS'
 alg_version = '2.0.0'
-alg_release = '2021-04-28'
+alg_release = '2021-04-19'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -147,31 +144,40 @@ def main():
             type_data=data_settings['algorithm']['ancillary']['type'],
             flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_domain'])
 
-        if data_settings['algorithm']['flags']['downloading_mp']:
-            retrieve_data_source_mp(
-                data_source, data_ancillary,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'],
-                process_n=data_settings['algorithm']['ancillary']['process_mp'], limit=data_settings['algorithm']['ancillary']['remote_server_hit_per_min'])
+        # Check source url(s) existence
+        url_check = check_url_source(data_source, process_n=data_settings['algorithm']['ancillary']['process_mp'])
+
+        # Retrieve and save data (in sequential or multiprocessing mode)
+        if url_check:
+            if data_settings['algorithm']['flags']['downloading_mp']:
+                retrieve_data_source_mp(
+                    data_source, data_ancillary,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'],
+                    process_n=data_settings['algorithm']['ancillary']['process_mp'],
+                )
+            else:
+                retrieve_data_source_seq(
+                    data_source, data_ancillary,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'])
+
+            # Merge and mask data ancillary to data outcome
+            arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
+                                 data_bbox=data_settings['data']['static']['bounding_box'],
+                                 cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
+                                 cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'],
+                                 source_standards=data_settings['data']['dynamic']['source']['vars_standards'],
+                                 data_range=time_data_range)
+
+            # Clean data tmp (such as ancillary and outcome global)
+            clean_data_tmp(
+                data_ancillary, data_outcome_global,
+                flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
+
+            # Ending info
+            logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... DONE')
         else:
-            retrieve_data_source_seq(
-                data_source, data_ancillary,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'], limit=data_settings['algorithm']['ancillary']['remote_server_hit_per_min'])
-
-        # Merge and mask data ancillary to data outcome
-        arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
-                             data_bbox=data_settings['data']['static']['bounding_box'],
-                             cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
-                             cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'],
-                             source_standards=data_settings['data']['dynamic']['source']['vars_standards'],
-                             data_range=time_data_range)
-
-        # Clean data tmp (such as ancillary and outcome global)
-        clean_data_tmp(
-            data_ancillary, data_outcome_global,
-            flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
-
-        # Ending info
-        logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... DONE')
+            # Ending info
+            logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... FAILED. Some url(s) are not available.')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -319,19 +325,21 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
             cdo.cat(input=src_data_step, output=tmp_data_global_step_cat, options='-r')
             info_file = cdo.infov(input=tmp_data_global_step_cat)
 
-            # Explore available variable in the grib file, skiping rows with headers and footers
-            var_in_all = [i.split(':')[-1].replace(' ','') for i in cdo.infov(input=tmp_data_global_step_cat) if i.split(':')[0].replace(' ','').isnumeric()]
-            var_in = np.unique(var_in_all)
-            logging.info(' ------> Var(s) found in file: ' + ','.join(var_in))
-
-            step_expected = int(src_data_step.__len__()*len(var_in))
-            step_get = len(var_in_all)
-
+            step_expected = int(src_data_step.__len__())
+            step_get = int(info_file.__len__() - 1)
             if step_get > step_expected:
+
                 step_ratio = int(step_get / step_expected)
                 var_select_cdo, timestep_select_cdo = select_time_steps(
                     info_file, id_start=step_ratio, id_end=step_get, id_period=step_ratio)
-                cdo.seltimestep(timestep_select_cdo, input=tmp_data_global_step_cat, output=tmp_data_global_step_seltimestep)
+
+                if (step_get / var_select_cdo.__len__()) > step_expected:
+                    cdo.seltimestep(timestep_select_cdo,
+                                    input=tmp_data_global_step_cat, output=tmp_data_global_step_seltimestep)
+                else:
+                    if os.path.exists(tmp_data_global_step_seltimestep):
+                        os.remove(tmp_data_global_step_seltimestep)
+                    tmp_data_global_step_seltimestep = tmp_data_global_step_cat
             else:
                 if os.path.exists(tmp_data_global_step_seltimestep):
                     os.remove(tmp_data_global_step_seltimestep)
@@ -342,61 +350,59 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
 
             if not source_standards == None:
 
-                if source_standards['convert2standard_continuum_format']:
-                    out_file = deepcopy(xr.open_dataset(dst_data_global_step))
-                    os.remove(dst_data_global_step)
-
-                    if '2t' in var_in.tolist():
+                if source_standards['convert2standard_continuum_format'] == True:
+                    if src_key_step == 'heightAboveGround_2m_temperature':
                         if source_standards['source_temperature_mesurement_unit'] == 'C':
                             pass
                         elif source_standards['source_temperature_mesurement_unit'] == 'K':
                             logging.info(' ------> Convert temperature to C ... ')
-                            #out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                            out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                            os.remove(dst_data_global_step)
                             out_file['2t_C'] = out_file['2t'] - 273.15
                             out_file['2t_C'].attrs['long_name'] = '2 metre temperature'
                             out_file['2t_C'].attrs['units'] = 'C'
                             out_file['2t_C'].attrs['standard_name'] = "air_temperature"
                             out_file = out_file.rename({'2t': '2t_K'})
-                            #out_file.to_netcdf(dst_data_global_step)
+                            out_file.to_netcdf(dst_data_global_step)
                             logging.info(' ------> Convert temperature to C ... DONE')
                         else:
                             raise NotImplementedError
 
-                    if 'tp' in var_in.tolist() and source_standards['source_precipitation_is_cumulated'] is True:
+                    if src_key_step == 'surface_rain' and source_standards['source_precipitation_is_cumulated'] is True:
                         logging.info(' ------> Decumulate precipitation ... ')
-                        #out_file = deepcopy(xr.open_dataset(dst_data_global_step))
-                        #os.remove(dst_data_global_step)
+                        out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                        os.remove(dst_data_global_step)
                         out_file['tp'].values = np.diff(out_file['tp'].values, n=1, axis=0, prepend=0)
                         out_file['tp'].attrs['long_name'] = 'hourly precipitation depth'
                         out_file['tp'].attrs['units'] = 'mm'
                         out_file['tp'].attrs['standard_name'] = "precipitation"
-                        #out_file.to_netcdf(dst_data_global_step)
+                        out_file.to_netcdf(dst_data_global_step)
                         logging.info(' ------> Decumulate precipitation ... DONE')
 
-                    if '10u' in var_in.tolist() and source_standards['source_wind_separate_components'] is True:
+                    if src_key_step == 'heightAboveGround_10m_wind' and source_standards['source_wind_separate_components'] is True:
                         logging.info(' ------> Combine wind component ... ')
-                        #out_file = deepcopy(xr.open_dataset(dst_data_global_step))
-                        #os.remove(dst_data_global_step)
+                        out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                        os.remove(dst_data_global_step)
                         out_file['10wind'] = np.sqrt(out_file['10u']**2 + out_file['10v']**2)
                         out_file['10wind'].attrs['long_name'] = '10 m wind'
                         out_file['10wind'].attrs['units'] = 'm s**-1'
                         out_file['10wind'].attrs['standard_name'] = "wind"
-                        #out_file.to_netcdf(dst_data_global_step)
+                        out_file.to_netcdf(dst_data_global_step)
                         logging.info(' ------> Combine wind component ... DONE')
 
-                    # out_file = deepcopy(xr.open_dataset(dst_data_global_step))
-                    # os.remove(dst_data_global_step)
+                    out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                    os.remove(dst_data_global_step)
 
                     # Check if file has "heigth" dimension and remove it
                     try:
                         out_file = out_file.squeeze(dim="height", drop=True)
-                        out_file = out_file.squeeze(dim="height_2", drop=True)
                         logging.info(' ------> Remove height dimensions ... ')
                     except:
                         pass
 
-                    # Reindex time axis by padding last available map over the time range
-                    out_file=out_file.reindex(time=data_range, method='nearest')
+                    # Reindex time axis by padding last available map over the time range (not for surface rain cause it is not an instantaneous value)
+                    if not src_key_step == "surface_rain":
+                        out_file=out_file.reindex(time=data_range, method='nearest')
                     out_file.to_netcdf(dst_data_global_step)
 
             if os.path.exists(tmp_data_global_step_cat):
@@ -467,7 +473,7 @@ def create_filename_tmp(prefix='gfs_tmp_', suffix='.grib2', folder=None):
 
 # -------------------------------------------------------------------------------------
 # Method to retrieve and store data (multiprocess)
-def retrieve_data_source_mp(src_data, dst_data, flag_updating=False, process_n=20, process_max=None, limit=9999):
+def retrieve_data_source_mp(src_data, dst_data, flag_updating=False, process_n=20, process_max=None):
 
     logging.info(' ----> Downloading data in multiprocessing mode ... ')
 
@@ -496,26 +502,10 @@ def retrieve_data_source_mp(src_data, dst_data, flag_updating=False, process_n=2
 
             data_check.append([src_step_url, dst_step_path])
 
-    if len(data_list)>limit:
-        for i in range(0,len(data_list),limit):
-            max_available = min(i + limit, len(data_list))
-            chunk = data_list[i:i + limit]
-
-            with Pool(processes=process_n, maxtasksperchild=1) as process_pool:
-                _ = process_pool.map(request_data_source, chunk, chunksize=1)
-                process_pool.close()
-                process_pool.join()
-
-            logging.info(' ----> Wait 60 seconds for next requests ...')
-            time.sleep(60)
-            if max_available<len(data_list):
-                logging.info(' ----> '  + str(int(100*max_available/len(data_list))) + ' % complete...')
-                logging.info(' ----> Continue with next chunk of requests...')
-    else:
-        with Pool(processes=process_n, maxtasksperchild=1) as process_pool:
-            _ = process_pool.map(request_data_source, data_list, chunksize=1)
-            process_pool.close()
-            process_pool.join()
+    with Pool(processes=process_n, maxtasksperchild=1) as process_pool:
+        _ = process_pool.map(request_data_source, data_list, chunksize=1)
+        process_pool.close()
+        process_pool.join()
 
     find_data_corrupted(data_check)
 
@@ -573,28 +563,27 @@ def request_data_source(data_list):
         return True
     except IOError:
         logging.warning(' :: Outcome data will be dumped in: ' + split(data_list[1])[1] + ' ... FAILED')
-        logging.error(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. IO error.')
-        raise IOError(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Data Not available on the server.')
+        logging.warning(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. IO error.')
+        return False
     except ConnectionResetError:
         logging.warning(' :: Outcome data will be dumped in: ' + split(data_list[1])[1] + ' ... FAILED')
-        logging.error(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Connection Reset error')
-        raise ConnectionResetError(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Connection Reset error')
+        logging.warning(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Connection Reset error')
+        return False
     except ConnectionAbortedError:
         logging.warning(' :: Outcome data will be dumped in: ' + split(data_list[1])[1] + ' ... FAILED')
-        logging.error(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Connetction Aborted error.')
-        raise ConnectionAbortedError(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Connetction Aborted error.')
+        logging.warning(' :: Http request for downloading: ' + data_list[0] + ' ... FAILED. Connetction Aborted error.')
+        return False
 # -------------------------------------------------------------------------------------
 
 
 # -------------------------------------------------------------------------------------
 # Method to retrieve and store data (sequential)
-def retrieve_data_source_seq(src_data, dst_data, flag_updating=False, limit=9999):
+def retrieve_data_source_seq(src_data, dst_data, flag_updating=False):
 
     logging.info(' ----> Downloading data in sequential mode ... ')
 
     data_list = []
     data_check = []
-    hit_count = 0
     for (src_data_key, src_data_list), (dst_data_key, dst_data_list) in zip(src_data.items(), dst_data.items()):
 
         logging.info(' -----> DataType: ' + src_data_key + ' ... ')
@@ -614,14 +603,8 @@ def retrieve_data_source_seq(src_data, dst_data, flag_updating=False, limit=9999
 
             if flag_updating:
                 request_data_source([src_step_url, dst_step_path])
-                hit_count += 1
                 data_list.append([src_step_url, dst_step_path])
                 logging.info(' -------> Save data in file: ' + str(dst_step_file) + ' ... DONE')
-                if hit_count == limite:
-                    logging.info(' ----> Wait 60 seconds for next requests ...')
-                    time.sleep(60)
-                    hit_count = 0
-                    logging.info(' ----> Continue with next chunk of requests...')
             else:
                 logging.info(' ------> Save data in file: ' + str(dst_step_file) +
                              ' ... SKIPPED. File saved previously')

@@ -22,6 +22,7 @@ Version:
 # -------------------------------------------------------------------------------------
 # Libraries
 import logging
+import matplotlib.pylab as plt
 
 from argparse import ArgumentParser
 from time import time, strftime, gmtime
@@ -64,7 +65,8 @@ def main():
     # Start Program
     logging.info('[' + alg_project + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
     logging.info('[' + alg_project + '] Execution Time: ' + strftime("%Y-%m-%d %H:%M", gmtime()) + ' GMT')
-    logging.info('[' + alg_project + '] Reference Time: ' + time_arg + ' GMT')
+    if time_arg is not None:
+        logging.info('[' + alg_project + '] Reference Time: ' + time_arg + ' GMT')
     logging.info('[' + alg_project + '] Start Program ... ')
 
     # Time algorithm information
@@ -75,7 +77,8 @@ def main():
     # Get data time
     logging.info(' --> Set algorithm time ... ')
     driver_time = DriverTime(time_arg, data_settings['time'])
-    time_run, time_exec, time_range = driver_time.set_algorithm_time()
+    time_run, time_exec, time_range = \
+        driver_time.set_algorithm_time(data_settings['time']['time_reverse'])
     logging.info(' --> Set algorithm time ... DONE')
     # -------------------------------------------------------------------------------------
 

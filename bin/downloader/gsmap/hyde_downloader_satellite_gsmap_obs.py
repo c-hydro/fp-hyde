@@ -3,8 +3,8 @@
 """
 HyDE Downloading Tool - SATELLITE GSMAP REAL TIME
 
-__date__ = '20210426'
-__version__ = '2.0.2'
+__date__ = '20210301'
+__version__ = '2.0.1'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -16,7 +16,6 @@ General command line:
 python3 hyde_downloader_satellite_gsmap_obs.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
-20210426 (2.0.2) --> Manage missing data on GSMAP server
 20210301 (2.0.1) --> Manage exception due to the absence of the gsmap_gauge folder on server between 00:00 and 6:00 UTC
 20210223 (2.0.0) --> Implemented quasi-real-time integration of gsmap_gauge and gsmap_gauge_now.
                      Change data sources to long-term ftp for allowing historical runs with gsmap_gauge.
@@ -54,8 +53,8 @@ from argparse import ArgumentParser
 # -------------------------------------------------------------------------------------
 # Algorithm information
 alg_name = 'HYDE DOWNLOADING TOOL - SATELLITE GSMAP'
-alg_version = '2.0.2'
-alg_release = '2021-04-26'
+alg_version = '1.0.0'
+alg_release = '2020-03-13'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 
@@ -269,14 +268,10 @@ def main():
                         flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_source'])
 
                 time_data_range_done = [i for i, b in zip(time_data_range_todo, missingSteps) if b is False]
-                expected_output = pd.DataFrame.from_dict({'time': time_data_range_todo, 'data_source': data_source,
-                                                          'data_outcome_global': data_outcome_global,
-                                                          'data_outcome_domain': data_outcome_domain},
-                                                         orient='columns').set_index('time').loc[time_data_range_done]
 
                 # Merge and mask data ancillary to data outcome
                 arrange_data_outcome(time_data_range_done, data_type,
-                                     expected_output['data_source'], expected_output['data_outcome_global'], expected_output['data_outcome_domain'], data_ancillary_ctl,
+                                     data_source, data_outcome_global, data_outcome_domain, data_ancillary_ctl,
                                      tags_template=data_settings['algorithm']['template'],
                                      data_bbox=data_settings['data']['static']['bounding_box'],
                                      cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
@@ -375,7 +370,7 @@ def unzip_data_source(filename_zip, filename_unzip):
         output.write(data)
         output.close()
     else:
-        logging.error(' ===> Zip file does not exist. Check your datasets.')
+        logging.warning(' ===> Zip file does not exist. Check your datasets.')
 
 
 # -------------------------------------------------------------------------------------
@@ -393,7 +388,6 @@ def arrange_data_outcome(time_range, type_data, src_data, dst_data_global, dst_d
         bbox_lon_left = str(data_bbox['lon_left'])
         bbox_lat_top = str(data_bbox['lat_top'])
         bbox_lat_bottom = str(data_bbox['lat_bottom'])
-
         bbox_points = [bbox_lon_left, bbox_lon_right, bbox_lat_bottom, bbox_lat_top]
         bbox_cdo = ','.join(bbox_points)
     else:
@@ -405,7 +399,7 @@ def arrange_data_outcome(time_range, type_data, src_data, dst_data_global, dst_d
 
     for cdo_dep in cdo_deps:
         os.environ['LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH:' + cdo_dep
-        #os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
+        os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
 
     cdo = Cdo()
     cdo.setCdo(cdo_exec)
@@ -436,11 +430,8 @@ def arrange_data_outcome(time_range, type_data, src_data, dst_data_global, dst_d
             src_file_step_unzip = os.path.splitext(src_file_step_zip)[0]
             ctl_template_step = fill_data_ancillary_ctl(time_step, src_file_step_unzip,
                                                         ctl_template_raw, tags_template)
-            try:
-                unzip_data_source(src_file_step_zip, src_file_step_unzip)
-            except:
-                logging.warning(' ------> Convert and project global data ... SKIPPED. Data have not been downloaded correctly')
-                continue
+
+            unzip_data_source(src_file_step_zip, src_file_step_unzip)
 
             write_data_ancillary_ctl(ctl_file_step, ctl_template_step)
 
@@ -796,7 +787,6 @@ def set_data_ancillary_ctl(time_run, time_range, data_def, geo_def, ancillary_de
 
     return file_ws
 
-
 # -------------------------------------------------------------------------------------
 
 
@@ -1139,6 +1129,7 @@ def get_args():
 
 
 # -------------------------------------------------------------------------------------
+
 
 # -------------------------------------------------------------------------------------
 # Method to set logging information

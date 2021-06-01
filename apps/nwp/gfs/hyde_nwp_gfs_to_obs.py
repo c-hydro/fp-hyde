@@ -85,12 +85,10 @@ def main():
     varIn = [i for i in data_settings['data']['dynamic']['source'] if data_settings['data']['dynamic']['source'][i]['compute']]
 
     logging.info(' ---> Compute variables : ' + ','.join(varIn))
-    readed_grid = False
 
     for timeNow in timeRange:
         logging.info(' ----> Compute time step ' + timeNow.strftime("%Y-%m-%d %H:%M") + '...')
         inMaps = {}
-        missing_input = False
 
         for var in varIn:
             logging.info(' ---> Extract variable: ' + var)
@@ -100,23 +98,18 @@ def main():
                                               data_settings['data']['dynamic']['source'][var]['file_name']).format(
                 **template_time_step)
 
-            if not os.path.isfile(file_time_step):
+            if os.path.isfile(file_time_step) == False:
                 # If the forecast related to the timeNow time step does not exist I search for timeNow in the precedent time step
                 template_time_step = fill_template_time_step(data_settings['algorithm']['template'], timeNow - pd.Timedelta('1D'))
                 file_time_step = os.path.join(data_settings['data']['dynamic']['source'][var]['folder_name'],
                                              data_settings['data']['dynamic']['source'][var]['file_name']).format(**template_time_step)
-                if not os.path.isfile(file_time_step):
-                    logging.warning(' --> WARNING! File for time step ' + timeNow.strftime(
-                        "%Y-%m-%d %H") + ' not found... SKIPPED!"')
-                    missing_input = True
-                    break
                 # And then re-generate the timeNow templates for the output templates
                 template_time_step = fill_template_time_step(data_settings['algorithm']['template'], timeNow)
 
             file_open = xr.open_dataset(file_time_step).sel(time=timeNow, method='backfill')
             inMaps[var] = np.squeeze(file_open[data_settings['data']['dynamic']['source'][var]['var_name']])
 
-            if not readed_grid:
+            if timeNow == timeRange[0] and var ==varIn[0]:
                 logging.info(" ---> Read geographic references")
                 nrows = len(file_open.lat)
                 ncols = len(file_open.lon)
@@ -132,32 +125,24 @@ def main():
                                    'cellsize': res}
 
                 geo_x_values = np.sort(file_open.lon)
-                # Check if lo is in the 0-360 format and shift to -180 180
-                if any(geo_x_values>180):
-                    geo_x_values = geo_x_values-360
                 geo_y_values = np.sort(file_open.lat)
                 geo_data_values = -9999
 
-                readed_grid = True
 
-        if not missing_input:
-            logging.info(' ---> Create variables dataset...')
-            dset_data = create_dset(inMaps, geo_data_values, geo_x_values, geo_y_values, timeNow,
+        logging.info(' ---> Create variables dataset...')
+        dset_data = create_dset(inMaps, geo_data_values, geo_x_values, geo_y_values, timeNow,
                                 global_attrs_dict=attributes_dict)
 
-            file_out_time_step = os.path.join(data_settings['data']['dynamic']['destination']['folder_name'], data_settings['data']['dynamic']['destination']['file_name']).format(**template_time_step)
+        file_out_time_step = os.path.join(data_settings['data']['dynamic']['destination']['folder_name'], data_settings['data']['dynamic']['destination']['file_name']).format(**template_time_step)
 
-            logging.info(' ---> Write output...')
-            os.makedirs(os.path.dirname(file_out_time_step), exist_ok=True)
-            write_dset(file_out_time_step, dset_data, dset_mode='w', dset_engine='h5netcdf', dset_compression_level=0,
-                       dset_format='NETCDF4',
-                       dim_key_time='time', fill_value=-9999.0)
+        logging.info(' ---> Write output...')
+        os.makedirs(os.path.dirname(file_out_time_step), exist_ok=True)
+        write_dset(file_out_time_step, dset_data, dset_mode='w', dset_engine='h5netcdf', dset_compression_level=0,
+                   dset_format='NETCDF4',
+                   dim_key_time='time', fill_value=-9999.0)
 
-            if data_settings['data']['dynamic']['destination']['file_compression']:
-                os.system('gzip -f ' + file_out_time_step)
-
-
-
+        if data_settings['data']['dynamic']['destination']['file_compression']:
+            os.system('gzip -f ' + file_out_time_step)
 
     # -------------------------------------------------------------------------------------
     # Info algorithm
