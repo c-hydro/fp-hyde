@@ -1,7 +1,7 @@
 """
 HyDE Processing Tool - GRISO interpolator
-__date__ = '20210425'
-__version__ = '2.0.0'
+__date__ = '20210602'
+__version__ = '2.1.0'
 __author__ =
         'Flavio Pignone (flavio.pignone@cimafoundation.org',
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -10,6 +10,7 @@ __library__ = 'hyde'
 General command line:
 ### python op_conditional_merging_GRISO.py -time "YYYY-MM-DD HH:MM"
 Version(s):
+20210602 (2.1.0) --> Added support for not-standard point files. Add netrc support for drops2. Bug fixes.
 20210425 (2.0.0) --> Added support to point rain files (for FloodProofs compatibility)
                      Script structure fully revised and bug fixes
 20210312 (1.5.0) --> Geotiff output implementation, script structure updates, various bug fixes and improvements
@@ -31,18 +32,19 @@ import xarray as xr
 import pandas as pd
 import json
 import time
+import netrc
 import rasterio as rio
 
 from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoPreproc
-from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_geotiff
+from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_geotiff, read_point_data
 # -------------------------------------------------------------------------------------
 # Script Main
 def main():
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
     alg_name = 'HyDE Processing Tool - GRISO Interpolator '
-    alg_version = '2.0.0'
-    alg_release = '2021-04-25'
+    alg_version = '2.1.0'
+    alg_release = '2021-06-02'
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -93,6 +95,15 @@ def main():
     # Import data for drops and time series setup
     if data_settings['algorithm']['flags']["sources"]['use_drops2']:
         logging.info(' --> Station data source: drops2 database')
+        drops_settings = data_settings['data']['dynamic']['source_stations']['drops2']
+        if not all([drops_settings['DropsUser'], drops_settings['DropsPwd']]):
+            netrc_handle = netrc.netrc()
+            try:
+                drops_settings['DropsUser'], _, drops_settings['DropsPwd'] = netrc_handle.authenticators(drops_settings['DropsAddress'])
+            except:
+                logging.error(' --> Netrc authentication file not found in home directory! Generate it or provide user and password in the settings!')
+                raise FileNotFoundError(
+                    'Verify that your .netrc file exists in the home directory and that it includes proper credentials!')
         dfData, dfStations = importDropsData(
             drops_settings=data_settings['data']['dynamic']['source_stations']['drops2'], start_time=startRun,
             end_time=dateRun, time_frequency=data_settings['data']['dynamic']['time']['time_frequency'])
@@ -141,13 +152,19 @@ def main():
 
         # Import point gauge data for point_data setup
         try:
-            if data_settings['algorithm']['flags']["sources"]['use_point_data'] is True:
+            if data_settings['algorithm']['flags']["sources"]['use_point_data']:
                 logging.info(' ----> Load time step point data ...')
-                dfStations = pd.read_csv(point_in_time_step, usecols=['code','name','latitude','longitude'], index_col=['code']).rename(columns={'latitude':'lat','longitude':'lon'})
-                data = pd.read_csv(point_in_time_step, usecols=['data']).squeeze()
+                if data_settings['algorithm']['flags']["sources"]['non_standard_tab_fields']:
+                    fields_dict = data_settings['data']['dynamic']['source_stations']['point_files']['non_standard_tab_fields']
+                    dfStations, data = read_point_data(point_in_time_step, st_code=fields_dict["station_code"], st_name=fields_dict["station_name"], st_lon=fields_dict["longitude"],
+                                                       st_lat=fields_dict["latitude"], st_data=fields_dict["data"])
+                else:
+                    dfStations, data = read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data')
             else:
                 data = dfData.loc[timeNow.strftime("%Y-%m-%d %H:00:00")].values
-        except:
+                if len(data) == 0:
+                    raise ValueError
+        except (FileNotFoundError, ValueError) as err:
         # If no time step available skip
             logging.warning(' ----> WARNING! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
             logging.warning(' ----> Skip time step' + timeNow.strftime("%Y-%m-%d %H:00:00"))

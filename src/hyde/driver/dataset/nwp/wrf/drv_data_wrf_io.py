@@ -3,8 +3,8 @@ Library Features:
 
 Name:          drv_data_wrf_io
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20200302'
-Version:       '1.0.0'
+Date:          '20210522'
+Version:       '1.1.0'
 """
 #################################################################################
 # Library

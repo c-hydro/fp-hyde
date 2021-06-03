@@ -4,7 +4,8 @@
       "sources": {
         "use_drops2": true,
         "use_timeseries": false,
-        "use_point_data": false
+        "use_point_data": false,
+        "non_standard_tab_fields": false
       },
       "mcm": {
         "fixed_correlation": true,
@@ -18,10 +19,10 @@
       "overwrite_existing": true
     },
     "general": {
-      "title": "Modified Coonditional Merging",
+      "title": "Modified Coonditional Merging - Satellite",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.2.0 [20201209]",
+      "history": "2.1.0 [20210531]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Data dynamic tool developed by CIMA Research Foundation"
     },
@@ -47,15 +48,18 @@
       "source_gridded": {
         "filename": "marche_gsmap_gauge_{source_gridded_datetime}.nc",
         "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/outcome/obs/satellite/gsmap_gauge_rt/domain/{source_gridded_sub_path_time}",
-        "var_name": "precip",
-        "lat_name": "lat",
-        "lon_name": "lon"
+        "file_type": "netcdf",
+        "nc_settings": {
+          "var_name": "precip",
+          "lat_name": "lat",
+          "lon_name": "lon"
+        }
       },
       "source_stations": {
         "drops2": {
           "DropsAddress": "http://dds.cimafoundation.org/dds/rest",
-          "DropsUser": "",
-          "DropsPwd": "",
+          "DropsUser": "admin",
+          "DropsPwd": "geoDDS2013",
           "DropsSensor": "PLUVIOMETRO",
           "DropsGroup": "Dewetra%default",
           "lon_left": 12.0,

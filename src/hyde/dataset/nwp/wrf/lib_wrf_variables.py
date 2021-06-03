@@ -3,8 +3,8 @@ Library Features:
 
 Name:          lib_wrf_variables
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '2020302'
-Version:       '1.0.0'
+Date:          '20210522'
+Version:       '1.1.0'
 """
 
 #######################################################################################
