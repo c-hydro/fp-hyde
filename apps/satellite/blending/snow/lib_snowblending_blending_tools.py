@@ -60,7 +60,6 @@ def read_mosaic_s2(da_domain, transform_domain, time_step, driver_algorithm, dat
     fx_pixel_size_aggregation = \
         driver_algorithm.algorithm_settings['variables']['source']['snow_cover_S2']['var_method_compute']['params']['pixel_size_aggregation']
     no_data_s2 = driver_algorithm.algorithm_settings['variables']['source']['snow_cover_S2']['var_method_compute']['no_data_value']
-    ground_value_s2 = driver_algorithm.algorithm_settings['variables']['source']['snow_cover_S2']['var_method_compute']['ground_value']
 
     max_julian_day = time_step.dayofyear
     min_julian_day = time_step.dayofyear - info_max_age + 1
@@ -104,20 +103,18 @@ def read_mosaic_s2(da_domain, transform_domain, time_step, driver_algorithm, dat
             # Clean based on julian day
             logging.info(' --> Applying julian day ... ')
             values_this_subdomain = da_this_subdomain.values
-            values_this_subdomain = values_this_subdomain.astype(float)
-            values_this_subdomain[values_this_subdomain > max_julian_day] = no_data_s2
-            values_this_subdomain[values_this_subdomain < ground_value_s2] = no_data_s2
-            values_this_subdomain[(values_this_subdomain > ground_value_s2) &
-                                  (values_this_subdomain < min_julian_day)] = no_data_s2
-            values_this_subdomain[(values_this_subdomain >= min_julian_day)
-                                  & (values_this_subdomain <= max_julian_day)] = 1
+            mask_snow = ((values_this_subdomain >= min_julian_day)
+                                  & (values_this_subdomain <= max_julian_day))
+            mask_nosnow = ((values_this_subdomain <= -1*min_julian_day)
+                                  & (values_this_subdomain >= -1*max_julian_day))
+            values_this_subdomain_masked = np.zeros(values_this_subdomain.shape) + no_data_s2
+            np.putmask(values_this_subdomain_masked, mask_snow, 1)
+            np.putmask(values_this_subdomain_masked, mask_nosnow, 0)
             logging.info(' --> Applying julian day ... DONE ')
-            if ground_value_s2 != 0.0:
-                logging.warning('Ground value is not zero! The algorithm implicitly assumes ground value is zero! Check results!')
 
             # Remap on reference grid
             logging.info(' --> Masking and regridding ... ')
-            values_this_subdomain_on_ref_grid = mask_data(var_data=values_this_subdomain,
+            values_this_subdomain_on_ref_grid = mask_data(var_data=values_this_subdomain_masked,
                                                           var_geo_x=da_this_subdomain.west_east.values,
                                                           var_geo_y=da_this_subdomain.south_north.values,
                                                           ref_geo_y=da_domain.south_north.values,
@@ -149,6 +146,25 @@ def read_mosaic_s2(da_domain, transform_domain, time_step, driver_algorithm, dat
             np.putmask(s2_map_domain, mask, values_this_subdomain_on_ref_grid)
 
             logging.info(' --> Clipping ...  DONE ')
+
+            # plt.figure()
+            # plt.imshow(da_this_subdomain.values)
+            # plt.colorbar()
+            # plt.figure()
+            # plt.imshow(mask_snow)
+            # plt.figure()
+            # plt.imshow(mask_nosnow)
+            # plt.figure()
+            # plt.imshow(values_this_subdomain_masked)
+            # plt.colorbar()
+            # plt.figure()
+            # plt.imshow(values_this_subdomain_on_ref_grid)
+            # plt.colorbar()
+            # plt.figure()
+            # plt.imshow(s2_map_domain)
+            # plt.colorbar()
+            # plt.show()
+            # print()
 
     s2_map_domain[np.isnan(s2_map_domain)] = no_data_s2
     da = create_darray_2d(s2_map_domain, da_domain.west_east, da_domain.south_north,
