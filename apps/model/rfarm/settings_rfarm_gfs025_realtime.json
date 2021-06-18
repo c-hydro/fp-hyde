@@ -1,0 +1,164 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_data": true,
+      "cleaning_dynamic_ancillary_in": true,
+      "cleaning_dynamic_ancillary_out": true,
+      "cleaning_dynamic_out": true,
+      "cleaning_dynamic_tmp": true,
+      "zipping_dynamic_out": true
+    },
+    "ancillary": {
+      "domain" : "regional_domain",
+	  "write_engine": "netcdf4",
+      "zip_format": ".gz"
+    },
+    "general": {
+      "title": "RFarm Model",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "4.0.0 [20190902]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    },
+    "parameters": {
+      "ensemble": {"start": 1, "end": 30},
+      "ratio_s": 18,
+      "ratio_t": 1,
+      "slope_s": null,
+      "slope_t": null,
+      "cs_sf": 2,
+      "ct_sf": 12,
+      "multi_core": false,
+      "domain_extension": 0,
+      "tmp": true
+    }
+  },
+  "data": {
+    "static": {
+      "land": {
+        "terrain_data": {
+          "filename": "guyana.dem.txt",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/"
+        },
+        "grid_data": {
+          "filename": "rf.gfs_0p25.grid_data.workspace",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": null,
+          "folder" : "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/"
+        }
+      }
+    },
+    "dynamic": {
+      "template": {
+        "run_hour":"%H",
+        "datetime_input": "%Hz.0p25.%Y%m%d",
+        "datetime_outcome": "%Hz.0p25.%Y%m%d",
+        "sub_path_time": "%Y/%m/%d",
+        "ensemble": "{:03d}"
+      },
+      "time": {
+        "time_forecast_period": 120,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 0,
+        "time_observed_frequency": "H",
+        "time_rounding": "H"
+      },
+      "input": {
+        "rain_input_data": {
+          "__comment__": "guyana_gfs.t00z.0p25.20200426_srf_rain.nc",
+          "filename": "guyana_gfs.t{datetime_input}_srf_rain.nc",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/"
+        },
+        "rain_input_ancillary" : {
+          "filename" : "{datetime_input}_gfs_0p25_t00z_precipitaion1h.workspace",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/{sub_path_time}/"
+        }
+      },
+      "outcome": {
+        "rain_outcome_ancillary": {
+          "filename": "rf.gfs_t{datetime_outcome}_{ensemble}.workspace",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/{sub_path_time}/"
+        },
+        "rain_outcome_data": {
+          "filename": "rf_guyana_gfs.t{datetime_outcome}_{ensemble}.nc",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/outcome/"
+        }
+      }
+    },
+    "log": {
+        "filename": "rfarm_gfs_0p25_log_realtime.txt",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/log/preprocessing/"
+    },
+    "temp": {
+        "filename": null,
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/temp/"
+    },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_period": 0,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "variables": {
+    "input": {
+      "rain_data": {
+        "id": {
+          "var_type": ["var3d", "inst"],
+          "var_source": "gfs025",
+          "var_format": "netcdf",
+          "var_name": "Total Precipitation",
+          "var_file": "rain_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "total_precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "kg m**-2",
+          "description": ""
+        }
+      }
+    },
+    "outcome": {
+      "rain_data":{
+        "id": {
+          "var_type": ["var3d", "inst"],
+          "var_source": null,
+          "var_format": "netcdf",
+          "var_name": "Rain",
+          "var_file": "rfarm_data",
+          "var_colormap": null,
+          "var_parameters": null
+        },
+        "attributes": {
+          "long_name": "",
+          "standard_name": "total_precipitation",
+          "Missing_value": -9999.0,
+          "_FillValue": -9999.0,
+          "ScaleFactor": 1,
+          "Valid_range": [0, null],
+          "units": "mm",
+          "description": ""
+        }
+      }
+    }
+  }
+}

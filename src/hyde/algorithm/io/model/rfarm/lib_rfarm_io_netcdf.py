@@ -1,5 +1,6 @@
 # -------------------------------------------------------------------------------------
 # Libraries
+import copy
 import logging
 import os
 
@@ -241,11 +242,11 @@ def read_data_gfs_025(file_name, tag_time='time', tag_geo_x='lon', tag_geo_y='la
     log_stream.info(' --> Open file ' + file_name + ' ... DONE')
 
     # Start Debug
-    # mat = da_values[0].values
-    # plt.figure()
-    # plt.imshow(mat[0,:,:])
-    # plt.colorbar()
-    # plt.show()
+    #mat = da_values[0].values
+    #plt.figure()
+    #plt.imshow(mat[0,:,:])
+    #plt.colorbar()
+    #plt.show()
     # End Debug
 
     if var_step_type is None:
@@ -281,29 +282,33 @@ def read_data_gfs_025(file_name, tag_time='time', tag_geo_x='lon', tag_geo_y='la
     if not (var_units == 'mm') and not (var_units == 'm'):
         log_stream.error(' ===> Rain components units are not allowed! Check your data!')
         raise IOError('Data units is not allowed!')
-    if not (var_step_type == 'accum') and not (var_step_type == 'accumulated'):
-        log_stream.error(' ===> Rain components allowed only in istant format! Check your data!')
-        raise IOError('Data type is not allowed!')
+    if (var_step_type == 'accum') or (var_step_type == 'accumulated'):
 
-    var_values_step_start = None
-    var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
-    var_values_out[:, :, :] = np.nan
-    for var_step in range(0, var_shape_in[2]):
+        var_values_step_start = None
+        var_values_out = np.zeros([var_shape_in[0], var_shape_in[1], var_shape_in[2]])
+        var_values_out[:, :, :] = np.nan
 
-        var_values_step_tmp = var_values_in[:, :, var_step]
+        for var_step in range(0, var_shape_in[2]):
 
-        if var_values_step_start is None:
-            var_values_step_end = var_values_step_tmp
-            var_values_step = var_values_step_end
-            var_values_step_start = var_values_step_end
-        else:
-            var_values_step_end = var_values_step_tmp
-            var_values_step = var_values_step_end - var_values_step_start
-            var_values_step_start = var_values_step_end
+            var_values_step_tmp = var_values_in[:, :, var_step]
 
-        var_values_step[var_values_step < 0.0] = 0.0
-        var_values_out[:, :, var_step] = var_values_step / var_scale_factor
+            if var_values_step_start is None:
+                var_values_step_end = var_values_step_tmp
+                var_values_step = var_values_step_end
+                var_values_step_start = var_values_step_end
+            else:
+                var_values_step_end = var_values_step_tmp
+                var_values_step = var_values_step_end - var_values_step_start
+                var_values_step_start = var_values_step_end
 
+            var_values_step[var_values_step < 0.0] = 0.0
+            var_values_out[:, :, var_step] = var_values_step / var_scale_factor
+
+            [var_geox_2d, var_geoy_2d] = np.meshgrid(var_geo_x, var_geo_y, sparse=False, indexing='xy')
+
+    elif (var_step_type == 'inst') or (var_step_type == 'instantaneous'):
+        var_values_out = copy.deepcopy(var_values_in)
+        var_values_in[var_values_in < 0.0] = 0.0
         [var_geox_2d, var_geoy_2d] = np.meshgrid(var_geo_x, var_geo_y, sparse=False, indexing='xy')
 
     # DEBUG START

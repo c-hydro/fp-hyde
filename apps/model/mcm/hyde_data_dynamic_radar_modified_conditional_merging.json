@@ -2,10 +2,10 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": true,
+        "use_drops2": false,
         "use_timeseries": false,
-        "use_point_data": false,
-        "non_standard_tab_fields": false
+        "use_point_data": true,
+        "non_standard_tab_fields": true
       },
       "mcm": {
         "fixed_correlation": false,

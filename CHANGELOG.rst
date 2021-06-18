@@ -23,6 +23,9 @@ BIN: **hyde_downloader_nwp_gfs_nomads.py**
 	        - [2021-03-25] Setting file template modified for supporting GFS v16. Added checks for granting Continuum compatibility.
             - [2021-02-12] Release for Hyde package from previous "hyde_downloader_nwp.py"
 
+BIN: **hyde_downloader_nwp_gfs_historical.py**
+    - Release for Hyde package
+
 BIN: **hyde_downloader_nwp_gfs_ftp.py**
 	- Release for Hyde package
 

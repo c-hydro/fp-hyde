@@ -284,28 +284,34 @@ def main():
 
             fig, axs = plt.subplots(2,2)
 
-            maxVal = np.max(np.concatenate((sat["precip"].values.flatten(),griso_out["precip"].values.flatten(), conditioned_sat.flatten(), data)))
+            maxVal = np.nanmax(np.concatenate((sat["precip"].values.flatten(),griso_out["precip"].values.flatten(), conditioned_sat.flatten(), data)))
             griso_out["precip"].plot(x="lon", y="lat", cmap='gray', ax=axs[0, 0], alpha=0.4, add_colorbar = False)
-            OB = axs[0, 0].scatter(dfStations.lon.astype(np.float),dfStations.lat.astype(np.float) ,10, c=data, vmin=0, vmax=maxVal)
+            OB = axs[0, 0].scatter(dfStations.lon.astype(np.float),dfStations.lat.astype(np.float) ,3, c=data, vmin=0, vmax=maxVal)
             axs[0, 0].set_title("OBS")
-            fig.colorbar(OB, ax=axs[0, 0])
+            axs[0, 0].set_xlabel("")
+            axs[0 ,0].set_ylabel("")
+            plt.colorbar(OB, ax=axs[0, 0])
 
             SAT = sat["precip"].plot(x="lon", y="lat", ax=axs[0, 1], add_colorbar = False, vmin=0, vmax=maxVal)
             axs[0, 1].set_title("SAT")
-            fig.colorbar(SAT, ax=axs[0, 1])
+            axs[0, 1].set_xlabel("")
+            axs[0, 1].set_ylabel("")
+            plt.colorbar(SAT, ax=axs[0, 1])
 
             GR = griso_out["precip"].plot(x="lon", y="lat", ax=axs[1, 0], add_colorbar = False, vmin=0, vmax=maxVal)
             axs[1, 0].set_title("GRISO")
-            fig.colorbar(GR, ax=axs[1, 0])
+            axs[1, 0].set_xlabel("")
+            axs[1, 0].set_ylabel("")
+            plt.colorbar(GR, ax=axs[1, 0])
 
             MCM = mcm_out.plot(x="lon", y="lat", ax=axs[1, 1], add_colorbar = False, vmin=0, vmax=maxVal)
-            axs[1, 1].set_xlabel("longitude [degrees_east]")
-            axs[1, 1].set_ylabel("latitude [degrees_north]")
+            axs[1, 1].set_xlabel("")
+            axs[1, 1].set_ylabel("")
             axs[1, 1].set_title("MCM")
-            fig.colorbar(MCM, ax=axs[1, 1])
+            plt.colorbar(MCM, ax=axs[1, 1])
 
             plt.suptitle(timeNow.strftime("%Y-%m-%d %H:%M"))
-            #plt.show(block=True)
+            # plt.show(block=True)
 
             plt.tight_layout()
             plt.savefig(os.path.join(os.path.dirname(ancillary_out_time_step), 'figure_mcm_' + timeNow.strftime("%Y%m%d_%H%M" + '.png')))

@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 """
-HyDE Downloading Tool - NWP GFS 0.25 backup procedure UCAR server
+HyDE Downloading Tool - NWP GFS 0.25 historical downloader
 
-__date__ = '20200428'
-__version__ = '2.0.0'
+__date__ = '20210618'
+__version__ = '1.0.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
@@ -12,16 +12,10 @@ __author__ =
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_nwp_gfs_ftp.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
+python3 hyde_downloader_nwp_gfs_historical.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
-20210609 (2.0.1) --> Add shifting of longitudes from [0,360] to [-180,180]
-20200428 (2.0.0) --> Change output format according to Nomads update.
-20200325 (1.8.0) --> Fix time accumulation for Continuum forcing compatibility
-                     Add check on the output dimension "heigth" for producing Continuum compliant
-                     Set reindex with "nearest" approach for filling the time range. Version number alligned to Nomads downloader.
-20210311 (1.1.0) --> Add conversion to wind and temperature Continuum compliant
-20210212 (1.0.0) --> Beta release
+20210618 (1.0.0) --> Beta release
 """
 # -------------------------------------------------------------------------------------
 
@@ -40,14 +34,16 @@ import os
 import time
 import json
 import numpy as np
+from siphon.http_util import session_manager
+import netrc
 
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
-alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS BACKUP PROCEDURE'
-alg_version = '2.0.0'
-alg_release = '2021-04-28'
+alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS HISTORICAL DOWNLOADER'
+alg_version = '1.0.0'
+alg_release = '2021-06-18'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -63,10 +59,18 @@ def main():
     # Set algorithm settings
     data_settings = read_file_json(alg_settings)
 
+    # Initialize UCAR user/pwd
+    if data_settings["data"]["credential_historical_ucar_archive"]["username"] is None or data_settings["data"]["credential_historical_ucar_archive"]["password"] is None:
+        netrc_handle = netrc.netrc()
+        UCARuser, _, UCARpwd = netrc_handle.authenticators('rda.ucar.edu')
+    else:
+        UCARuser = data_settings["data"]["credential_historical_ucar_archive"]["username"]
+        UCARpwd = data_settings["data"]["credential_historical_ucar_archive"]["password"]
+
     # Set algorithm logging
     os.makedirs(data_settings['data']['log']['folder'], exist_ok=True)
     set_logging(logger_file=os.path.join(data_settings['data']['log']['folder'], data_settings['data']['log']['filename']))
-
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
     # -------------------------------------------------------------------------------------
     # Info algorithm
     logging.info(' ============================================================================ ')
@@ -98,59 +102,92 @@ def main():
     variables = data_settings["data"]["dynamic"]["variables"]
     variables_name = [i for i in variables.keys()]
 
+    # Extract keys info
+    variables_info = {}
+    for varHMC in variables_name:
+        for varGFS in variables[varHMC].keys():
+            variables_info[varGFS] = variables[varHMC][varGFS]
+
+    logging.info(' ---> Connect to UCAR archive...')
+    session_manager.set_session_options(auth=(UCARuser, UCARpwd))
+    archiveFrc = TDSCatalog(
+        'https://rda.ucar.edu/thredds/catalog/files/g/ds084.1/' + timeRun.strftime('%Y') + '/' + timeRun.strftime(
+            '%Y%m%d') + '/catalog.xml')
+    listFrc = [i for i in list(archiveFrc.datasets.values()) if timeRun.strftime('%Y%m%d%H') in i.id and  int(i.id[-9:-6])<=data_settings["data"]["dynamic"]["time"]["time_forecast_period"]]
+    outVarName = [varGFS for varHMC in variables.keys() for varGFS in variables[varHMC]]
+
+    frcStepTimes = [timeRun + pd.Timedelta(str(int(frcStepDS.name[-9:-6])) + 'H') for frcStepDS in listFrc[1:]]
+
+    logging.info(' ---> Connect to UCAR archive... OK')
+
     # Query remote UCAR server for data
-    logging.info(' ---> Search files on UCAR server ... ')
-    lastFrc = TDSCatalog('https://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/GFS_Global_0p25deg_' + timeRun.strftime('%Y%m%d') + '_' + timeRun.strftime('%H%M') + '.grib2/catalog.xml')
-    lastFrcDS = list(lastFrc.datasets.values())[0]
-    ncss = NCSS(lastFrcDS.access_urls['NetcdfSubset'])
+    for frcStepDS, time_frc in zip(listFrc[1:], frcStepTimes):
+        ncss = NCSS(frcStepDS.access_urls['NetcdfSubset'])
 
-    logging.info(' ---> Forecast GFS_Global_0p25deg_' + timeRun.strftime('%Y%m%d') + '_' + timeRun.strftime('%H%M') + '.grib2 found')
+        # Remove variables not contained in dataset
+        variablesGFS = convert_historical_GFS_varnames(outVarName)
+        presentVariables = ()
 
-    variablesGFS = [varGFS for varHMC in variables.keys() for varGFS in variables[varHMC]]
+        for v in variablesGFS:
+            if v in ncss.variables:
+                presentVariables = presentVariables + (v,)
 
-    # Remove variables not contained in dataset
-    presentVariables = ()
-    for v in variablesGFS:
-        if v in ncss.variables:
-            presentVariables = presentVariables + (v,)
+        if len(presentVariables) < len(outVarName):
+            variablesGFS = [w.replace('6_Hour', '3_Hour') for w in variablesGFS]
+            presentVariables = ()
+            for v in variablesGFS:
+                if v in ncss.variables:
+                    presentVariables = presentVariables + (v,)
 
-    logging.info(' ---> Download forecast file ... ')
-    query = ncss.query()
-    query.lonlat_box(data_settings["data"]["static"]["bounding_box"]["lon_left"], data_settings["data"]["static"]["bounding_box"]["lon_right"], data_settings["data"]["static"]["bounding_box"]["lat_bottom"], data_settings["data"]["static"]["bounding_box"]["lat_top"])
-    query.accept('netcdf4')
-    query.variables(*presentVariables)
+            if len(presentVariables) < len(variablesGFS):
+                logging.warning("---> WARNING! Some variables are not present in the original dataset!")
+        logging.info(' --> Forecast time ' + time_frc.strftime("%Y-%m-%d %H:%M"))
+        logging.info(' --> Download forecast file ' + frcStepDS.name)
+        query = ncss.query()
+        query.lonlat_box(data_settings["data"]["static"]["bounding_box"]["lon_left"], data_settings["data"]["static"]["bounding_box"]["lon_right"], data_settings["data"]["static"]["bounding_box"]["lat_bottom"], data_settings["data"]["static"]["bounding_box"]["lat_top"])
+        query.accept('netcdf4')
+        query.variables(*presentVariables)
 
-    # Download variables
-    if timeRun is not None and timeEnd is not None:
-        query.time_range(timeRun, timeEnd)
-    else:
         query.all_times()
-    data = ncss.get_data(query)
-    data = xr.open_dataset(NetCDF4DataStore(data))
-    logging.info(' ---> Download forecast file ... OK ')
+        data = ncss.get_data(query)
+        data = xr.open_dataset(NetCDF4DataStore(data)).drop_dims("bounds_dim", errors='ignore')
 
+        if frcStepDS.name == listFrc[1].name:
+            frcDS = xr.Dataset(coords={'time':frcStepTimes, 'lat':data.latitude.values, 'lon':data.longitude.values})
+            for variableGFS in outVarName:
+                frcDS[variableGFS] = xr.DataArray(dims=['time','lat','lon'], coords={'time':pd.date_range(timeRun + pd.Timedelta('1H'), timeEnd, freq='1H'), 'lat':data.latitude.values, 'lon':data.longitude.values})
+
+        for presentVariable, variableGFS in zip(presentVariables, outVarName):
+            logging.info(' ---> Download variable ' + presentVariable)
+            if len(data[presentVariable].dims) > 3:
+                if 'height' in data[presentVariable].dims:
+                    data_step = data.loc[{'height':variables_info[variableGFS]["height"]}][presentVariable].squeeze().rename({'longitude':'lon','latitude':'lat'})
+                else:
+                    height_dim = [i for i in data[presentVariable].dims if 'height' in i]
+                    if len(height_dim) > 1:
+                        logging.error(" --> ERROR! Cannot identify heigth dim name for variable " + presentVariable)
+                        raise ValueError
+                    else:
+                        data_step = data.loc[{height_dim[0]: variables_info[variableGFS]["height"]}][presentVariable].squeeze().rename({'longitude':'lon','latitude':'lat'})
+            else:
+                data_step = data[presentVariable].squeeze().rename({'longitude':'lon','latitude':'lat'})
+
+            frcDS[variableGFS].loc[{'time':time_frc}] = data_step
+
+    logging.info(' ---> Download forecast file ... OK ')
     output_list = []
 
     # Merge and reformat downloaded file to be consistent with the outcomes of the NOMADS gfs download procedure
     logging.info(' ---> Compute output files ... ')
+    timeRange = pd.date_range(timeRun + pd.Timedelta(variables[varHMC][varGFS]["freq"]), timeEnd,
+                              freq=variables[varHMC][varGFS]["freq"])
+
     for varHMC in variables_name:
         logging.info(' ---> Elaborate ' + varHMC + ' file...')
         variables_GFS_in = [i for i in variables[varHMC].keys()]
         logging.info(' ---> Is expected to contain GFS variables:' + ','.join(variables_GFS_in))
         for varGFS in variables[varHMC].keys():
-            logging.info(' ----> Compute ' + varGFS + ' variable...')
-            if len(data[varGFS].shape)==4:
-                varIn = data[varGFS].loc[:,[variables[varHMC][varGFS]["height"]],:,:]
-                codHeight = str(variables[varHMC][varGFS]["height"]) + 'm'
-                varIn = varIn.rename({varIn.dims[0]: 'time', varIn.dims[1]:"height"})
-            elif len(data[varGFS].shape)==3:
-                varIn = data[varGFS]
-                codHeight = 'srf'
-                varIn = varIn.rename({varIn.dims[0]: 'time'})
-            else:
-                print('Problem in data shape for variable ' + varGFS)
-
-            timeRange = pd.date_range(timeRun + pd.Timedelta(variables[varHMC][varGFS]["freq"]), timeEnd, freq=variables[varHMC][varGFS]["freq"])
+            varIn = frcDS[varGFS]
             varFilled = varIn.reindex({'time': timeRange}, method='nearest')
 
             if varGFS=="Precipitation_rate_surface_Mixed_intervals_Average":
@@ -159,9 +196,6 @@ def main():
                     varFilled = temp.cumsum(dim=temp.dims[0], keep_attrs=True)
                 else:
                     varFilled = deepcopy(varFilled)*3600
-
-            if "height" in [i for i in varIn.dims]:
-                varFilled = varFilled.squeeze(dim="height", drop=True)
 
             outName = data_settings["algorithm"]["ancillary"]["domain"] + "_gfs.t" + timeRun.strftime('%H') + "z.0p25." + timeRun.strftime('%Y%m%d') + "_" + variables[varHMC][varGFS]["out_group"] + ".nc"
 
@@ -316,6 +350,11 @@ def set_logging(logger_file='log.txt', logger_format=None):
 
 # -------------------------------------------------------------------------------------
 
+# -------------------------------------------------------------------------------------
+def convert_historical_GFS_varnames(varList):
+    conversion_dict = {"Precipitation_rate_surface_Mixed_intervals_Average":"Precipitation_rate_surface_6_Hour_Average", "Downward_Short-Wave_Radiation_Flux_surface_Mixed_intervals_Average":"Downward_Short-Wave_Radiation_Flux_surface_6_Hour_Average", "Downward_Long-Wave_Radp_Flux_surface_Mixed_intervals_Average":"Downward_Long-Wave_Radp_Flux_surface_6_Hour_Average", "Albedo_surface_Mixed_intervals_Average":"Albedo_surface_6_Hour_Average"}
+    outputVarList = [conversion_dict.get(x, x) for x in varList]
+    return outputVarList
 
 # ----------------------------------------------------------------------------
 # Call script from external library
