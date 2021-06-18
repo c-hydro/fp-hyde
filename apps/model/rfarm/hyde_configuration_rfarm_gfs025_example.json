@@ -39,17 +39,17 @@
       "land": {
         "terrain_data": {
           "filename": "guyana.dem.txt",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/"
+          "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_static/guyana/gridded/"
         },
         "grid_data": {
           "filename": "rf.gfs_0p25.grid_data.workspace",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/"
+          "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/ancillary/nwp/rfarm_gfs025/"
         }
       },
       "colormap": {
         "rain_colormap" : {
           "filename": null,
-          "folder" : "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/"
+          "folder" : "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/ancillary/nwp/rfarm_gfs025/"
         }
       }
     },
@@ -72,31 +72,31 @@
         "rain_input_data": {
           "__comment__": "guyana_gfs.t00z.0p25.20200426_srf_rain.nc",
           "filename": "guyana_gfs.t{datetime_input}_srf_rain.nc",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/"
+          "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/outcome/nwp/gfs025/domain/{sub_path_time}/"
         },
         "rain_input_ancillary" : {
           "filename" : "{datetime_input}_gfs_0p25_t00z_precipitaion1h.workspace",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/{sub_path_time}/"
+          "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/ancillary/nwp/rfarm_gfs025/{sub_path_time}/"
         }
       },
       "outcome": {
         "rain_outcome_ancillary": {
           "filename": "rf.gfs_t{datetime_outcome}_{ensemble}.workspace",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/ancillary/nwp/rfarm_gfs025/{sub_path_time}/"
+          "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/ancillary/nwp/rfarm_gfs025/{sub_path_time}/"
         },
         "rain_outcome_data": {
           "filename": "rf_guyana_gfs.t{datetime_outcome}_{ensemble}.nc",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/outcome/"
+          "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/outcome/nwp/rfarm_gfs025/{sub_path_time}/"
         }
       }
     },
     "log": {
         "filename": "rfarm_gfs_0p25_log_realtime.txt",
-        "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/log/preprocessing/"
+        "folder": "/home/hsnfews/floodProofs_HSNFEWS/log/preprocessing/"
     },
     "temp": {
         "filename": null,
-        "folder": "/home/andrea/CIMA/DEVELOPEMENT/rfarm/temp/"
+        "folder": "/home/hsnfews/floodProofs_HSNFEWS/data/data_dynamic/ancillary/nwp/rfarm_gfs025/temp/"
     },
     "library": {
       "filename": "",
