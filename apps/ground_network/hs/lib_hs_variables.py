@@ -3,8 +3,8 @@ Library Features:
 
 Name:          lib_hs_variables
 Author(s):     Francesco Avanzi (francesco.avanzi@cimafoundation.org), Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20210525'
-Version:       '1.0.0'
+Date:          '20210621'
+Version:       '1.0.1'
 """
 
 #######################################################################################
@@ -188,13 +188,15 @@ def compute_snow_height(var_data, var_geo_x, var_geo_y, var_geo_z,
                                               interp_radius_x=fx_interp_radius_x,
                                               interp_radius_y=fx_interp_radius_y,
                                               n_cpu=fx_n_cpu)
+            var_point_res_after = grid_data_res_this_region[index_geo_y_this_region, index_geo_x_this_region]
             grid_data_res_this_region[ref_geo_homogeneous_region != homog_region_this_round] = np.nan
             grid_data_res_this_region[grid_data_res_this_region == fx_nodata] = np.nan
             #note: we set grid_data_res_this_region to nan also where it shows missing value, because this is not the final
             #map. We will add it to basemap.
 
             #final map
-            grid_data_this_region = grid_basemap_this_region + grid_data_res_this_region
+            grid_data_this_region = grid_basemap_this_region - grid_data_res_this_region
+            var_data_select_this_region_after = grid_data_this_region[index_geo_y_this_region, index_geo_x_this_region]
             grid_data_this_region[grid_data_this_region < 0] = 0
             grid_map_all_regions[ref_geo_homogeneous_region == homog_region_this_round] = deepcopy(\
                 grid_data_this_region[ref_geo_homogeneous_region == homog_region_this_round])

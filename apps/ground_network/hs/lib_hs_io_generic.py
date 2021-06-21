@@ -3,8 +3,8 @@ Library Features:
 
 Name:          lib_hs_io_generic
 Author(s):     Francesco Avanzi (francesco.avanzi@cimafoundation.org), Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20210525'
-Version:       '1.0.0'
+Date:          '20210621'
+Version:       '1.1.0'
 """
 #######################################################################################
 # Libraries
@@ -344,6 +344,10 @@ def create_dset(var_data_dict, geo_data_values, geo_x_values, geo_y_values, time
             if fill_value is None:
                 fill_value = fill_value_default
             var_da_data = var_da_data.where(var_da_terrain > global_attrs_dict['nodata_value'], other=fill_value)
+
+            if var_attrs_step['scale_factor'] is not None:
+                var_da_data = var_da_data*var_attrs_step['scale_factor']
+                var_da_data = var_da_data.where(var_da_data > global_attrs_dict['nodata_value'])
 
         var_dset[var_name_step] = var_da_data
 
