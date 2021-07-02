@@ -75,7 +75,7 @@
   },
   "library" : {
     "name": "mrt",
-    "folder" : "/home/fabio/Documents/Work_Area/Code_Development/Library/mrt-4.1/bin/",
+    "folder" : "/home/fabio/Desktop/Library/mrt-4.1/bin/",
     "app_mosaic": {
       "executable": "mrtmosaic",
       "activation": true

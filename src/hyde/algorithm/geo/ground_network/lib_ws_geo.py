@@ -5,6 +5,8 @@ import numpy as np
 import rasterio
 import rasterio.crs
 import os
+import matplotlib.pylab as plt
+from rasterio.enums import Resampling
 
 from src.hyde.algorithm.io.ground_network.lib_ws_io_generic import create_darray_2d
 
@@ -51,24 +53,44 @@ def find_geo_index(geo_x_ref, geo_y_ref, geo_x_var, geo_y_var, geo_cellsize_var)
 
 
 # -------------------------------------------------------------------------------------
-# Method to get a raster ascii file
 def read_file_raster(file_name, file_proj='epsg:4326', var_name='land',
                      coord_name_x='west_east', coord_name_y='south_north',
-                     dim_name_x='west_east', dim_name_y='south_north'):
+                     dim_name_x='west_east', dim_name_y='south_north', no_data_default=-9999.0, scale_factor=1):
 
     if os.path.exists(file_name):
-        if file_name.endswith('.txt') or file_name.endswith('.asc'):
+        if (file_name.endswith('.txt') or file_name.endswith('.asc')) or file_name.endswith('.tif'):
 
-            crs = rasterio.crs.CRS({"init": file_proj})
             with rasterio.open(file_name, mode='r+') as dset:
-                dset.crs = crs
-                bounds = dset.bounds
-                no_data = dset.nodata
-                res = dset.res
-                transform = dset.transform
-                data = dset.read()
+
+                # resample data to target
+                # source: https://rasterio.readthedocs.io/en/latest/topics/resampling.html
+                data = dset.read(
+                    out_shape=(
+                        dset.count,
+                        int(dset.height * scale_factor),
+                        int(dset.width * scale_factor)
+                    ),
+                    resampling=Resampling.mode
+                )
+
+                # scale image transform
+                transform = dset.transform * dset.transform.scale(
+                    (dset.width / data.shape[-1]),
+                    (dset.height / data.shape[-2])
+                )
+
+                #Get ancillary info
+                crs = dset.crs
                 proj = dset.crs.wkt
+                bounds = rasterio.transform.array_bounds(data.shape[-2], data.shape[-1], transform)
+                bounds = rasterio.coords.BoundingBox(bounds[0], bounds[1], bounds[2], bounds[3])
+                no_data = dset.nodata
+                res = (abs(transform.a), abs(transform.e))  #we take resolution from the delta_x in the transform, assuming delta_x and delta_y are the same
                 values = data[0, :, :]
+
+            # Define no data if none or nan
+            if (no_data is None) or (np.isnan(no_data)):
+                no_data = no_data_default
 
             decimal_round = 7
 
@@ -78,8 +100,16 @@ def read_file_raster(file_name, file_proj='epsg:4326', var_name='land',
             center_bottom = bounds.bottom + (res[1] / 2)
 
             lon = np.arange(center_left, center_right + np.abs(res[0] / 2), np.abs(res[0]), float)
-            lat = np.arange(center_bottom, center_top + np.abs(res[0] / 2), np.abs(res[1]), float)
+            lat = np.flip(np.arange(center_bottom, center_top + np.abs(res[0] / 2), np.abs(res[1]), float), axis=0)
             lons, lats = np.meshgrid(lon, lat)
+
+            if center_bottom > center_top:
+                center_bottom_tmp = center_top
+                center_top_tmp = center_bottom
+                center_bottom = center_bottom_tmp
+                center_top = center_top_tmp
+                values = np.flipud(values)
+                lats = np.flipud(lats)
 
             min_lon_round = round(np.min(lons), decimal_round)
             max_lon_round = round(np.max(lons), decimal_round)
@@ -95,8 +125,6 @@ def read_file_raster(file_name, file_proj='epsg:4326', var_name='land',
             assert max_lon_round == center_right_round
             assert min_lat_round == center_bottom_round
             assert max_lat_round == center_top_round
-
-            lats = np.flipud(lats)
 
             dims = values.shape
             high = dims[0] # nrows
@@ -114,5 +142,5 @@ def read_file_raster(file_name, file_proj='epsg:4326', var_name='land',
         logging.error(' ===> Geographical file ' + file_name + ' not found')
         raise IOError('Geographical file location or name is wrong')
 
-    return da, wide, high, proj, transform, bounding_box, no_data
+    return da, wide, high, proj, transform, bounding_box, no_data, crs
 # -------------------------------------------------------------------------------------

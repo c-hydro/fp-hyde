@@ -14,7 +14,7 @@ virtual_env_name='hsaf_env_python3'
 
 #-----------------------------------------------------------------------------------------
 # Get file information
-script_file='/home/hsaf/hyde-master/apps/hsaf/snow/HYDE_DynamicData_HSAF_H10.py'
+script_file='/home/hsaf/hyde-master/apps/hsaf/snow/S3MResampler.py'
 setting_file='/home/hsaf/hyde-master/apps/hsaf/snow/hyde_configuration_hsaf_h10_realtime.json'
 
 # Get information (-u to get gmt time)

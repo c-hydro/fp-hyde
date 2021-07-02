@@ -5,7 +5,6 @@ import re
 
 import xarray as xr
 import pandas as pd
-import numpy as np
 
 from src.hyde.algorithm.settings.nwp.wrf.lib_wrf_args import logger_name
 
@@ -21,7 +20,7 @@ log_stream = logging.getLogger(logger_name)
 # Method to read data for wrf
 def read_data_wrf(file_name, var_name=None,
                   tag_coord_time='time', tag_coord_geo_x='lon', tag_coord_geo_y='lat',
-                  tag_dim_time='time', tag_dim_geo_x='lon', tag_dim_geo_y='lat', engine='netcdf'):
+                  tag_dim_time='time', tag_dim_geo_x='lon', tag_dim_geo_y='lat'):
 
     # Starting info
     log_stream.info(' --> Open file ' + file_name + ' ... ')
@@ -34,10 +33,7 @@ def read_data_wrf(file_name, var_name=None,
             var_name = [var_name]
 
     # Open datasets
-    if engine=='netcdf':
-        engine='netcdf4'
-
-    dst = xr.open_dataset(file_name, engine=engine)
+    dst = xr.open_dataset(file_name)
 
     # Get variables ALL and DATA
     var_list_all = list(dst.variables)
@@ -50,7 +46,6 @@ def read_data_wrf(file_name, var_name=None,
     log_stream.info(' ---> Get time, geo_x and geo_y data ... ')
     if tag_coord_time in var_list_all:
         da_time = dst[tag_coord_time]
-        match_str_step = tag_coord_time
     else:
 
         log_stream.info(' ---> Time dimension name is not in the variables list of grib file. '
@@ -70,110 +65,65 @@ def read_data_wrf(file_name, var_name=None,
             log_stream.error(' ===> Time dimension name is not in the variables list of grib file')
             raise IOError(' ===> Check the time dimension!')
 
-    if len(da_time) == 1:
-        if tag_coord_geo_x in var_list_all:
-            da_geo_x_tmp = dst[tag_coord_geo_x]
-            if tag_dim_time in da_geo_x_tmp.dims:
-                da_geo_x = da_geo_x_tmp.squeeze(tag_dim_time)
-            else:
-                da_geo_x = da_geo_x_tmp
+    if tag_coord_geo_x in var_list_all:
+        da_geo_x_tmp = dst[tag_coord_geo_x]
+        if tag_dim_time in da_geo_x_tmp.dims:
+            da_geo_x = da_geo_x_tmp.squeeze(tag_dim_time)
         else:
-            log_stream.error(' ===> GeoX dimension name is not in the variables list of grib file')
-            raise IOError(' ===> Check the GeoX dimension!')
-        if tag_coord_geo_y in var_list_all:
-            da_geo_y_tmp = dst[tag_coord_geo_y]
-            if tag_dim_time in da_geo_y_tmp.dims:
-                da_geo_y = da_geo_y_tmp.squeeze(tag_dim_time)
-            else:
-                da_geo_y = da_geo_y_tmp
+            da_geo_x = da_geo_x_tmp
+    else:
+        log_stream.error(' ===> GeoX dimension name is not in the variables list of grib file')
+        raise IOError(' ===> Check the GeoX dimension!')
+    if tag_coord_geo_y in var_list_all:
+        da_geo_y_tmp = dst[tag_coord_geo_y]
+        if tag_dim_time in da_geo_y_tmp.dims:
+            da_geo_y = da_geo_y_tmp.squeeze(tag_dim_time)
         else:
-            log_stream.error(' ===> GeoY dimension name is not in the variables list of grib file')
-            raise IOError(' ===> Check the GeoY dimension!')
-        log_stream.info(' --->  Get time, geo_x and geo_y data ... DONE')
+            da_geo_y = da_geo_y_tmp
+    else:
+        log_stream.error(' ===> GeoY dimension name is not in the variables list of grib file')
+        raise IOError(' ===> Check the GeoY dimension!')
+    log_stream.info(' --->  Get time, geo_x and geo_y data ... DONE')
 
-        var_list_select = []
-        for var_step in var_name:
-            if var_step in var_list_data:
-                var_list_select.append(var_step)
-            else:
-                log_stream.warning(' ===> Variable name ' + var_step + ' is not available in the datasets')
-
-        time_period = []
-        try:
-            test_time_format = np.issubdtype(da_time[0].values, np.datetime64)
-            datetime_idx = pd.to_datetime(da_time.astype(int)).round('H')
-        except:
-            for time_byte in da_time.values:
-                time_str = time_byte.decode("utf-8")
-                time_period.append(time_str)
-            datetime_idx = pd.to_datetime(time_period, format='%Y-%m-%d_%H:%M:%S')
-            datetime_idx = datetime_idx.round('H')
-
-        log_stream.info(' ---> Get time, geo_x and geo_y data ... DONE')
-
-        # Get data
-        da_var = []
-        for var_list_step in var_list_select:
-            log_stream.info(' --->  Get ' + var_list_step + ' data ... ')
-            da_step = dst[var_list_step]
-
-            if tag_coord_time not in list(da_step.coords):
-                da_step = da_step.squeeze(tag_dim_time)
-                da_step = da_step.expand_dims({tag_dim_time: datetime_idx})
-
-            da_var.append(da_step)
-            log_stream.info(' --->  Get ' + var_list_step + ' data ... DONE')
-
-        # Ending info
-        log_stream.info(' --> Open file ' + file_name + ' ... DONE')
-
-    elif len(da_time)>1:
-        if tag_coord_geo_x in var_list_all:
-            da_geo_x_tmp = dst[tag_coord_geo_x]
-            if tag_dim_time in da_geo_x_tmp.dims:
-                da_geo_x = da_geo_x_tmp.loc[da_geo_x_tmp[tag_dim_time]==da_geo_x_tmp[tag_dim_time][0].values].squeeze()
-            else:
-                da_geo_x = da_geo_x_tmp
+    var_list_select = []
+    for var_step in var_name:
+        if var_step in var_list_data:
+            var_list_select.append(var_step)
         else:
-            log_stream.error(' ===> GeoX dimension name is not in the variables list of grib file')
-            raise IOError(' ===> Check the GeoX dimension!')
-        if tag_coord_geo_y in var_list_all:
-            da_geo_y_tmp = dst[tag_coord_geo_y]
-            if tag_dim_time in da_geo_y_tmp.dims:
-                da_geo_y = da_geo_y_tmp.loc[da_geo_y_tmp[tag_dim_time]==da_geo_y_tmp[tag_dim_time][0].values].squeeze()
-            else:
-                da_geo_y = da_geo_y_tmp
-        else:
-            log_stream.error(' ===> GeoY dimension name is not in the variables list of grib file')
-            raise IOError(' ===> Check the GeoY dimension!')
-        log_stream.info(' --->  Get time, geo_x and geo_y data ... DONE')
+            log_stream.warning(' ===> Variable name ' + var_step + ' is not available in the datasets')
 
-        var_list_select = []
-        for var_step in var_name:
-            if var_step in var_list_data:
-                var_list_select.append(var_step)
-            else:
-                log_stream.warning(' ===> Variable name ' + var_step + ' is not available in the datasets')
+    time_period = []
+    for time_byte in da_time.values:
+        time_str = time_byte.decode("utf-8")
+        time_period.append(time_str)
+    datetime_idx = pd.to_datetime(time_period, format='%Y-%m-%d_%H:%M:%S')
+    datetime_idx = datetime_idx.round('H')
 
-        log_stream.info(' ---> Get time, geo_x and geo_y data ... DONE')
+    log_stream.info(' ---> Get time, geo_x and geo_y data ... DONE')
 
-        # Get data
-        da_var = []
-        for var_list_step in var_list_select:
-            log_stream.info(' --->  Get ' + var_list_step + ' data ... ')
-            da_var = dst[var_list_step]
-            log_stream.info(' --->  Get ' + var_list_step + ' data ... DONE')
+    # Get data
+    da_var = []
+    for var_list_step in var_list_select:
+        log_stream.info(' --->  Get ' + var_list_step + ' data ... ')
+        da_step = dst[var_list_step]
 
-        # Ending info
-        log_stream.info(' --> Open file ' + file_name + ' ... DONE')
+        if tag_coord_time not in list(da_step.coords):
+            da_step = da_step.squeeze(tag_dim_time)
+            da_step = da_step.expand_dims({tag_dim_time: datetime_idx})
 
-        # Start Debug
-        # mat = da_values[0].values
-        # plt.figure()
-        # plt.imshow(mat[0,:,:])
-        # plt.colorbar()
-        # plt.show()
-        # End Debug
+        da_var.append(da_step)
+        log_stream.info(' --->  Get ' + var_list_step + ' data ... DONE')
+
+    # Ending info
+    log_stream.info(' --> Open file ' + file_name + ' ... DONE')
+
+    # Start Debug
+    # mat = da_values[0].values
+    # plt.figure()
+    # plt.imshow(mat[0,:,:])
+    # plt.colorbar()
+    # plt.show()
+    # End Debug
 
     return da_var, da_time, da_geo_x, da_geo_y
 # -------------------------------------------------------------------------------------
