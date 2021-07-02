@@ -179,7 +179,7 @@ class DriverGeo:
         if os.path.exists(file_path_land):
             if not os.path.exists(file_path_ancillary):
 
-                da_land, wide_land, high_land, proj_land, transform_land, bounding_box, no_data_land, crs_land = read_file_raster(
+                da_land, wide_land, high_land, proj_land, transform_land, bounding_box, no_data_land = read_file_raster(
                     file_path_land,
                     coord_name_x=self.tag_coord_geo_x, coord_name_y=self.tag_coord_geo_y,
                     dim_name_x=self.tag_dim_geo_x, dim_name_y=self.tag_dim_geo_y, var_name=var_name)

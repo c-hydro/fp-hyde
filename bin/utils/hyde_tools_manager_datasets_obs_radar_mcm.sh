@@ -2,19 +2,20 @@
 
 # ----------------------------------------------------------------------------------------
 # Script information
-script_name='HYDE DOWNLOADER - HSAF PRODUCT SNOW H12'
-script_version="1.5.0"
-script_date='2018/07/25'
+script_name='HYDE UTILS - MANAGER DATASETS - OBS - RADAR PRECIPITATION MCM - REALTIME'
+script_version="1.0."
+script_date='2019/07/10'
+
+# Specific command line usage:
+# rsync -v -e ssh -v regmarche@130.251.104.16:/home/regmarche/geotiff/2019/07/10/MCM_20190710160000.tif /hydro/data/dynamic_data/source/observation/mcm/2019/07/10/
 
 # Script argument(s)
-data_folder_raw="/home/hsaf/hsaf_datasets/dynamic/source/h12/%YYYY/%MM/%DD/"
-days=10
-proxy="http://130.251.104.8:3128"
+data_folder_remote_raw="/home/regmarche/geotiff/%YYYY/%MM/%DD/"
+data_folder_local_raw="/hydro/data/data_dynamic/source/obs/radar/mcm/%YYYY/%MM/%DD/"
 
-ftp_url="ftphsaf.meteoam.it"
-ftp_usr="sgabellani_r" 
-ftp_pwd="gabellaniS334"
-ftp_folder="/products/h12/h12_cur_mon_data"
+days=5
+
+remote_server='regmarche@130.251.104.16'
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ for day in $(seq 0 $days); do
 	
     # ----------------------------------------------------------------------------------------
     # Info time start
-    echo " =====> TIME_STEP: "$date_step" ===> START "
+    echo " ===> TIME_STEP: "$date_step" ===> START "
 
     # Define time step information
     date_get=$(date -u -d "$date_step" +"%Y%m%d%H")
@@ -53,66 +54,39 @@ for day in $(seq 0 $days); do
 	
 	# ----------------------------------------------------------------------------------------
 	# Define dynamic folder(s)
-    data_folder_get=${data_folder_raw/'%YYYY'/$year_get}
-    data_folder_get=${data_folder_get/'%MM'/$month_get}
-    data_folder_get=${data_folder_get/'%DD'/$day_get}
-    data_folder_get=${data_folder_get/'%HH'/$hour_get}
-	# ----------------------------------------------------------------------------------------
+    data_folder_remote_step=${data_folder_remote_raw/'%YYYY'/$year_get}
+    data_folder_remote_step=${data_folder_remote_step/'%MM'/$month_get}
+    data_folder_remote_step=${data_folder_remote_step/'%DD'/$day_get}
+    data_folder_remote_step=${data_folder_remote_step/'%HH'/$hour_get}
+
+    data_folder_local_step=${data_folder_local_raw/'%YYYY'/$year_get}
+    data_folder_local_step=${data_folder_local_step/'%MM'/$month_get}
+    data_folder_local_step=${data_folder_local_step/'%DD'/$day_get}
+    data_folder_local_step=${data_folder_local_step/'%HH'/$hour_get}
+   # ----------------------------------------------------------------------------------------
 
 	# ----------------------------------------------------------------------------------------	
 	# Create folder(s)
-	if [ ! -d "$data_folder_get" ]; then
-		mkdir -p $data_folder_get
+	if [ ! -d "$data_folder_local_step" ]; then
+		mkdir -p $data_folder_local_step
 	fi
 	# ----------------------------------------------------------------------------------------
 	
-	# ----------------------------------------------------------------------------------------
-	# Get file list from ftp
-	ftp_file_list=`lftp << ftprem
-	                set ftp:proxy ${proxy}
-					open -u ${ftp_usr},${ftp_pwd} ${ftp_url}
-					cd ${ftp_folder}
-					cls -1 | sort -r | grep ${date_step} | sed -e "s/@//"
-					close
-					quit
-ftprem`
     # ----------------------------------------------------------------------------------------
-    
+    # Download file from remote to local server using rsync 
+    echo -n " =====> DOWNLOAD FILES: from ${remote_server}:${data_folder_remote_step} to ${data_folder_local_step} ..."
 
-	# ----------------------------------------------------------------------------------------
-	# Download file(s)	
-	for ftp_file in ${ftp_file_list}; do
-        
-        echo -n " =====> DOWNLOAD FILE: ${ftp_file} IN ${data_folder_get}" 
-        
-		if ! [ -e ${data_folder_get}/${ftp_file} ]; then
-			
-			`lftp << ftprem
-			            set ftp:proxy  ${proxy}
-						open -u ${ftp_usr},${ftp_pwd} ${ftp_url}
-						cd ${ftp_folder}
-						get1 -o ${data_folder_get}/${ftp_file} ${ftp_file}
-						close
-						quit
-ftprem`
+    if rsync -v -e ssh -v ${remote_server}:${data_folder_remote_step}* ${data_folder_local_step} > /dev/null 2>&1; then
+        echo " DONE!"
+    else
+        echo " FAILED! Error in command execution!"
+ 
+    fi
+    # ----------------------------------------------------------------------------------------
 
-			if [ $? -eq 0 ]; then
-		 		echo " ==> DONE!"
-			else
-				echo " ==> FAILED [FTP ERROR] "
-			fi
-		
-		else
-			echo " $? ... SKIPPED! File previously downloaded!"
-		fi
-        # ----------------------------------------------------------------------------------------
-        
-	done
-	# ----------------------------------------------------------------------------------------
-	
 	# ----------------------------------------------------------------------------------------
 	# Info time end
-	echo " =====> TIME_STEP: "$date_step" ===> END "
+	echo " ===> TIME_STEP: "$date_step" ===> END "
     # ----------------------------------------------------------------------------------------
 
 done
@@ -122,5 +96,6 @@ echo " ==> "$script_name" (Version: "$script_version" Release_Date: "$script_dat
 echo " ==> ... END"
 echo " ==> Bye, Bye"
 echo " ==================================================================================="
+
 # ----------------------------------------------------------------------------------------
 

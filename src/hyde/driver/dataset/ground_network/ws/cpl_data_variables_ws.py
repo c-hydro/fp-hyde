@@ -66,7 +66,7 @@ class DriverVariable:
             self.ref_cellsize_x, self.ref_cellsize_y, self.ref_nodata = self.get_ref_attributes()
 
         self.fx_nodata, self.fx_interp_name, self.fx_interp_radius_x, self.fx_interp_radius_y, \
-            self.fx_regression_radius_influence, self.fx_cpu = self.get_fx_attributes()
+            self.fx_regression_radius_influence = self.get_fx_attributes()
         self.fx_obj = self.get_fx_method()
 
     # -------------------------------------------------------------------------------------
@@ -199,11 +199,8 @@ class DriverVariable:
         fx_regression_radius_influence = 0.0
         if 'regression_radius_influence' in list(self.fx_parameters.keys()):
             fx_regression_radius_influence = self.fx_parameters['regression_radius_influence']
-        fx_cpu = 1
-        if 'cpu' in list(self.fx_parameters.keys()):
-            fx_cpu = self.fx_parameters['cpu']
 
-        return fx_nodata, fx_interp_name, fx_interp_radius_x, fx_interp_radius_y, fx_regression_radius_influence, fx_cpu
+        return fx_nodata, fx_interp_name, fx_interp_radius_x, fx_interp_radius_y, fx_regression_radius_influence
 
     # -------------------------------------------------------------------------------------
 
@@ -268,12 +265,11 @@ class DriverVariable:
                        'ref_geo_x': ref_obj[self.tag_ref_geo_x].values,
                        'ref_geo_y': ref_obj[self.tag_ref_geo_y].values,
                        'ref_geo_z': ref_obj[self.tag_ref_land_data].values,
-                       'ref_geo_aspect': ref_obj[self.tag_ref_aspect_data].values,
+                       'ref_geo_aspect': ref_obj[self.tag_ref_land_data].values,
                        'ref_geo_slope': ref_obj[self.tag_ref_slope_data].values,
                        'ref_geo_hillshade': ref_obj[self.tag_ref_hillshade_data].values,
                        'ref_cell_size': np.mean([self.ref_cellsize_x, self.ref_cellsize_y]),
-                       'ref_no_data': self.ref_nodata, 'ref_epsg': '4326',
-                       'fx_cpu': self.fx_cpu
+                       'ref_no_data': self.ref_nodata, 'ref_epsg': '4326'
                        }
 
             # Fill and pop fx data
