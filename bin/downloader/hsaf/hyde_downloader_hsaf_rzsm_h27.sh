@@ -8,13 +8,13 @@ script_date='2019/10/04'
 
 # Script argument(s)
 days=4000
-proxy=""
+proxy="http://130.251.104.8:3128" 
 
-ftp_url=""
-ftp_usr=""
-ftp_pwd=""
+ftp_url="ftphsaf.meteoam.it"
+ftp_usr="sgabellani_r" 
+ftp_pwd="gabellaniS334"
 
-ftp_folder_raw="" # archive h27
+ftp_folder_raw="/products/h27/SMDAS3_%YYYY_T1279/%YYYY%MM/" # archive h27
 
 # Define folder(s)
 folder_in_raw="/home/hsaf/hsaf_datasets/dynamic/source/h27/%YYYY/%MM/%DD/"

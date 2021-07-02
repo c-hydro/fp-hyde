@@ -1,0 +1,116 @@
+{
+  "algorithm": {
+    "flags": {
+      "sources": {
+        "use_drops2": false,
+        "use_timeseries": false,
+        "use_point_data": true,
+        "non_standard_tab_fields": true
+      },
+      "mcm": {
+        "fixed_correlation": false,
+        "dynamic_correlation": true
+      },
+      "save_griso_ancillary_maps": true,
+      "save_figures": true,
+      "raise_error_if_no_station_available": false,
+      "compressed_gridded_input": false,
+      "compress_output": false,
+      "overwrite_existing": true
+    },
+    "general": {
+      "title": "Modified Coonditional Merging - Radar",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "2.1.0 [20210602]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Data dynamic tool developed by CIMA Research Foundation"
+    },
+    "template": {
+      "source_gridded_sub_path_time": "%Y/%m/%d/",
+      "source_gridded_datetime": "%Y%m%d%H%M",
+      "source_point_sub_path_time": "%Y/%m/%d/",
+      "source_point_datetime": "%Y%m%d%H%M",
+      "outcome_sub_path_time": "%Y/%m/%d/",
+      "outcome_datetime": "%Y%m%d%H%M"
+    },
+    "settings": {
+      "radius_GRISO_km": 10
+    }
+  },
+  "data": {
+    "dynamic": {
+      "time": {
+        "time_observed_period": 1,
+        "time_forecast_period": 0,
+        "time_frequency": "H"
+      },
+      "source_gridded": {
+        "filename": "RME{source_gridded_datetime}0U.tif",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/radar/{source_gridded_sub_path_time}",
+        "file_type": "tif",
+        "nc_settings": {
+          "var_name": "precip",
+          "lat_name": "lat",
+          "lon_name": "lon"
+        }
+      },
+      "source_stations": {
+        "drops2": {
+          "DropsAddress": "http://dds.cimafoundation.org/dds/rest",
+          "DropsUser": null,
+          "DropsPwd": null,
+          "DropsSensor": "PLUVIOMETRO",
+          "DropsGroup": "Dewetra%default",
+          "lon_left": 6,
+          "lon_right": 10.5,
+          "lat_top": 46,
+          "lat_bottom": 42.5,
+          "codes_not_valid": []
+        },
+        "time_series": {
+          "coordinates_file": {
+            "filename" : "coordinates.txt",
+            "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/outcome/obs/time_series/",
+            "delimiter": ",",
+            "station_name_col": 0,
+            "lat_col": 1,
+            "lon_col": 2
+          },
+          "data_files": {
+            "filename" : "{station_name}.txt",
+            "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/outcome/obs/time_series/data/",
+            "delimiter": ",",
+            "datetime_col": 0,
+            "data_col": 1
+          }
+        },
+        "point_files":{
+          "filename" : "RAINC_{source_point_datetime}.csv",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/weather_stations/{source_point_sub_path_time}",
+          "non_standard_tab_fields": {
+            "latitude": "lat.strum",
+            "longitude": "lon.strum",
+            "data": "v.strum",
+            "station_name": null,
+            "station_code": null
+          }
+        }
+      }
+    },
+    "ancillary": {
+      "filename": "marche_griso_stations_ts_{outcome_datetime}.nc",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
+    },
+    "outcome": {
+      "format": "tif",
+      "filename": "radar_cm_ts_{outcome_datetime}.tif",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/results/{outcome_sub_path_time}"
+    },
+    "log": {
+      "filename": "hyde_conditional_merging.txt",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT_Various/CM/"
+    }
+  }
+}
+

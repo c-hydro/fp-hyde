@@ -9,12 +9,12 @@ script_date='2018/07/25'
 # Script argument(s)
 data_folder_raw="/home/hsaf/hsaf_datasets/dynamic/source/h12/%YYYY/%MM/%DD/"
 days=10
-proxy=""
+proxy="http://130.251.104.8:3128"
 
-ftp_url=""
-ftp_usr=""
-ftp_pwd=""
-ftp_folder=""
+ftp_url="ftphsaf.meteoam.it"
+ftp_usr="sgabellani_r" 
+ftp_pwd="gabellaniS334"
+ftp_folder="/products/h12/h12_cur_mon_data"
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------

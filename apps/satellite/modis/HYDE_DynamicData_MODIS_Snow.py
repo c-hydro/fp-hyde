@@ -7,7 +7,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 S3MResampler.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
+python3 HYDE_DynamicData_MODIS_Snow.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version:
 20201202 (3.5.0) --> Hyde package refactor

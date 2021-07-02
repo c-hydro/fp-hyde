@@ -1,0 +1,409 @@
+{
+  "algorithm":{
+    "flags": {
+      "cleaning_static_data": true,
+      "cleaning_dynamic_ancillary_source": true,
+      "cleaning_dynamic_ancillary_processing": true,
+      "cleaning_dynamic_ancillary_outcome": true,
+      "cleaning_dynamic_product": true,
+      "cleaning_dynamic_tmp": true,
+      "zipping_dynamic_product": false
+    },
+    "ancillary": {
+      "domain" : "guyana",
+      "write_engine": "netcdf4",
+      "zip_format": ".gz"
+    },
+    "general": {
+      "title": "NWP WRF",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.2.0 [20200317]",
+      "project-info": "Hydrological Data Engines - HyDE Library/Project",
+      "algorithm": "Processing tool developed by CIMA Research Foundation"
+    },
+    "parameters": {}
+  },
+  "data": {
+    "static": {
+      "land": {
+        "terrain_data": {
+          "filename": "guyana.dem.txt",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//gridded/"
+        },
+        "grid_data": {
+          "filename": "grid_wrf.workspace",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//ancillary/"
+        },
+        "geo_data": {
+          "filename": "geo_wrf.workspace",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//ancillary/"
+        }
+      },
+      "colormap": {
+        "rain_colormap" : {
+          "filename": "",
+          "folder" : "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//colormap/"
+        },
+        "air_temperature_colormap" : {
+          "filename": "",
+          "folder" : "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//colormap/"
+        },
+        "wind_colormap" : {
+          "filename": "",
+          "folder" : "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//colormap/"
+        },
+        "incoming_radiation_colormap" : {
+          "filename": "",
+          "folder" : "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//colormap/"
+        },
+        "air_pressure_colormap" : {
+          "filename": "",
+          "folder" : "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//colormap/"
+        },
+        "relative_humidity_colormap" : {
+          "filename": "",
+          "folder" : "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana//colormap/"
+        }
+      }
+    },
+    "dynamic": {
+      "template": {
+        "domain": "string_domain",
+        "datetime_source": "%Y-%m-%d_%H:%M:00",
+        "runtime_source": "%H",
+        "datetime_ancillary": "%Y%m%d%H%M",
+        "datetime_outcome": "%Y%m%d%H%M",
+        "sub_path_time_source": "%Y/%m/%d/",
+        "sub_path_time_ancillary": "%Y/%m/%d",
+        "sub_path_time_outcome": "%Y/%m/%d"
+      },
+      "time": {
+        "time_forecast_period": 72,
+        "time_forecast_frequency": "H",
+        "time_observed_period": 0,
+        "time_observed_frequency": "H",
+        "time_rounding": "H",
+        "time_coordinate_label": "XTIME"
+      },
+      "source": {
+        "_comment": "W99C95.nc -- ww3.$yyyy$mm$ddT$HHZ.nc - wrfout_d01_2018-07-10_01:00:00_PLEV_BIL.nc",
+        "air_temperature_source_data": {
+          "filename": "wrfout_d01_{datetime_source}",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/sources/"
+        },
+        "rain_source_data": {
+          "filename": "wrfout_d01_{datetime_source}",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/sources"
+        },
+        "relative_humidity_source_data": {
+          "filename": "wrfout_d01_{datetime_source}",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/sources/"
+        },
+        "incoming_radiation_source_data": {
+          "filename": "wrfout_d01_{datetime_source}",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/sources/"
+        },
+        "wind_source_data": {
+          "filename": "wrfout_d01_{datetime_source}",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/sources/"
+        }
+      },
+      "ancillary": {
+        "nwp_source_ancillary": {
+          "filename": "wrf_{datetime_ancillary}_{domain}_source.workspace",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/ancillary/{sub_path_time_ancillary}"
+        },
+        "nwp_processing_ancillary": {
+          "filename": "wrf_{datetime_ancillary}_{domain}_processing.workspace",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/ancillary/{sub_path_time_ancillary}"
+        },
+        "nwp_outcome_ancillary": {
+          "filename": "wrf_{datetime_ancillary}_{domain}_outcome.workspace",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/ancillary/{sub_path_time_ancillary}"
+        }
+      },
+      "outcome": {
+        "nwp_outcome_data": {
+          "filename": "wrf_{datetime_outcome}_{domain}.nc",
+          "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/outcome/{sub_path_time_outcome}"
+        }
+      }
+    },
+    "log": {
+        "filename": "hyde_dynamicdata_nwp_wrf_local_log.txt",
+        "folder": "/home/andrea/CIMA/PROJECT_Guyana/wrf/guyana/log/"
+      },
+    "library": {
+      "filename": "",
+      "folder": ""
+    },
+    "bin": {
+      "filename": "",
+      "folder": ""
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_period": 0,
+    "time_frequency": "12H",
+    "time_rounding": "12H"
+  },
+  "variables": {
+    "source": {
+      "air_temperature_data": {
+        "id": {
+          "var_dims": ["var3d"],
+          "var_type": ["instantaneous"],
+          "var_source": ["wrf"],
+          "var_format": ["netcdf"],
+          "var_name": ["T2"],
+          "var_file": ["air_temperature_source_data"],
+          "var_colormap": [null],
+          "var_parameters": [null],
+          "var_method_compute": ["computeAirTemperature"],
+          "var_method_save": [null]
+        },
+        "attributes": {
+          "long_name": ["TEMP at 2 M"],
+          "standard_name": ["air_temperature"],
+          "Missing_value": [-9999.0],
+          "_FillValue": [-9999.0],
+          "ScaleFactor": [1],
+          "Valid_range": [[250, 330]],
+          "units": ["K"],
+          "Format": [null],
+          "description": [""]
+        }
+      },
+      "rain_data": {
+        "id": {
+          "var_dims": ["var3d"],
+          "var_type": ["accumulated"],
+          "var_source": ["wrf"],
+          "var_format": ["netcdf"],
+          "var_name": ["RAINNC"],
+          "var_file": ["rain_source_data"],
+          "var_colormap": [null],
+          "var_parameters": [null],
+          "var_method_compute": ["computeRain"],
+          "var_method_save": [null]
+        },
+        "attributes": {
+          "long_name": ["ACCUMULATED TOTAL GRID SCALE PRECIPITATION"],
+          "standard_name": ["rain"],
+          "Missing_value": [-9999.0],
+          "_FillValue": [-9999.0],
+          "ScaleFactor": [1],
+          "Valid_range": [[0, null]],
+          "units": ["mm"],
+          "Format": [null],
+          "description": [""]
+
+        }
+      },
+      "wind_data": {
+        "id": {
+          "var_dims": ["var3d", "var3d", "var3d"],
+          "var_type": ["instantaneous", "instantaneous", "instantaneous"],
+          "var_source": ["wrf", "wrf", null],
+          "var_format": ["netcdf", "netcdf", null],
+          "var_name": ["U10", "V10", "wind_speed"],
+          "var_file": ["wind_source_data", "wind_source_data", null],
+          "var_colormap": [null, null, null],
+          "var_parameters": [null, null, null],
+          "var_method_compute": ["computeWindSpeed", "computeWindSpeed", null],
+          "var_method_save": [null, null, null]
+        },
+        "attributes": {
+          "long_name": ["U at 10 M", "V at 10 M", "wind_speed"],
+          "standard_name": ["wind_component_u", "wind_component_v", "wind_speed"],
+          "Missing_value": [-9999.0, -9999.0, -9999.0],
+          "_FillValue": [-9999.0, -9999.0, -9999.0],
+          "ScaleFactor": [1, 1, 1],
+          "Valid_range": [[0, 10], [0, 10], [0, 10]],
+          "units": ["m s-1", "m s-1", "m s-1"],
+          "Format": [null, null, null],
+          "description": ["", "", ""]
+        }
+      },
+      "incoming_radiation_data": {
+        "id": {
+          "var_dims": ["var3d", "var3d"],
+          "var_type": ["average", "instantaneous"],
+          "var_source": ["wrf",  null],
+          "var_format": ["netcdf",  null],
+          "var_name": ["SWDOWN",  "incoming_radiation"],
+          "var_file": ["incoming_radiation_source_data", null],
+          "var_colormap": [null,  null],
+          "var_parameters": [null,  null],
+          "var_method_compute": ["computeIncomingRadiation",  null],
+          "var_method_save": [null,  null]
+        },
+        "attributes": {
+          "long_name": ["DOWNWARD LONG WAVE FLUX AT GROUND SURFACE",  "incoming_radiation"],
+          "standard_name": ["downward_long-wave_radiation_flux",  "incomingradiation"],
+          "Missing_value": [-9999.0,  -9999.0],
+          "_FillValue": [-9999.0,  -9999.0],
+          "ScaleFactor": [1,  1],
+          "Valid_range": [[-200, 1200], [-200, 1200]],
+          "units": ["W m-2",  "W m-2"],
+          "Format": [null,  null],
+          "description": ["",  ""]
+        }
+      },
+      "relative_humidity_data": {
+        "id": {
+          "var_dims": ["var3d", "var3d", "var3d", "var3d"],
+          "var_type": ["instantaneous", "instantaneous", "instantaneous", "instantaneous"],
+          "var_source": ["wrf", "wrf", "wrf", null],
+          "var_format": ["netcdf", "netcdf", "netcdf", null],
+          "var_name": ["Q2", "T2", "PSFC", "relative_humidity"],
+          "var_file": ["relative_humidity_source_data", "relative_humidity_source_data", "relative_humidity_source_data", null],
+          "var_colormap": [null, null, null, null],
+          "var_parameters": [null, null, null, null],
+          "var_method_compute": ["computeRH_from_Q", "computeRH_from_Q", "computeRH_from_Q", null],
+          "var_method_save": [null, null, null, null]
+        },
+        "attributes": {
+          "long_name": ["QV at 2 M", "TEMP at 2 M", "SURFACE PRESSURE", "relative humidity"],
+          "standard_name": ["specific_humidity","air_temperature", "surface_pressure","relative_humidity"],
+          "Missing_value": [-9999.0, -9999.0, -9999.0, -9999.0],
+          "_FillValue": [-9999.0, -9999.0, -9999.0, -9999.0],
+          "ScaleFactor": [1, 1, 1, 1],
+          "Valid_range": [[0, 100], [250, 330], [null, null], [0, 100]],
+          "units": ["kg kg-1", "K", "Pa", "%"],
+          "Format": [null, null, null, null],
+          "description": ["", "", "", ""]
+        }
+      }
+    },
+    "outcome": {
+      "air_temperature_data":{
+        "id": {
+          "var_dims": ["var3d"],
+          "var_type": ["instantaneous"],
+          "var_source": ["wrf"],
+          "var_format": ["netcdf"],
+          "var_name": ["AirTemperature"],
+          "var_file": ["nwp_outcome_data"],
+          "var_colormap": ["air_temperature_colormap"],
+          "var_parameters": [null],
+          "var_method_compute": [null],
+          "var_method_save": ["write3DVar"]
+        },
+        "attributes": {
+          "long_name": [""],
+          "standard_name": ["air_temperature"],
+          "Missing_value": [-9999.0],
+          "_FillValue": [-9999.0],
+          "ScaleFactor": [1],
+          "Valid_range": [[-20, 50]],
+          "units": ["C"],
+          "Format": ["f4"],
+          "description": ["Temperature at 2m"]
+        }
+      },
+      "rain_data":{
+        "id": {
+          "var_dims": ["var3d"],
+          "var_type": ["accumulated"],
+          "var_source": ["wrf"],
+          "var_format": ["netcdf"],
+          "var_name": ["Rain"],
+          "var_file": ["nwp_outcome_data"],
+          "var_colormap": ["rain_colormap"],
+          "var_parameters": [null],
+          "var_method_compute": [null],
+          "var_method_save": ["write3DVar"]
+        },
+        "attributes": {
+          "long_name": [""],
+          "standard_name": ["total_precipitation"],
+          "Missing_value": [-9999.0],
+          "_FillValue": [-9999.0],
+          "ScaleFactor": [1],
+          "Valid_range": [[0, null]],
+          "units": ["mm"],
+          "Format": ["f4"],
+          "description": ["Total precipitation"]
+        }
+      },
+      "wind_data":{
+        "id": {
+          "var_dims": ["var3d", "var3d", "var3d"],
+          "var_type": ["instantaneous", "instantaneous", "instantaneous"],
+          "var_source": ["wrf", "wrf", "wrf"],
+          "var_format": [null, null, "netcdf"],
+          "var_name": ["10 metre U wind component", "10 metre V wind component", "WindSpeed"],
+          "var_file": [null, null, "nwp_outcome_data"],
+          "var_colormap": ["wind_colormap", "wind_colormap", "wind_colormap"],
+          "var_parameters": [null, null, null],
+          "var_method_compute": [null, null, null],
+          "var_method_save": [null, null,"write3DVar"]
+        },
+        "attributes": {
+          "long_name": ["", "", ""],
+          "standard_name": ["wind_comp_u", "wind_comp_v", "wind_speed"],
+          "Missing_value": [-9999.0, -9999.0, -9999.0],
+          "_FillValue": [-9999.0, -9999.0, -9999.0],
+          "ScaleFactor": [1, 1, 1],
+          "Valid_range": [[0, 10], [0, 10], [0, 10]],
+          "units": ["m/s", "m/s", "m/s"],
+          "Format": ["f4", "f4", "f4"],
+          "description": ["Wind U at 10m", "Wind V at 10m", "Wind speed at 10m"]
+        }
+      },
+      "incoming_radiation_data":{
+        "id": {
+          "var_dims": ["var3d",  "var3d"],
+          "var_type": ["instantaneous",  "instantaneous"],
+          "var_source": ["wrf",  "wrf"],
+          "var_format": ["netcdf",  "netcdf"],
+          "var_name": ["SWDOWN",  "IncomingRadiation"],
+          "var_file": [null,  "nwp_outcome_data"],
+          "var_colormap": ["incoming_radiation_colormap", "incoming_radiation_colormap"],
+          "var_parameters": [null,  null],
+          "var_method_compute": [null,  null],
+          "var_method_save": [null,  "write3DVar"]
+        },
+        "attributes": {
+          "long_name": ["",""],
+          "standard_name": ["swdown", "incoming_radiation"],
+          "Missing_value": [-9999.0,  -9999.0],
+          "_FillValue": [-9999.0,  -9999.0],
+          "ScaleFactor": [1, 1],
+          "Valid_range": [[-200, 1500], [-200, 1500]],
+          "units": ["W m-2",  "W m-2"],
+          "Format": ["f4","f4"],
+          "description": ["downward long-wave radiation flux",  "incoming radiation"]
+        }
+      },
+      "relative_humidity_data": {
+        "id": {
+          "var_dims": ["var3d", "var3d", "var3d", "var3d"],
+          "var_type": ["instantaneous", "instantaneous", "instantaneous", "instantaneous"],
+          "var_source": ["wrf", "wrf", "wrf", null],
+          "var_format": [null, null, null, "netcdf"],
+          "var_name": ["Q2", "T2", "PSFC", "RelativeHumidity"],
+          "var_file": [null, null, null, "nwp_outcome_data"],
+          "var_colormap": [null, null, null, "relative_humidity_colormap"],
+          "var_parameters": [null, null, null, null],
+          "var_method_compute": [null, null, null, null],
+          "var_method_save": [null, null, null, "write3DVar"]
+        },
+        "attributes": {
+          "long_name": ["QV at 2 M", "TEMP at 2 M", "SURFACE PRESSURE", "relative humidity"],
+          "standard_name": ["specific_humidity", "air_temperature", "surface_pressure", "relative_humidity"],
+          "Missing_value": [-9999.0, -9999.0, -9999.0, -9999.0],
+          "_FillValue": [-9999.0, -9999.0, -9999.0, -9999.0],
+          "ScaleFactor": [1, 1, 1, 1],
+          "Valid_range": [[0, 100], [250, 330], [null, null], [0, 100]],
+          "units": ["kg kg-1", "K", "Pa", "%"],
+          "Format": [null, null, null, null],
+          "description": ["", "", "", "Relative humidity at 2m"]
+        }
+      }
+    }
+  }
+}

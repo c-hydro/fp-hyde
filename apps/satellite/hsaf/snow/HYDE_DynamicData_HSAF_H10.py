@@ -7,7 +7,7 @@ __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
 General command line:
-python3 S3MResampler.py -settings_file configuration.json -time YYYYMMDDHHMM
+python3 HYDE_DynamicData_HSAF_H10.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
 20191003 (4.0.1) --> Hyde package refactor

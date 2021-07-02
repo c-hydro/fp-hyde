@@ -2,7 +2,7 @@
 Library Features:
 
 Name:          lib_ws_analysis_interpolation_point
-Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org), Francesco Avanzi (francesco.avanzi@cimafoundation.org)
+Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
 Date:          '20201102'
 Version:       '1.0.0'
 """
@@ -29,8 +29,7 @@ from src.hyde.algorithm.utils.ground_network.lib_ws_process import exec_process
 def interp_point2grid(data_in_1d, geox_in_1d, geoy_in_1d, geox_out_2d, geoy_out_2d, epsg_code='4326',
                       interp_no_data=-9999.0, interp_radius_x=None, interp_radius_y=None,
                       interp_method='nearest', interp_option=None,
-                      folder_tmp=None, var_name_data='values', var_name_geox='x', var_name_geoy='y',
-                      n_cpu=1):
+                      folder_tmp=None, var_name_data='values', var_name_geox='x', var_name_geoy='y'):
 
     # Define layer name (using a random string)
     var_name_layer = random_string()
@@ -90,7 +89,7 @@ def interp_point2grid(data_in_1d, geox_in_1d, geoy_in_1d, geox_out_2d, geoy_out_
                     str(geoy_out_min) + ' ' + str(geoy_out_max) + ' -a_srs EPSG:' + epsg_code + ' ' +
                     interp_option + ' -outsize ' + str(geo_out_rows) + ' ' + str(geo_out_cols) +
                     ' -of GTiff -ot Float32 -l ' + var_name_layer + ' ' +
-                    file_name_vrt + ' ' + file_name_tiff + ' --config GDAL_NUM_THREADS ' + str(n_cpu))
+                    file_name_vrt + ' ' + file_name_tiff + ' --config GDAL_NUM_THREADS ALL_CPUS')
 
     # Execute algorithm
     [std_out, std_err, std_exit] = exec_process(command_line=line_command)

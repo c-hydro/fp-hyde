@@ -12,7 +12,7 @@ Version:       '1.0.0'
 import logging
 import os
 import logging.config
-#import progressbar
+import progressbar
 import glob
 
 from src.common.default.lib_default_args import logger_name as logger_name_default
@@ -32,7 +32,7 @@ def set_logging_file(logger_file=logger_file_default, logger_name=logger_name_de
                      logger_history=False, logger_history_maxfiles=12):
 
     # Set to flush progressbar output in logging stream handle
-    #progressbar.streams.wrap_stderr()
+    progressbar.streams.wrap_stderr()
 
     # Save old logger file (to check run in the past)
     if logger_history:

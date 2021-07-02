@@ -8,12 +8,12 @@ script_date='2019/07/04'
 
 # Script argument(s)
 days=10
-proxy=""
+proxy="http://130.251.104.8:3128" 
 
-ftp_url=""
-ftp_usr=""
-ftp_pwd=""
-ftp_folder_raw="" 	# current
+ftp_url="ftphsaf.meteoam.it"
+ftp_usr="sgabellani_r" 
+ftp_pwd="gabellaniS334"
+ftp_folder_raw="/products/h14/h14_cur_mon_grib/" 	# current
 #ftp_folder_raw="/hsaf_archive/h14/%YYYY/%MM/%DD/"	# archive
 
 # Define folder(s)
