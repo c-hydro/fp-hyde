@@ -66,12 +66,6 @@ def create_darray_3d(data, time, geo_x, geo_y, geo_1d=True,
                      dim_name_x='west_east', dim_name_y='south_north', dim_name_time='time',
                      dims_order=None):
 
-    if len(geo_x.shape) == 3 :
-        geo_x = geo_x.values[0, :, :]
-
-    if len(geo_y.shape) == 3:
-        geo_y = geo_y.values[0, :, :]
-
     if dims_order is None:
         dims_order = [dim_name_y, dim_name_x, dim_name_time]
 

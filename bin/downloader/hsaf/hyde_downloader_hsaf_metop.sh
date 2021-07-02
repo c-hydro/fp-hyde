@@ -8,11 +8,11 @@ script_date='2019/08/28'
 
 # Script argument(s)
 days=40
-proxy="http://130.251.104.8:3128" 
+proxy=""
 
-ftp_url="ftphsaf.meteoam.it"
-ftp_usr="sgabellani_r" 
-ftp_pwd="gabellaniS334"
+ftp_url=""
+ftp_usr=""
+ftp_pwd=""
 
 # Define products name
 products=( "h16" "h101" "h102" "h103")

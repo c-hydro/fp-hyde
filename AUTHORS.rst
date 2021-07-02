@@ -8,3 +8,4 @@ Developers
 * Simone Gabellani <simone.gabellani@cimafoundation.org>
 * Francesco Silvestro <francesco.silvestro@cimafoundation.org>
 * Nicola Rebora <nicola.rebora@cimafoundation.org>
+* Francesco Avanzi <francesco.avanzi@cimafoundation.org>

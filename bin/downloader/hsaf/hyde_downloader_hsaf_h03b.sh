@@ -9,12 +9,12 @@ script_date='2019/10/07'
 # Script argument(s)
 data_folder_raw="/home/hsaf/hsaf_datasets/dynamic/source/h03b/%YYYY/%MM/%DD/"
 days=5
-proxy="http://130.251.104.8:3128"
+proxy=""
 
-ftp_url="ftphsaf.meteoam.it"
-ftp_usr="sgabellani_r" 
-ftp_pwd="gabellaniS334"
-ftp_folder="/products/h03B/h03B_cur_mon_data/"
+ftp_url=""
+ftp_usr=""
+ftp_pwd=""
+ftp_folder=""
 
 str_grib='fdk'
 str_tmp_step1='fdk'

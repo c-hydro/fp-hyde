@@ -40,9 +40,6 @@
         "data_product": {
           "filename": "wrf_1h_$yyyy$mm$dd$HH$MM_marche.nc.gz",
           "folder": "/home/fp/fp_mount/datasets_hyde/dynamic/"
-        },
-        "var_decode": {
-          "rain": "RAINC"
         }
       }
     },

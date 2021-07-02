@@ -4,28 +4,9 @@ Changelog
 
 Version 1.9.7 [2021-03-01]
 **************************
-APP: **hyde_data_dynamic_weather_stations_griso.py**
-	- Release for Hyde package
-	    - Previous version(s):
-	        - [2020-03-26] Beta Release for FloodProofs Bolivia
-	       
-APP: **hyde_data_dynamic_modified_conditional_merging.py**
-	- Release for Hyde package
-	    - Previous version(s):
-            - [2021-04-25] Added support for dynamic griso interpolation. Full review of the script structure.
-	        - [2020-12-09] Integrated with local station data configuration. Settings file implemented
-	        - [2020-07-16] Integrated with drops2 libraries. Generalized gridded input type
-	        - [2020-03-26] Beta release for FloodProofs Bolivia with GSMAP
-	        
 BIN: **hyde_downloader_nwp_gfs_nomads.py**
-    - Added hit per minute limit for new NOAA policy compatibility
-    - Previous version(s):
-	        - [2021-03-25] Setting file template modified for supporting GFS v16. Added checks for granting Continuum compatibility.
-            - [2021-02-12] Release for Hyde package from previous "hyde_downloader_nwp.py"
-
-BIN: **hyde_downloader_nwp_gfs_historical.py**
-    - Release for Hyde package
-
+	- Release for Hyde package
+	
 BIN: **hyde_downloader_nwp_gfs_ftp.py**
 	- Release for Hyde package
 
@@ -35,12 +16,6 @@ BIN: **hyde_downloader_satellite_gsmap_nowcasting.py**
 BIN: **hyde_downloader_satellite_gsmap_obs.py**
 	- Release for Hyde package
 
-DRV: **drv_model_griso_exec.py**
-    - Release for Hyde package
-
-FIX: **HYDE_Model_RFarm.py**
-    - Add the support to GFS 0.25 products
-    - Update WRF reader for supporting 3d files
 
 Version 1.9.6 [2021-01-13]
 **************************
