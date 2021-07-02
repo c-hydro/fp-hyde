@@ -2,17 +2,24 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": true,
+        "use_drops2": false,
         "use_timeseries": false,
-        "use_point_data": false,
-        "non_standard_tab_fields": false
+        "use_point_data": true,
+        "non_standard_tab_fields": true
       },
+      "mcm": {
+        "fixed_correlation": false,
+        "dynamic_correlation": true
+      },
+      "save_griso_ancillary_maps": true,
+      "save_figures": true,
+      "raise_error_if_no_station_available": false,
       "compressed_gridded_input": false,
       "compress_output": false,
       "overwrite_existing": true
     },
     "general": {
-      "title": "GRISO interpolator",
+      "title": "Modified Coonditional Merging - Radar",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
       "history": "2.1.0 [20210602]",
@@ -28,19 +35,25 @@
       "outcome_datetime": "%Y%m%d%H%M"
     },
     "settings": {
-      "radius_GRISO_km": 30
+      "radius_GRISO_km": 10
     }
   },
   "data": {
-    "static": {
-      "filename" : "LiguriaDomain.dem.txt",
-      "folder": "/home/andrea/Desktop/"
-    },
     "dynamic": {
       "time": {
         "time_observed_period": 1,
         "time_forecast_period": 0,
         "time_frequency": "H"
+      },
+      "source_gridded": {
+        "filename": "RME{source_gridded_datetime}0U.tif",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/radar/{source_gridded_sub_path_time}",
+        "file_type": "tif",
+        "nc_settings": {
+          "var_name": "precip",
+          "lat_name": "lat",
+          "lon_name": "lon"
+        }
       },
       "source_stations": {
         "drops2": {
@@ -85,14 +98,18 @@
         }
       }
     },
+    "ancillary": {
+      "filename": "marche_griso_stations_ts_{outcome_datetime}.nc",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
+    },
     "outcome": {
-      "format": "netcdf",
-      "filename": "marche_griso_{outcome_datetime}.nc",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/griso/data_dynamic/results/{outcome_sub_path_time}"
+      "format": "tif",
+      "filename": "radar_cm_ts_{outcome_datetime}.tif",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/results/{outcome_sub_path_time}"
     },
     "log": {
-      "filename": "hyde_griso.txt",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/griso/"
+      "filename": "hyde_conditional_merging.txt",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT_Various/CM/"
     }
   }
 }

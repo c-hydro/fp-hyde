@@ -3,8 +3,8 @@ Library Features:
 
 Name:          lib_wrf_args
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20200316'
-Version:       '1.1.0'
+Date:          '20210522'
+Version:       '1.2.0'
 """
 
 # -------------------------------------------------------------------------------------

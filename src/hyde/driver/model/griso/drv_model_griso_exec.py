@@ -23,13 +23,15 @@ import xarray as xr
 from src.hyde.driver.model.griso.drv_model_griso_generic import deg2km, sub2ind, averageCells, cart2pol
 
 # -------------------------------------------------------------------------------------
-# Prepare input data for GRISO
+
+# -------------------------------------------------------------------------------------
+# function for preparing griso input data
 def GrisoPreproc(corrFin, lonGauge, latGauge, data_gauge, data_sat=None, Grid=None):
 
     logging.info(' ---> Compute grid...')
     # generate lat-lon grid
-    lonGrid = np.around(Grid.lon.values, decimals=5)
-    latGrid = np.around(Grid.lat.values, decimals=5)
+    lonGrid = np.around(Grid.lon.values, decimals=10)
+    latGrid = np.around(Grid.lat.values, decimals=10)
     gridx, gridy = np.meshgrid(lonGrid, latGrid)
     grid = pyresample.geometry.GridDefinition(lats=gridy, lons=gridx)
 
@@ -44,24 +46,16 @@ def GrisoPreproc(corrFin, lonGauge, latGauge, data_gauge, data_sat=None, Grid=No
     logging.info(' ---> Compute grid...DONE')
 
     logging.info(' ---> Grid point values...')
-    # extract grid coordinates (radius of influence is an approx of the radius where the script look for neighbours in meters)
-    # not valid gauges are the ones out of the domain
+    # extract grid coordinates
     swath = pyresample.geometry.SwathDefinition(lons=lonGauge, lats=latGauge)
     _, is_valid, index_array, _ = pyresample.kd_tree.get_neighbour_info(
-        source_geo_def=grid, target_geo_def=swath, radius_of_influence=1000*passoKm*2,
+        source_geo_def=grid, target_geo_def=swath, radius_of_influence=np.Inf,
         neighbours=1)
 
     rPluvio, cPluvio = np.unravel_index(index_array, grid.shape)
 
     # if more rain gauges fall in the same cell they are averaged
     rPluvio_uniq, cPluvio_uniq, gauge_value = averageCells(rPluvio, cPluvio, data_gauge[is_valid])
-
-    # (equivalent) rain gauge ID: 1-max over the grid
-    gauge_codes = np.arange(1, gauge_value.shape[0] + 1, 1)
-
-    # generate grid with (equivalent) rain-gauge locations
-    a2dPosizioni = np.squeeze(np.zeros(grid.shape))
-    a2dPosizioni[rPluvio_uniq, cPluvio_uniq] = gauge_codes
 
     # calculate grid data for modified conditional merging
     if not data_sat is None:
@@ -72,17 +66,26 @@ def GrisoPreproc(corrFin, lonGauge, latGauge, data_gauge, data_sat=None, Grid=No
         else:
             grid_rain = Grid['precip'].values
     else:
-        grid_value = None
+        grid_value = np.empty(gauge_value.shape)
         grid_rain = None
 
-    # generate dataframe with all the point data
-    point_data = pd.DataFrame(index=gauge_codes, data={"rPluvio":rPluvio_uniq, "cPluvio":cPluvio_uniq, "gauge_value":gauge_value, "grid_value":grid_value})
+    mat_in = np.vstack((rPluvio_uniq, cPluvio_uniq, gauge_value, grid_value)).T
+    gauge_codes = np.arange(1, gauge_value.shape[0] + 1, 1)
+    # gridded nan values (related to gauges falling out of the radar radius) are queued, to be cutted off in the intepolation phase
+    point_data = pd.DataFrame(mat_in[np.argsort(mat_in[:, 3])], index=gauge_codes, columns=["rPluvio", "cPluvio", "gauge_value", "grid_value"])
+
+    # generate grid with (equivalent) rain-gauge locations
+    a2dPosizioni = np.squeeze(np.zeros(grid.shape))
+    a2dPosizioni[point_data["rPluvio"].values.astype(np.int), point_data["cPluvio"].values.astype(np.int)] = gauge_codes
+
     logging.info(' ---> Grid point values...DONE')
 
     return point_data, a2dPosizioni, grid_rain, grid, passoKm
 
 # -------------------------------------------------------------------------------------
-# Compute correlation, kernel and position of each rain gauge neighbourhood
+
+# -------------------------------------------------------------------------------------
+# function for computing correlation, kernel and position of each rain gauge neighbourhood
 def GrisoCorrel(rPluvio, cPluvio, corrFin, z, passoKm, a2dPosizioni, nRows, nCols, vp_pluvio, corr_type='fixed'):
 
     logging.info(' ---> Initialize correlation estimation...')
@@ -142,7 +145,7 @@ def GrisoCorrel(rPluvio, cPluvio, corrFin, z, passoKm, a2dPosizioni, nRows, nCol
             CorrStim = finestraCorrMax
             Lambda[ind + 1] = buffer
         else:
-            finestra_radar = zExt[R-buffer:R+buffer+1,C-buffer:C+buffer+1]
+            finestra_radar = zExt[int(R-buffer):int(R+buffer+1),int(C-buffer):int(C+buffer+1)]
             finestra_radar[bins_ddfin>=corrFin/2] = np.nan
             pixel_validi = finestra_radar[finestra_radar >= p0]
 
@@ -174,7 +177,7 @@ def GrisoCorrel(rPluvio, cPluvio, corrFin, z, passoKm, a2dPosizioni, nRows, nCol
                 CorrStim = finestraCorrNull
                 Lambda[ind + 1] = 5
 
-        FinestraPosizioniExt[ind +1] = xr.DataArray(data=a2dPosizioniExt[R - buffer:R + buffer + 1, C - buffer:C + buffer + 1], dims=['rows','cols'], coords={'rows': np.arange(R - buffer, R + buffer + 1, 1), 'cols': np.arange(C - buffer, C + buffer + 1, 1)}).reindex({'rows': np.arange(0, a2dPosizioniExt.shape[0], 1), 'cols': np.arange(0, a2dPosizioniExt.shape[1], 1)}, fill_value=0)
+        FinestraPosizioniExt[ind +1] = xr.DataArray(data=a2dPosizioniExt[int(R - buffer):int(R + buffer + 1), int(C - buffer):int(C + buffer + 1)], dims=['rows','cols'], coords={'rows': np.arange(R - buffer, R + buffer + 1, 1), 'cols': np.arange(C - buffer, C + buffer + 1, 1)}).reindex({'rows': np.arange(0, a2dPosizioniExt.shape[0], 1), 'cols': np.arange(0, a2dPosizioniExt.shape[1], 1)}, fill_value=0)
         CorrStimata[ind + 1] = xr.DataArray(data=CorrStim, dims=['rows', 'cols'],
                                                     coords={'rows': np.arange(R - buffer, R + buffer + 1, 1),
                                                             'cols': np.arange(C - buffer, C + buffer + 1, 1)}).reindex(
@@ -191,11 +194,16 @@ def GrisoCorrel(rPluvio, cPluvio, corrFin, z, passoKm, a2dPosizioni, nRows, nCol
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
-# Compute GRISO interpolation over the extended matrix
+# compute GRISO interpolation over the extended matrix
 def GrisoInterpola(rPluvio, cPluvio, data, a3dMatriceCorrStimata, corrFin, passoKm, a3dFinestraPosizioniExt):
 
-   # Average null
+   # average null
     mu = 0
+
+    # if rain gauge fall in radar null field remove the gauges from the correlation system
+    rPluvio = rPluvio[~np.isnan(data)]
+    cPluvio = cPluvio[~np.isnan(data)]
+    data = data[~np.isnan(data)]
 
     logging.info(' ---> Write and solve system...')
     # write system
@@ -205,11 +213,12 @@ def GrisoInterpola(rPluvio, cPluvio, data, a3dMatriceCorrStimata, corrFin, passo
     for k in np.arange(0, len(rPluvio)):
         corr = a3dMatriceCorrStimata[k + 1].values
         posiz = a3dFinestraPosizioniExt[k + 1].values
+        posiz[posiz>len(rPluvio)]=0                                     # if rain gauge fall in radar null field remove the gauge from the position matrix
         A[posiz[posiz > 0].astype('int') - 1, k] = corr[posiz > 0]
         A[len(rPluvio), k] = 0
         A[k -1, k-1] = 1
 
-    # system solving
+    # System solving
     b = np.append(data, mu)
 
     num_vars = A.shape[1]
@@ -233,16 +242,6 @@ def GrisoInterpola(rPluvio, cPluvio, data, a3dMatriceCorrStimata, corrFin, passo
 
     for ind, k in enumerate(np.arange(0, len(rPluvio))):
         s0 += (a3dMatriceCorrStimata[k+1].values*W[k])
-
-    #old interpolation routine
-    #s0 = np.zeros([int((nRows + (corrFin / passoKm)) * (nCols + (corrFin / passoKm))), 1])
-    #for ind, k in enumerate(np.arange(0, len(rPluvio))):
-    #    logging.info(' ---> Cell ' + str(ind + 1) + ' of ' + str(len(rPluvio)))
-    #    corr = a3dMatriceCorrStimata[k+1]
-    #    temp = np.vstack([rKernel[k+1].flatten('F'), cKernel[k+1].flatten('F'), np.zeros(cKernel[k+1].flatten('F').shape)]).T
-    #    indKernel = np.apply_along_axis(sub2ind, 1, temp.astype('int'), nRows + (corrFin / passoKm), nCols + (corrFin / passoKm))
-    #    s0[indKernel] = np.expand_dims(s0[indKernel].flatten('F') + corr.flatten('F') * W[k], 1)
-    #s0 = np.reshape(s0, (int(nRows + (corrFin / passoKm)), int(nCols + (corrFin / passoKm))), order='F').copy()
 
     s0 = s0 + W[len(rPluvio)]
     s0[s0 < 0] = 0
