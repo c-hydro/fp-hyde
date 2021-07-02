@@ -3,8 +3,8 @@
 """
 MODIS Downloading Tool - MODIS SNOW
 
-__date__ = '20191007'
-__version__ = '1.0.1'
+__date__ = '20201202'
+__version__ = '1.5.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
@@ -12,6 +12,7 @@ General command line:
 python3 hyde_downloader_modis_snow.py -settings_file configuration.json
 
 Version:
+20201202 (1.5.0) --> Fix bugs and Hyde package operational release
 20191007 (1.0.1) --> Hyde package refactor
 20180906 (1.0.0) --> Beta release
 """
@@ -29,7 +30,6 @@ from bin.downloader.modis.lib_utils_io import read_file_settings
 from bin.downloader.modis.lib_utils_system import make_folder
 from bin.downloader.modis.lib_utils_time import set_time
 
-#from bin.downloader.modis.drv_downloader_ws_geo import DriverGeo#
 from bin.downloader.modis.drv_downloader_modis_data import DriverData
 
 from shutil import rmtree, copyfileobj

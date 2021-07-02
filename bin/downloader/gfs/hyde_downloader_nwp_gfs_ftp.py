@@ -194,6 +194,9 @@ def main():
                     out_file['2t_C'].attrs['units'] = 'C'
                     out_file['2t_C'].attrs['standard_name'] = "air_temperature"
                     out_file = out_file.rename({'2t': '2t_K'})
+==== BASE ====
+                    #out_file.to_netcdf(os.path.join(outFolder, out_file_name))
+==== BASE ====
                     logging.info(' ------> Convert temperature to C ... DONE')
                 else:
                     raise NotImplementedError
@@ -206,6 +209,9 @@ def main():
                 out_file['10wind'].attrs['long_name'] = '10 m wind'
                 out_file['10wind'].attrs['units'] = 'm s**-1'
                 out_file['10wind'].attrs['standard_name'] = "wind"
+==== BASE ====
+                #out_file.to_netcdf(os.path.join(outFolder, out_file_name))
+==== BASE ====
                 logging.info(' ------> Combine wind component ... DONE')
 
             logging.info(' -----> Shift longitude to be in the -180 +180 range')

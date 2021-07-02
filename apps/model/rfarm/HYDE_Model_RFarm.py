@@ -1,8 +1,8 @@
 """
 RFarm Model Processing Tool
 
-__date__ = '20210503'
-__version__ = '4.0.3'
+__date__ = '20210202'
+__version__ = '4.0.2'
 __author__ = 'Fabio Delogu            (fabio.delogu@cimafoundation.org,
               Simone Gabellani        (simone.gabellani@cimafoundation.org)
               Francesco Silvestro     (francesco.silvestro@cimafoundation.org)
@@ -13,7 +13,6 @@ General command line:
 python3 HYDE_Model_RFarm.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
-20210503 (4.0.3) --> Add gfs025 routines
 20210202 (4.0.2) --> Adapt scripts and fix bugs; add expert forecast routines
 20210125 (4.0.1) --> Adapt scripts and fix bugs
 20190902 (4.0.0) --> Porting in Hyde package and python 3.x
