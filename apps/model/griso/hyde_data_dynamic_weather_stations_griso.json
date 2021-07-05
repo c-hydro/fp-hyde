@@ -4,17 +4,18 @@
       "sources": {
         "use_drops2": true,
         "use_timeseries": false,
-        "use_point_data": false
+        "use_point_data": false,
+        "non_standard_tab_fields": false
       },
       "compressed_gridded_input": false,
       "compress_output": false,
       "overwrite_existing": true
     },
     "general": {
-      "title": "Modified Coonditional Merging",
+      "title": "GRISO interpolator",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "1.2.0 [20201209]",
+      "history": "2.1.0 [20210602]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Data dynamic tool developed by CIMA Research Foundation"
     },
@@ -32,25 +33,25 @@
   },
   "data": {
     "static": {
-      "filename" : "marche.dem.txt",
-      "folder": "/home/andrea/CIMA/PROJECT_Marche/PROJECT_stream/static_data/land/"
+      "filename" : "LiguriaDomain.dem.txt",
+      "folder": "/home/andrea/Desktop/"
     },
     "dynamic": {
       "time": {
-        "time_observed_period": 3,
+        "time_observed_period": 1,
         "time_forecast_period": 0,
         "time_frequency": "H"
       },
       "source_stations": {
         "drops2": {
           "DropsAddress": "http://dds.cimafoundation.org/dds/rest",
-          "DropsUser": "",
-          "DropsPwd": "",
+          "DropsUser": null,
+          "DropsPwd": null,
           "DropsSensor": "PLUVIOMETRO",
           "DropsGroup": "Dewetra%default",
-          "lon_left": 12.0,
-          "lon_right": 14.0,
-          "lat_top": 44.0,
+          "lon_left": 6,
+          "lon_right": 10.5,
+          "lat_top": 46,
           "lat_bottom": 42.5,
           "codes_not_valid": []
         },
@@ -72,8 +73,15 @@
           }
         },
         "point_files":{
-          "filename" : "rain_marche_{source_point_datetime}.csv",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/weather_stations/{source_point_sub_path_time}"
+          "filename" : "RAINC_{source_point_datetime}.csv",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/weather_stations/{source_point_sub_path_time}",
+          "non_standard_tab_fields": {
+            "latitude": "lat.strum",
+            "longitude": "lon.strum",
+            "data": "v.strum",
+            "station_name": null,
+            "station_code": null
+          }
         }
       }
     },

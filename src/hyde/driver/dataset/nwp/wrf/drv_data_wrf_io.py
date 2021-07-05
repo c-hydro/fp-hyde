@@ -3,13 +3,14 @@ Library Features:
 
 Name:          drv_data_wrf_io
 Author(s):     Fabio Delogu (fabio.delogu@cimafoundation.org)
-Date:          '20200302'
-Version:       '1.0.0'
+Date:          '20210522'
+Version:       '1.1.0'
 """
 #################################################################################
 # Library
 import logging
 import os
+from copy import deepcopy
 
 import numpy as np
 
@@ -281,7 +282,7 @@ class DataReader:
         var_obj = read_obj(self.file_tmp)
         return var_obj
 
-    def organize_obj(self, time_range):
+    def organize_obj(self, time_range, time_run):
 
         # Starting info
         log_stream.info(' ----> Get data ... ')
@@ -332,10 +333,15 @@ class DataReader:
                     var_dims_list_fill.extend([var_dims_list[var_source_id]] * step_ratio)
                     var_name_list_fill.extend([var_name_list[var_source_id]] * step_ratio)
 
+                    if var_dims_list[var_source_id] == 'var2d':
+                        ref_time = time_range
+                    elif var_dims_list[var_source_id] == 'var3d':
+                        ref_time = [time_run]
+
                     if time_range_fill is None:
-                        time_range_fill = time_range
+                        time_range_fill = deepcopy(ref_time)
                     else:
-                        time_range_fill = time_range_fill.append(time_range)
+                        time_range_fill.append(ref_time)
 
                 if n_var > 1:
                     idx_start = np.arange(0, n_file, n_var).tolist()
@@ -366,11 +372,15 @@ class DataReader:
                 var_dims_list_fill = var_dims_list
                 var_name_list_fill = var_name_list
                 file_list_fill = file_list
-                time_range_fill = time_range
+                if var_dims_list[0] == 'var2d':
+                    time_range_fill = time_range
+                elif var_dims_list[0] == 'var3d':
+                    time_range_fill = [time_run]
 
             var_dset_data = None
             var_dset_name = []
             var_frame[var_key] = {}
+
             for file_id, (var_source, var_format, var_dims, var_name, file_name, time_step) in enumerate(
                     zip(var_source_list_fill, var_format_list_fill, var_dims_list_fill,
                         var_name_list_fill, file_list_fill, time_range_fill)):
@@ -420,9 +430,35 @@ class DataReader:
                                                 ' :: TimeStep ' + str(time_step) + ' ... DONE')
 
                             elif var_dims == 'var3d':
-                                log_stream.error(' ===>  VarKey ' + var_key + ' :: VarName ' + var_name +
-                                                 ' :: TimeStep ' + str(time_step) + ' ... FAILED!')
-                                raise NotImplementedError('File source dims not implemented!')
+
+                                [file_data_raw, var_time, file_geo_x, file_geo_y] = read_data_wrf(
+                                    file_name, var_name,
+                                    tag_coord_geo_x=self.file_tag_coord_geo_x,
+                                    tag_coord_geo_y=self.file_tag_coord_geo_y,
+                                    tag_coord_time=self.file_tag_coord_time,
+                                    tag_dim_geo_x=self.file_tag_dim_geo_x,
+                                    tag_dim_geo_y=self.file_tag_dim_geo_y,
+                                    tag_dim_time=self.file_tag_dim_time,
+                                    engine=var_format,
+                                )
+
+                                name_data_raw = file_data_raw[var_id_step].name
+                                file_dset_raw = file_data_raw.to_dataset(name=name_data_raw)
+
+                                if self.var_tag_geo_x not in list(var_data.keys()):
+                                    var_frame[self.var_tag_geo_x] = file_geo_x
+                                if self.var_tag_geo_y not in list(var_data.keys()):
+                                    var_frame[self.var_tag_geo_y] = file_geo_y
+
+                                var_dset_name.append(name_data_raw)
+                                if var_dset_data is None:
+                                    var_dset_data = file_dset_raw
+                                else:
+                                    var_dset_data = var_dset_data.combine_first(file_dset_raw)
+
+                                log_stream.info(' ------>  VarKey ' + var_key + ' :: VarName ' + var_name +
+                                                ' :: TimeStep ' + str(time_step) + ' ... DONE')
+
                             else:
                                 log_stream.error(' ===>  VarKey ' + var_key + ' :: VarName ' + var_name +
                                                  ' :: TimeStep ' + str(time_step) + ' ... FAILED!')
@@ -458,6 +494,10 @@ class DataReader:
                                     var_time_null = var_frame_step[self.file_tag_coord_time]
                                     var_geo_x_null = var_frame_step[self.file_tag_coord_geo_x].values
                                     var_geo_y_null = var_frame_step[self.file_tag_coord_geo_y].values
+
+                                    if len(var_time_null)>1:
+                                        var_geo_x_null = var_geo_x_null[0, :, :]
+                                        var_geo_y_null = var_geo_y_null[0, :, :]
 
                                     var_da_null = create_darray_3d(
                                         var_frame_null, var_time_null, var_geo_x_null, var_geo_y_null,
