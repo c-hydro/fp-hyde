@@ -1,7 +1,7 @@
 """
 HyDE Processing Tool - Modified Conditional Merging with GRISO
-__date__ = '20210602'
-__version__ = '2.1.0'
+__date__ = '20210706'
+__version__ = '2.2.0'
 __author__ =
         'Flavio Pignone (flavio.pignone@cimafoundation.org',
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
@@ -10,6 +10,7 @@ __library__ = 'hyde'
 General command line:
 ### python op_conditional_merging_GRISO.py -time "YYYY-MM-DD HH:MM"
 Version(s):
+20210602 (2.2.0) --> Added support for AAIGrid inputs/outputs
 20210602 (2.1.0) --> Added beta support for radar rainfall products
                      Implemented tif inputs, implemented not-standard point files input.
                      Add netrc support for drops2. Bug fixes.
@@ -42,7 +43,7 @@ import fnmatch
 import netrc
 
 from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoPreproc
-from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_geotiff, read_file_tiff, read_point_data
+from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_raster, read_file_tiff, read_point_data
 # -------------------------------------------------------------------------------------
 # Script Main
 def main():
@@ -50,8 +51,8 @@ def main():
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
     alg_name = 'HyDE Processing Tool - Modified Conditional Merging with GRISO '
-    alg_version = '2.1.0'
-    alg_release = '2021-06-02'
+    alg_version = '2.2.0'
+    alg_release = '2021-07-06'
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -173,7 +174,9 @@ def main():
                     {data_settings['data']['dynamic']['source_gridded']['nc_settings']['var_name']: 'precip',
                      data_settings['data']['dynamic']['source_gridded']['nc_settings']['lon_name']: 'lon',
                      data_settings['data']['dynamic']['source_gridded']['nc_settings']['lat_name']: 'lat'})
-            elif fnmatch.fnmatch(data_settings['data']['dynamic']['source_gridded']['file_type'],'*tif*'):
+            elif (fnmatch.fnmatch(data_settings['data']['dynamic']['source_gridded']['file_type'],'*tif*')
+                  or fnmatch.fnmatch(data_settings['data']['dynamic']['source_gridded']['file_type'],'*txt*')
+                  or fnmatch.fnmatch(data_settings['data']['dynamic']['source_gridded']['file_type'],'AAIGrid')):
                 logging.info(' ---> Grids in tif format')
                 data_settings['data']['dynamic']['source_gridded']['file_type'] = "tif"
                 sat = read_file_tiff(gridded_in_time_step, var_name= 'precip', time=[timeNow],\
@@ -182,8 +185,6 @@ def main():
             else:
                 logging.error(" ---> ERROR! Only netcdf or tif inputs are supported for grid files")
                 raise NotImplementedError("Please, choose 'netcdf' or 'tif' in the setting file!")
-            if data_settings['algorithm']['flags']['compressed_gridded_input']:
-                os.system('gzip ' + gridded_in_time_step)
         except FileNotFoundError:
             logging.error('----> ERROR! File ' + os.path.basename(gridded_in_time_step) + ' not found!')
             raise FileNotFoundError
@@ -206,6 +207,7 @@ def main():
                 if len(data) == 0:
                     raise ValueError
         except (FileNotFoundError, ValueError) as err:
+
         # If no data available for the actual time step just copy the input
             if not data_settings['algorithm']['flags']['raise_error_if_no_station_available']:
                 logging.warning(' ----> WARNING! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
@@ -331,7 +333,13 @@ def main():
             logging.info(' ---> Saving outfile in GTiff format ' + os.path.basename(file_out_time_step))
 
             grid = xr.open_rasterio(gridded_in_time_step)
-            write_geotiff(conditioned_sat, grid, file_out_time_step)
+            write_raster(conditioned_sat, grid, file_out_time_step, driver='GTiff')
+
+        elif (fnmatch.fnmatch(data_settings['data']['outcome']['format'], '*txt*')
+              or fnmatch.fnmatch(data_settings['data']['outcome']['format'], 'AAIGrid')):
+
+            grid = xr.open_rasterio(gridded_in_time_step)
+            write_raster(conditioned_sat, grid, file_out_time_step, driver='AAIGrid')
 
         else:
             logging.error('ERROR! Unknown or unsupported output format! ')
@@ -341,6 +349,9 @@ def main():
             os.system('gzip -f ' + file_out_time_step)
 
         logging.info(' ---> Saving outfile...DONE')
+
+        if data_settings['algorithm']['flags']['compressed_gridded_input']:
+            os.system('gzip ' + gridded_in_time_step)
 
     # -------------------------------------------------------------------------------------
     # Info algorithm
