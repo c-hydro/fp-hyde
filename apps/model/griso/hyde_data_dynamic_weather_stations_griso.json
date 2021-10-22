@@ -2,10 +2,10 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": true,
+        "use_drops2": false,
         "use_timeseries": false,
-        "use_point_data": false,
-        "non_standard_tab_fields": false
+        "use_point_data": true,
+        "non_standard_tab_fields": true
       },
       "compressed_gridded_input": false,
       "compress_output": false,
@@ -34,7 +34,7 @@
   "data": {
     "static": {
       "filename" : "LiguriaDomain.dem.txt",
-      "folder": "/home/andrea/Desktop/"
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/"
     },
     "dynamic": {
       "time": {
@@ -88,7 +88,7 @@
     "outcome": {
       "format": "netcdf",
       "filename": "marche_griso_{outcome_datetime}.nc",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/griso/data_dynamic/results/{outcome_sub_path_time}"
+      "folder": "/home/andrea/Desktop"
     },
     "log": {
       "filename": "hyde_griso.txt",

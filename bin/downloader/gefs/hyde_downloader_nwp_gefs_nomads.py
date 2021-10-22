@@ -1,35 +1,19 @@
 #!/usr/bin/python3
 
 """
-HyDE Downloading Tool - NWP GFS 0.25
+HyDE Downloading Tool - NWP GEFS 0.25
 
-__date__ = '20200428'
-__version__ = '2.0.0'
+__date__ = '20210914'
+__version__ = '1.0.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org',
-        'Alessandro Masoero (alessandro.masoero@cimafoundation.org',
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_downloader_nwp_gfs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
+python3 hyde_downloader_nwp_gefs_nomads.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
-20210428 (2.0.0) --> Add hit per minute limit for new NOAA policy compatibility
-                     Fix time step problems. Modified output format for decreasing number of hits to the server.
-20200325 (1.8.0) --> Fix time accumulation for Continuum forcing compatibility
-                     Add check on the output dimension "heigth" for producing Continuum compliant files
-                     Set reindex with "nearest" approach for filling the time range at the correct frequency.
-                     Setting file template modified for supporting GFS v16
-20210212 (1.7.0) --> Add conversion to wind and temperature Continuum compliant
-                     Derived from hyde_downloader_nwp_gfs.py
-20200429 (1.6.0) --> Add checking url request(s)
-20200313 (1.5.0) --> Add filtering of time-steps for accumulated variables (tp)
-20200312 (1.4.0) --> Add shifting of longitudes from [0,360] to [-180,180];
-                     change file output format from grib2 to nc for allowing to store negative longitudes in outcomes
-20200309 (1.3.0) --> Fix runtime issue in tags replacing
-20200306 (1.2.0) --> Add cdo library to perform actions for manipulating grib2 file(s)
-20200302 (1.1.0) --> Add multiprocessing http request(s)
 20200227 (1.0.0) --> Beta release
 """
 # -------------------------------------------------------------------------------------
@@ -61,9 +45,9 @@ from argparse import ArgumentParser
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
-alg_name = 'HYDE DOWNLOADING TOOL - NWP GFS'
-alg_version = '2.0.0'
-alg_release = '2021-04-28'
+alg_name = 'HYDE DOWNLOADING TOOL - NWP GEFS'
+alg_version = '1.0.0'
+alg_release = '2021-09-14'
 # Algorithm parameter(s)
 time_format = '%Y%m%d%H%M'
 # -------------------------------------------------------------------------------------
@@ -99,9 +83,11 @@ def main():
     # -------------------------------------------------------------------------------------
     # Get algorithm time range
     time_run, time_run_range = set_run_time(alg_time, data_settings['time'])
+    ens_members = np.arange(1,data_settings["algorithm"]["ancillary"]["ens_members"]+1)
 
     # Starting info
     logging.info(' --> TIME RUN: ' + str(time_run))
+
 
     # Iterate over time steps
     for time_run_step in time_run_range:
@@ -109,66 +95,75 @@ def main():
         # Starting info
         logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... ')
 
-        # Get data time range
-        time_data_range = set_data_time(time_run_step, data_settings['data']['dynamic']['time'])
+        # Iterate over ensemble members
+        for ens_member in ens_members:
 
-        # Set data sources
-        data_source = set_data_source(time_run_step, time_data_range,
-                                      data_settings['data']['dynamic']['source'],
-                                      data_settings['data']['static']['bounding_box'],
-                                      data_settings['algorithm']['ancillary'],
-                                      data_settings['algorithm']['template'],
-                                      type_data=data_settings['algorithm']['ancillary']['type'],)
-        # Set data ancillary
-        data_ancillary = set_data_ancillary(time_run_step, time_data_range,
-                                            data_settings['data']['dynamic']['ancillary'],
-                                            data_settings['data']['static']['bounding_box'],
-                                            data_settings['algorithm']['ancillary'],
-                                            data_settings['algorithm']['template'],
-                                            type_data=data_settings['algorithm']['ancillary']['type'],)
+            # Starting info
+            logging.info(' ---> ENSEMBLE MEMBER: ' + str(ens_member).zfill(2) + ' ... ')
 
-        # Set data outcome global
-        data_outcome_global = set_data_outcome(
-            time_run_step,
-            data_settings['data']['dynamic']['outcome']['global'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'],
-            flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_global'])
+            # Get data time range
+            time_data_range = set_data_time(time_run_step, data_settings['data']['dynamic']['time'])
+            time_data_full = pd.date_range(time_run + pd.Timedelta('1H'), time_data_range[-1], freq='1H')
 
-        # Set data outcome domain
-        data_outcome_domain = set_data_outcome(
-            time_run_step,
-            data_settings['data']['dynamic']['outcome']['domain'],
-            data_settings['data']['static']['bounding_box'],
-            data_settings['algorithm']['ancillary'],
-            data_settings['algorithm']['template'],
-            type_data=data_settings['algorithm']['ancillary']['type'],
-            flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_domain'])
+            # Set data sources
+            data_source = set_data_source(time_run_step, time_data_range, ens_member,
+                                          data_settings['data']['dynamic']['source'],
+                                          data_settings['data']['static']['bounding_box'],
+                                          data_settings['algorithm']['ancillary'],
+                                          data_settings['algorithm']['template'],
+                                          type_data=data_settings['algorithm']['ancillary']['type'],)
+            # Set data ancillary
+            data_ancillary = set_data_ancillary(time_run_step, time_data_range, ens_member,
+                                                data_settings['data']['dynamic']['ancillary'],
+                                                data_settings['data']['static']['bounding_box'],
+                                                data_settings['algorithm']['ancillary'],
+                                                data_settings['algorithm']['template'],
+                                                type_data=data_settings['algorithm']['ancillary']['type'],)
 
-        if data_settings['algorithm']['flags']['downloading_mp']:
-            retrieve_data_source_mp(
-                data_source, data_ancillary,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'],
-                process_n=data_settings['algorithm']['ancillary']['process_mp'], limit=data_settings['algorithm']['ancillary']['remote_server_hit_per_min'])
-        else:
-            retrieve_data_source_seq(
-                data_source, data_ancillary,
-                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'], limit=data_settings['algorithm']['ancillary']['remote_server_hit_per_min'])
+            # Set data outcome global
+            data_outcome_global = set_data_outcome(
+                time_run_step, ens_member,
+                data_settings['data']['dynamic']['outcome']['global'],
+                data_settings['data']['static']['bounding_box'],
+                data_settings['algorithm']['ancillary'],
+                data_settings['algorithm']['template'],
+                type_data=data_settings['algorithm']['ancillary']['type'],
+                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_global'])
 
-        # Merge and mask data ancillary to data outcome
-        arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
-                             data_bbox=data_settings['data']['static']['bounding_box'],
-                             cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
-                             cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'],
-                             source_standards=data_settings['data']['dynamic']['source']['vars_standards'],
-                             data_range=time_data_range)
+            # Set data outcome domain
+            data_outcome_domain = set_data_outcome(
+                time_run_step, ens_member,
+                data_settings['data']['dynamic']['outcome']['domain'],
+                data_settings['data']['static']['bounding_box'],
+                data_settings['algorithm']['ancillary'],
+                data_settings['algorithm']['template'],
+                type_data=data_settings['algorithm']['ancillary']['type'],
+                flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_domain'])
 
-        # Clean data tmp (such as ancillary and outcome global)
-        clean_data_tmp(
-            data_ancillary, data_outcome_global,
-            flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
+            if data_settings['algorithm']['flags']['downloading_mp']:
+                retrieve_data_source_mp(
+                    data_source, data_ancillary,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'],
+                    process_n=data_settings['algorithm']['ancillary']['process_mp'], limit=data_settings['algorithm']['ancillary']['remote_server_hit_per_min'])
+            else:
+                retrieve_data_source_seq(
+                    data_source, data_ancillary,
+                    flag_updating=data_settings['algorithm']['flags']['cleaning_dynamic_data_ancillary'], limit=data_settings['algorithm']['ancillary']['remote_server_hit_per_min'])
+
+            # Merge and mask data ancillary to data outcome
+            arrange_data_outcome(data_ancillary, data_outcome_global, data_outcome_domain,
+                                 data_bbox=data_settings['data']['static']['bounding_box'],
+                                 cdo_exec=data_settings['algorithm']['ancillary']['cdo_exec'],
+                                 cdo_deps=data_settings['algorithm']['ancillary']['cdo_deps'],
+                                 source_standards=data_settings['data']['dynamic']['source']['vars_standards'],
+                                 date_range=time_data_full)
+
+            # Clean data tmp (such as ancillary and outcome global)
+            clean_data_tmp(
+                data_ancillary, data_outcome_global,
+                flag_cleaning_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_data_tmp'])
+
+            logging.info(' ---> ENSEMBLE MEMBER: ' + str(ens_member).zfill(2) + ' ... DONE')
 
         # Ending info
         logging.info(' ---> NWP RUN: ' + str(time_run_step) + ' ... DONE')
@@ -269,7 +264,7 @@ def clean_data_tmp(data_ancillary, data_outcome_global,
 # -------------------------------------------------------------------------------------
 # Method to merge and mask outcome dataset(s)
 def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
-                         data_bbox=None, cdo_exec=None, cdo_deps=None, source_standards=None, data_range=None):
+                         data_bbox=None, cdo_exec=None, cdo_deps=None, source_standards=None, date_range=None):
 
     logging.info(' ----> Dumping data ... ')
 
@@ -291,7 +286,7 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
     for cdo_dep in cdo_deps:
         os.environ['LD_LIBRARY_PATH'] = 'LD_LIBRARY_PATH:' + cdo_dep
     #temp for local debug
-    #os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
+    os.environ['PATH'] = os.environ['PATH'] + ':/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/'
 
     cdo = Cdo()
     cdo.setCdo(cdo_exec)
@@ -344,6 +339,7 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
 
                 if source_standards['convert2standard_continuum_format']:
                     out_file = deepcopy(xr.open_dataset(dst_data_global_step))
+                    time_range_full = pd.date_range(min(out_file["time"].values),max(out_file["time"].values),freq='H')
                     os.remove(dst_data_global_step)
 
                     if '2t' in var_in.tolist():
@@ -366,7 +362,9 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
                         logging.info(' ------> Decumulate precipitation ... ')
                         #out_file = deepcopy(xr.open_dataset(dst_data_global_step))
                         #os.remove(dst_data_global_step)
-                        out_file['tp'].values = np.diff(out_file['tp'].values, n=1, axis=0, prepend=0)
+                        temp = np.diff(out_file['tp'].values, n=1, axis=0, prepend=0)
+                        out_file['tp'][np.arange(2,out_file['tp'].values.shape[0],2),:,:].values = temp[np.arange(2,out_file['tp'].values.shape[0],2),:,:]
+                        out_file['tp'].values = out_file['tp'].values/3
                         out_file['tp'].attrs['long_name'] = 'hourly precipitation depth'
                         out_file['tp'].attrs['units'] = 'mm'
                         out_file['tp'].attrs['standard_name'] = "precipitation"
@@ -396,7 +394,7 @@ def arrange_data_outcome(src_data, dst_data_global, dst_data_domain,
                         pass
 
                     # Reindex time axis by padding last available map over the time range
-                    out_file=out_file.reindex(time=data_range, method='nearest')
+                    out_file=out_file.reindex(time=date_range, method='nearest')
                     out_file.to_netcdf(dst_data_global_step)
 
             if os.path.exists(tmp_data_global_step_cat):
@@ -638,7 +636,7 @@ def retrieve_data_source_seq(src_data, dst_data, flag_updating=False, limit=9999
 
 # -------------------------------------------------------------------------------------
 # Method to create data outcome list
-def set_data_outcome(time_run, data_def, geo_def, ancillary_def, tags_template,
+def set_data_outcome(time_run, ens_member_num, data_def, geo_def, ancillary_def, tags_template,
                      type_data=None, flag_updating=True):
 
     if type_data is None:
@@ -653,6 +651,7 @@ def set_data_outcome(time_run, data_def, geo_def, ancillary_def, tags_template,
     lat_bottom = geo_def['lat_bottom']
 
     domain = ancillary_def['domain']
+    ens_member = str(ens_member_num).zfill(2)
 
     hour_run = time_run.hour
     datetime_run = time_run.to_pydatetime()
@@ -667,7 +666,8 @@ def set_data_outcome(time_run, data_def, geo_def, ancillary_def, tags_template,
                             "run_lon_right": str(lon_right),
                             "run_lon_left": str(lon_left),
                             "run_lat_bottom": str(lat_bottom),
-                            "run_lat_top": str(lat_top)}
+                            "run_lat_top": str(lat_top),
+                            "ens_member" : ens_member}
 
         folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
         filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
@@ -692,7 +692,7 @@ def set_data_outcome(time_run, data_def, geo_def, ancillary_def, tags_template,
 
 # -------------------------------------------------------------------------------------
 # Method to create data ancillary list
-def set_data_ancillary(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
+def set_data_ancillary(time_run, time_range, ens_member_num, data_def, geo_def, ancillary_def, tags_template,
                        type_data=None, anl_include=False):
 
     if type_data is None:
@@ -707,6 +707,7 @@ def set_data_ancillary(time_run, time_range, data_def, geo_def, ancillary_def, t
     lat_bottom = geo_def['lat_bottom']
 
     domain = ancillary_def['domain']
+    ens_member = str(ens_member_num).zfill(2)
 
     hour_run = time_run.hour
     datetime_run = time_run.to_pydatetime()
@@ -726,7 +727,8 @@ def set_data_ancillary(time_run, time_range, data_def, geo_def, ancillary_def, t
                                 "run_lon_right": str(lon_right),
                                 "run_lon_left": str(lon_left),
                                 "run_lat_bottom": str(lat_bottom),
-                                "run_lat_top": str(lat_top)}
+                                "run_lat_top": str(lat_top),
+                                "ens_member": ens_member}
 
             folder_step = fill_tags2string(folder_raw, tags_template, tags_values_step)
             filename_step = fill_tags2string(filename_raw, tags_template, tags_values_step)
@@ -744,7 +746,7 @@ def set_data_ancillary(time_run, time_range, data_def, geo_def, ancillary_def, t
 
 # -------------------------------------------------------------------------------------
 # Method to create data source list
-def set_data_source(time_run, time_range, data_def, geo_def, ancillary_def, tags_template,
+def set_data_source(time_run, time_range, ens_member_num, data_def, geo_def, ancillary_def, tags_template,
                     type_data=None, anl_include=False):
 
     if type_data is None:
@@ -763,6 +765,9 @@ def set_data_source(time_run, time_range, data_def, geo_def, ancillary_def, tags
     lat_bottom = geo_def['lat_bottom']
 
     domain = ancillary_def['domain']
+    ens_member = str(ens_member_num).zfill(2)
+
+    frc_steps = (time_range - time_run).total_seconds()/3600
 
     hour_run = time_run.hour
     datetime_run = time_run.to_pydatetime()
@@ -774,20 +779,18 @@ def set_data_source(time_run, time_range, data_def, geo_def, ancillary_def, tags
             url_bbox_raw = ''
 
         url_list = []
-        for time_id, time_step in enumerate(time_range):
-
-            if not anl_include:
-                time_id = time_id + 1
+        for time_id, time_step in zip(frc_steps, time_range):
 
             datetime_step = time_step.to_pydatetime()
             tags_values_step = {"domain": domain,
                                 "outcome_sub_path_time": datetime_run, "outcome_datetime": datetime_step,
-                                "run_hour": hour_run, "run_step": time_id,
+                                "run_hour": hour_run, "run_step": int(time_id),
                                 "run_datetime": datetime_run,
                                 "run_lon_right": str(lon_right),
                                 "run_lon_left": str(lon_left),
                                 "run_lat_bottom": str(lat_bottom),
-                                "run_lat_top": str(lat_top)}
+                                "run_lat_top": str(lat_top),
+                                "ens_member": ens_member}
 
             url_root_step = fill_tags2string(url_root_raw, tags_template, tags_values_step)
             url_file_step = fill_tags2string(url_file_raw, tags_template, tags_values_step)
@@ -841,7 +844,7 @@ def fill_tags2string(string_raw, tags_format=None, tags_filling=None):
                     if isinstance(tag_filling_value, (float, int)):
                         tag_filling_value = tag_format_value.format(tag_filling_value)
 
-                    string_filled = string_filled.replace(tag_format_value, tag_filling_value)
+                string_filled = string_filled.replace(tag_format_value, tag_filling_value)
 
         string_filled = string_filled.replace('//', '/')
         return string_filled

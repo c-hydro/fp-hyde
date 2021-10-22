@@ -21,8 +21,6 @@ Version(s):
 # -------------------------------------------------------------------------------------
 # Complete library
 import os
-import sys
-import copy
 import logging
 from os.path import join
 from datetime import datetime, timedelta
@@ -33,10 +31,9 @@ import pandas as pd
 import json
 import time
 import netrc
-import rasterio as rio
 
 from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoPreproc
-from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_geotiff, read_point_data
+from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_raster, read_point_data
 # -------------------------------------------------------------------------------------
 # Script Main
 def main():
@@ -198,7 +195,7 @@ def main():
 
         elif data_settings['data']['outcome']['format'].lower() == 'tif' or data_settings['data']['outcome']['format'].lower() == 'tiff' or data_settings['data']['outcome']['format'].lower() == 'gtiff':
             logging.info(' ---> Saving outfile in GTiff format ' + os.path.basename(file_out_time_step))
-            write_geotiff(griso_obs, grid_in, file_out_time_step)
+            write_raster(griso_obs, grid, file_out_time_step, driver='GTiff')
         else:
             logging.error('ERROR! Unknown or unsupported output format! ')
             raise ValueError("Supported output formats are netcdf and GTiff")
