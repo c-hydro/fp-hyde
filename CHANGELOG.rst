@@ -5,7 +5,7 @@ Version 1.9.8 [2021-08-01]
 **************************
 BIN: **hyde_downloader_nwp_gefs_nomads.py**
     - Release for Hyde package
-    
+
 FIX: **HYDE_Model_RFarm.py**
     - Fix 3d array vertical direction for ecmwf0100
 
