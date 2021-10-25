@@ -29,7 +29,7 @@ from src.common.utils.lib_utils_op_system import createTemp
 log_stream = logging.getLogger(logger_name)
 
 # Debug
-# import matplotlib.pylab as plt
+import matplotlib.pylab as plt
 #################################################################################
 
 

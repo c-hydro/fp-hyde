@@ -75,25 +75,25 @@ class DataGeo:
     # Method to compose geographical data
     def compose(self):
 
-        logging.info(' ---> Organize Geo ... ')
+        log_stream.info(' ---> Organize Geo ... ')
 
         geo_collections = {}
         if not os.path.exists(self.file_path_ancillary):
 
-            logging.info(' ----> Terrain datasets ... ')
+            log_stream.info(' ----> Terrain datasets ... ')
             if os.path.exists(self.file_path_terrain):
                 terrain_obj = read_file_raster(self.file_path_terrain)
-                logging.info(' ----> Terrain datasets ... DOME')
+                log_stream.info(' ----> Terrain datasets ... DOME')
             else:
-                logging.error(' ----> Terrain datasets ... FAILED! File not found.')
+                log_stream.error(' ----> Terrain datasets ... FAILED! File not found.')
                 raise FileNotFoundError('File ' + self.file_path_terrain + ' not found')
 
-            logging.info(' ----> Alert area datasets ... ')
+            log_stream.info(' ----> Alert area datasets ... ')
             if (self.file_path_alert_area is not None) and (os.path.exists(self.file_path_alert_area)):
                 alert_area_obj = read_file_raster(self.file_path_alert_area)
-                logging.info(' ----> Alert area datasets ... DOME')
+                log_stream.info(' ----> Alert area datasets ... DOME')
             else:
-                logging.info(' ----> Alert area datasets ... SKIPPED! File not defined or not found.')
+                log_stream.info(' ----> Alert area datasets ... SKIPPED! File not defined or not found.')
                 alert_area_obj = None
 
             # Create geo collections
@@ -109,7 +109,7 @@ class DataGeo:
             # Read geo collections
             geo_collections = read_obj(self.file_path_ancillary)
 
-        logging.info(' ---> Organize Geo ... DONE')
+        log_stream.info(' ---> Organize Geo ... DONE')
 
         return geo_collections
 

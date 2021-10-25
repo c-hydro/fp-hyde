@@ -315,7 +315,7 @@ class RFarmModel:
 
         # Choose computing mode
         if self.multi_core:
-            raise NotImplemented
+            raise NotImplemented('Ensembles method in multiprocessing mode not implemented yet')
             # Define process(es) for RF model using multi core mode
             # ensemble_status = self.worker_multi_core()
         else:

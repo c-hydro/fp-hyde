@@ -441,7 +441,8 @@ class ModelRunner:
                     time_obj = data_obj['time'].values
 
                 else:
-                    raise NotImplementedError('Object not in supported format')
+                    log_stream.error(' ===> Data object not in supported format.')
+                    raise NotImplementedError('Case not implemented yet')
 
                 lons_geo = self.data_geo_terrain['longitude']
                 lats_geo = self.data_geo_terrain['latitude']

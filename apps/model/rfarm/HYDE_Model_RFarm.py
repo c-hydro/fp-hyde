@@ -31,16 +31,16 @@ import logging
 from argparse import ArgumentParser
 from time import time, strftime, gmtime
 
-from src.common.log.lib_logging import setLoggingFile
-
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_formatter, logger_handle, logger_name
 
-from src.hyde.driver.configuration.generic.drv_configuration_algorithm import DataAlgorithm
 from src.hyde.driver.configuration.model.rfarm.drv_configuration_algorithm_rfarm import DriverAlgorithm
 from src.hyde.driver.configuration.model.rfarm.drv_configuration_time_rfarm import DataTime
 
 from src.hyde.driver.model.rfarm.drv_model_rfarm_geo import DataGeo
 from src.hyde.driver.model.rfarm.drv_model_rfarm_base import ModelTime, ModelRunner
+
+# Log
+log_stream = logging.getLogger(logger_name)
 # ----------------------------------------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
@@ -71,10 +71,10 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Start Program
-    logging.info('[' + alg_project + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
-    logging.info('[' + alg_project + '] Execution Time: ' + strftime("%Y-%m-%d %H:%M", gmtime()) + ' GMT')
-    logging.info('[' + alg_project + '] Reference Time: ' + time_arg + ' GMT')
-    logging.info('[' + alg_project + '] Start Program ... ')
+    log_stream.info('[' + alg_project + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
+    log_stream.info('[' + alg_project + '] Execution Time: ' + strftime("%Y-%m-%d %H:%M", gmtime()) + ' GMT')
+    log_stream.info('[' + alg_project + '] Reference Time: ' + time_arg + ' GMT')
+    log_stream.info('[' + alg_project + '] Start Program ... ')
 
     # Time algorithm information
     start_time = time()
@@ -82,7 +82,7 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Get data time
-    logging.info(' --> Set time information ... ')
+    log_stream.info(' --> Set time information ... ')
     driver_algorithm_time = DataTime(
         time_arg,
         time_settings=data_settings['time']['time_now'],
@@ -90,17 +90,17 @@ def main():
         time_frequency=data_settings['time']['time_frequency'],
         time_rounding=data_settings['time']['time_rounding'])
     data_time = driver_algorithm_time.getDataTime()
-    logging.info(' --> Set time information ... DONE')
+    log_stream.info(' --> Set time information ... DONE')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
     # Get data geo
-    logging.info(' --> Set static datasets ... ')
+    log_stream.info(' --> Set static datasets ... ')
     data_algorithm_geo = DataGeo(
         src_dict=data_settings['data']['static']['land'],
         cleaning_static_data=data_settings['algorithm']['flags']['cleaning_static_data'])
     data_geo = data_algorithm_geo.compose()
-    logging.info(' --> Set static datasets ... DONE')
+    log_stream.info(' --> Set static datasets ... DONE')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -109,18 +109,18 @@ def main():
 
         # -------------------------------------------------------------------------------------
         # Compute dynamic time
-        logging.info(' --> Configure time ... ')
+        log_stream.info(' --> Configure time ... ')
         driver_dynamic_time = ModelTime(
             time_step=time_step,
             time_run=data_time['time_run'],
             time_settings=data_settings['data']['dynamic']['time'])
         data_dynamic_time = driver_dynamic_time.computeModelTime()
-        logging.info(' --> Configure time ... DONE')
+        log_stream.info(' --> Configure time ... DONE')
         # -------------------------------------------------------------------------------------
 
         # -------------------------------------------------------------------------------------
         # Configure and execute model
-        logging.info(' --> Initialize RainFarm instance ... ')
+        log_stream.info(' --> Initialize RainFarm instance ... ')
         driver_model_runner = ModelRunner(
             time_step=data_dynamic_time.time_step,
             time_range=data_dynamic_time.time_range,
@@ -141,27 +141,27 @@ def main():
             file_write_engine=data_settings['algorithm']['ancillary']['write_engine'],
             tag_model_algorithm=data_settings['algorithm']['ancillary']['algorithm_mode']
         )
-        logging.info(' --> Initialize RainFarm instance ... DONE')
+        log_stream.info(' --> Initialize RainFarm instance ... DONE')
 
         # Collect data
-        logging.info(' --> Collect RainFarm datasets ... ')
+        log_stream.info(' --> Collect RainFarm datasets ... ')
         data_dynamic = driver_model_runner.collect(data_dynamic_time)
-        logging.info(' --> Collect RainFarm datasets ... DONE!')
+        log_stream.info(' --> Collect RainFarm datasets ... DONE!')
 
         # Configure model
-        logging.info(' --> Configure RainFarm instance ... ')
+        log_stream.info(' --> Configure RainFarm instance ... ')
         driver_model_runner.configure(data_dynamic)
-        logging.info(' --> Configure RainFarm instance ... DONE!')
+        log_stream.info(' --> Configure RainFarm instance ... DONE!')
 
         # Execute model
-        logging.info(' --> Execute RainFarm instance ... ')
+        log_stream.info(' --> Execute RainFarm instance ... ')
         data_run = driver_model_runner.exec()
-        logging.info(' --> Execute RainFarm instance ... DONE')
+        log_stream.info(' --> Execute RainFarm instance ... DONE')
 
         # Finalize model
-        logging.info(' --> Save RainFarm results ... ')
+        log_stream.info(' --> Save RainFarm results ... ')
         driver_model_runner.save(data_run)
-        logging.info(' --> Save RainFarm results ... DONE')
+        log_stream.info(' --> Save RainFarm results ... DONE')
 
         # Clean tmp file(s)
         driver_model_runner.clean(cleaning_dynamic_tmp=data_settings['algorithm']['flags']['cleaning_dynamic_tmp'])
@@ -171,16 +171,16 @@ def main():
 
     # ----------------------------------------------------------------------------------------------------------------------
     # Note about script parameter(s)
-    logging.info('NOTE - Algorithm parameter(s)')
-    logging.info('Script: ' + str(script_name))
+    log_stream.info('NOTE - Algorithm parameter(s)')
+    log_stream.info('Script: ' + str(script_name))
     # ----------------------------------------------------------------------------------------------------------------------
 
     # ----------------------------------------------------------------------------------------------------------------------
     # End Program
     elapsed_time = round(time() - start_time, 1)
 
-    logging.info('[' + alg_project + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
-    logging.info('End Program - Time elapsed: ' + str(elapsed_time) + ' seconds')
+    log_stream.info('[' + alg_project + ' ' + alg_type + ' - ' + alg_name + ' (Version ' + alg_version + ')]')
+    log_stream.info('End Program - Time elapsed: ' + str(elapsed_time) + ' seconds')
     # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
   "algorithm":{
     "flags": {
       "cleaning_static_data": false,
-      "cleaning_dynamic_ancillary_in": false,
+      "cleaning_dynamic_ancillary_in": true,
       "cleaning_dynamic_ancillary_out": true,
       "cleaning_dynamic_out": true,
       "cleaning_dynamic_tmp": true,
@@ -108,7 +108,7 @@
     }
   },
   "time": {
-    "time_now": "201812210000",
+    "time_now": null,
     "time_period": 0,
     "time_frequency": "D",
     "time_rounding": "D"
