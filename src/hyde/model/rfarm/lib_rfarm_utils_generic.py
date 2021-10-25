@@ -137,7 +137,7 @@ def computeVar(a3dDataXYT_IN, iTimeRatio_RF,
     a3dDataXYT_RF = a3dDataXYT_IN[iIMin_RF: iIMax_RF + 1, iJMin_RF: iJMax_RF + 1, :]
     # Check data limits (just in case)
     a3dDataXYT_RF[a3dDataXYT_RF < 0.01] = 0
-    # Convert from accumulated rain to istantaneous rain
+    # Convert from accumulated rain to instantaneous rain
     a3dDataXYT_RF = a3dDataXYT_RF/float(iTimeRatio_RF)
 
     return a3dDataXYT_RF

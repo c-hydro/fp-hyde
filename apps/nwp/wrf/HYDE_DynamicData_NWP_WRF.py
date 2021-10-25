@@ -1,8 +1,8 @@
 """
 Hyde Processing Tool - NWP WRF
 
-__date__ = '20200317'
-__version__ = '1.2.0'
+__date__ = '20210522'
+__version__ = '1.3.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'hyde'
 
@@ -10,6 +10,7 @@ General command line:
 python3 HYDE_DynamicData_NWP_WRF.py -settings_file configuration.json -time YYYYMMDDHHMM
 
 Version:
+20210522 (1.3.0) --> Add support to wrf-3d
 20200317 (1.2.0) --> Refactoring using classes and super methods
 20191018 (1.1.1) --> Manage issue(s) in input definition of "time" variable
 20190916 (1.1.0) --> Refactoring for HyDE package in Python3
@@ -65,7 +66,7 @@ def main():
     # -------------------------------------------------------------------------------------
     # Version and algorithm information
     project_name = 'HYDE'
-    alg_version = '1.2.0'
+    alg_version = '1.3.0'
     alg_type = 'DataDynamic'
     alg_name = 'NWP WRF Processing Tool'
     # Time algorithm information
@@ -101,6 +102,12 @@ def main():
         time_frequency=data_algorithm_settings['time']['time_frequency'],
         time_rounding=data_algorithm_settings['time']['time_rounding'])
     data_algorithm_time = driver_algorithm_time.getDataTime()
+    try:
+        data_time_label = data_algorithm_settings['data']['dynamic']['time']['time_coordinate_label']
+        if data_time_label is None:
+            data_time_label = 'Time'
+    except:
+            data_time_label = 'Time'
     log_stream.info(' --> Set algorithm time ... DONE')
     # -------------------------------------------------------------------------------------
 
@@ -153,6 +160,7 @@ def main():
             file_out_write_engine=data_algorithm_settings['algorithm']['ancillary']['write_engine'],
             file_out_mode_zipping=data_algorithm_flags['zipping_dynamic_product'],
             file_out_ext_zipping=data_algorithm_settings['algorithm']['ancillary']['zip_format'],
+            coord_time = data_time_label
         )
         log_stream.info(' --> Initialize product driver ... DONE')
 

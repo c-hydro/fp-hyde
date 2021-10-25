@@ -11,18 +11,19 @@
       "domain" : "guyana",
       "process_mp": 20,
       "remote_server_hit_per_min": 100,
+      "ens_members": 30,
       "type": [
         "surface_rain",
         "other_variables"],
-      "vars_in": ["tp","2r","dlwrf","dswrf","al","10u","10v"],
+      "vars_in": ["tp","2r","dswrf","10u","10v"],
       "cdo_exec": "/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/cdo",
       "cdo_deps": ["/home/andrea/FP_libs/fp_libs_cdo/eccodes2.17.0/lib/"]
     },
     "general": {
-      "title": "NWP GFS 0.25 degree NOMADS",
+      "title": "NWP GEFS 0.25 degree NOMADS",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "2.0.0 [20200428]",
+      "history": "1.0.0 [20210914]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Downloading tool developed by CIMA Research Foundation"
     },
@@ -32,6 +33,7 @@
       "ancillary_datetime": "%Y%m%d%H%M",
       "outcome_sub_path_time": "%Y/%m/%d/",
       "outcome_datetime": "%Y%m%d",
+      "ens_member": "string_member",
       "run_hour": "{:02d}",
       "run_step": "{:03d}",
       "run_datetime": "%Y%m%d",
@@ -52,8 +54,8 @@
     },
     "dynamic": {
       "time": {
-        "time_forecast_period": 120,
-        "time_forecast_frequency": "H",
+        "time_forecast_period": 40,
+        "time_forecast_frequency": "3H",
         "time_observed_period": 0,
         "time_observed_frequency": "H",
         "time_rounding": "H"
@@ -61,13 +63,13 @@
       "source": {
         "url_root":
         [
-          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?",
-          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?"
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gefs_atmos_0p25s.pl?",
+          "https://nomads.ncep.noaa.gov/cgi-bin/filter_gefs_atmos_0p25s.pl?"
         ],
         "url_file":
         [
-          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}",
-          "file=gfs.t{run_hour}z.pgrb2.0p25.f{run_step}"
+          "file=gep{ens_member}.t{run_hour}z.pgrb2s.0p25.f{run_step}",
+          "file=gep{ens_member}.t{run_hour}z.pgrb2s.0p25.f{run_step}"
         ],
         "url_lev" :
         [
@@ -77,7 +79,7 @@
         "url_vars":
         [
           "&var_APCP=on",
-          "&var_UGRD=on&var_VGRD=on&var_ALBDO=on&var_DLWRF=on&var_DSWRF=on&var_TMP=on&var_RH=on"
+          "&var_UGRD=on&var_VGRD=on&var_DSWRF=on&var_TMP=on&var_RH=on"
         ],
         "url_bbox":
         [
@@ -86,8 +88,8 @@
         ],
         "url_loc" :
         [
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos",
-          "&dir=%2Fgfs.{run_datetime}%2F{run_hour}%2Fatmos"
+          "&dir=%2Fgefs.{run_datetime}%2F{run_hour}%2Fatmos%2Fpgrb2sp25",
+          "&dir=%2Fgefs.{run_datetime}%2F{run_hour}%2Fatmos%2Fpgrb2sp25"
         ],
         "vars_standards":{
           "source_temperature_mesurement_unit": "K",
@@ -99,8 +101,8 @@
       "ancillary": {
         "filename":
         [
-          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_srf_rain.grib2",
-          "gfs.t{run_hour}z.0p25.{ancillary_datetime}_other_variables.grib2"
+          "gep{ens_member}.t{run_hour}z.0p25.{ancillary_datetime}_srf_rain.grib2",
+          "gep{ens_member}.t{run_hour}z.0p25.{ancillary_datetime}_other_variables.grib2"
         ],
         "folder":
         [
@@ -111,8 +113,8 @@
       "outcome": {
         "global": {
           "filename": [
-            "gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_variables.nc",
-            "gfs.t{run_hour}z.0p25.{outcome_datetime}_10m_variables.nc"
+            "gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_srf_variables.nc",
+            "gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_10m_variables.nc"
           ],
           "folder": [
             "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
@@ -121,8 +123,8 @@
         },
         "domain" : {
           "filename": [
-            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_srf_rain.nc",
-            "{domain}_gfs.t{run_hour}z.0p25.{outcome_datetime}_other_variables.nc"
+            "{domain}_gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_srf_rain.nc",
+            "{domain}_gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_other_variables.nc"
           ],
           "folder": [
             "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",

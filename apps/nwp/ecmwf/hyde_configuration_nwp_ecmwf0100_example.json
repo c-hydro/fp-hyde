@@ -2,9 +2,9 @@
   "algorithm":{
     "flags": {
       "cleaning_static_data": false,
-      "cleaning_dynamic_ancillary_source": false,
-      "cleaning_dynamic_ancillary_processing": false,
-      "cleaning_dynamic_ancillary_outcome": false,
+      "cleaning_dynamic_ancillary_source": true,
+      "cleaning_dynamic_ancillary_processing": true,
+      "cleaning_dynamic_ancillary_outcome": true,
       "cleaning_dynamic_product": true,
       "cleaning_dynamic_tmp": false,
       "zipping_dynamic_product": true
@@ -141,7 +141,7 @@
     }
   },
   "time": {
-    "time_now": "202002081233",
+    "time_now": null,
     "time_period": 1,
     "time_frequency": "D",
     "time_rounding": "D"

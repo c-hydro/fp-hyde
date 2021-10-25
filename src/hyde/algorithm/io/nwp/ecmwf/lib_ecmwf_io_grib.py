@@ -62,13 +62,5 @@ def read_data_ecmwf_0100(file_name, data_filters=None,
     # Ending info
     log_stream.info(' --> Open file ' + file_name + ' ... DONE')
 
-    # Start Debug
-    # mat = da_values[0].values
-    # plt.figure()
-    # plt.imshow(mat[0,:,:])
-    # plt.colorbar()
-    # plt.show()
-    # End Debug
-
     return da_var, da_time, da_geo_x, da_geo_y
 # -------------------------------------------------------------------------------------

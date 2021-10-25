@@ -2,10 +2,10 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": false,
+        "use_drops2": true,
         "use_timeseries": false,
-        "use_point_data": true,
-        "non_standard_tab_fields": true
+        "use_point_data": false,
+        "non_standard_tab_fields": false
       },
       "mcm": {
         "fixed_correlation": false,
@@ -14,7 +14,7 @@
       "save_griso_ancillary_maps": true,
       "save_figures": true,
       "raise_error_if_no_station_available": false,
-      "compressed_gridded_input": false,
+      "compressed_gridded_input": true,
       "compress_output": false,
       "overwrite_existing": true
     },
@@ -46,9 +46,9 @@
         "time_frequency": "H"
       },
       "source_gridded": {
-        "filename": "RME{source_gridded_datetime}0U.tif",
-        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/radar/{source_gridded_sub_path_time}",
-        "file_type": "tif",
+        "filename": "Rain_{source_gridded_datetime}.txt",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/",
+        "file_type": "AAIGrid",
         "nc_settings": {
           "var_name": "precip",
           "lat_name": "lat",
@@ -87,7 +87,7 @@
         },
         "point_files":{
           "filename" : "RAINC_{source_point_datetime}.csv",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/source/obs/weather_stations/{source_point_sub_path_time}",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/",
           "non_standard_tab_fields": {
             "latitude": "lat.strum",
             "longitude": "lon.strum",
@@ -100,12 +100,12 @@
     },
     "ancillary": {
       "filename": "marche_griso_stations_ts_{outcome_datetime}.nc",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
     },
     "outcome": {
-      "format": "tif",
-      "filename": "radar_cm_ts_{outcome_datetime}.tif",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/data_dynamic/results/{outcome_sub_path_time}"
+      "format": "AAIGrid",
+      "filename": "radar_cm_ts_{outcome_datetime}.txt",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/data_dynamic/results/{outcome_sub_path_time}"
     },
     "log": {
       "filename": "hyde_conditional_merging.txt",

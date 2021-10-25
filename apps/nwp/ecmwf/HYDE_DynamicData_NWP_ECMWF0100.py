@@ -100,7 +100,7 @@ def main():
         time_period_past=int(data_algorithm_settings['time']['time_period']),
         time_frequency=data_algorithm_settings['time']['time_frequency'],
         time_rounding=data_algorithm_settings['time']['time_rounding'])
-    data_algorithm_time = driver_algorithm_time.getDataTime()
+    data_algorithm_time = driver_algorithm_time.getDataTime(time_reverse=True)
     log_stream.info(' --> Set algorithm time ... DONE')
     # -------------------------------------------------------------------------------------
 
