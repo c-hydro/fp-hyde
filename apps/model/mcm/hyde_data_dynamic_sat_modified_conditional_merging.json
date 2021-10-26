@@ -8,8 +8,8 @@
         "non_standard_tab_fields": false
       },
       "mcm": {
-        "fixed_correlation": true,
-        "dynamic_correlation": false
+        "fixed_correlation": false,
+        "dynamic_correlation": true
       },
       "save_griso_ancillary_maps": true,
       "save_figures": true,
