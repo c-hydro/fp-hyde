@@ -6,6 +6,8 @@ import pandas as pd
 import xarray as xr
 
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import time_format, logger_name
+
+logging.getLogger("cfgrib").setLevel(logging.WARNING)
 log_stream = logging.getLogger(logger_name)
 
 # Debug
@@ -132,7 +134,10 @@ def adjust_data_ecmwf_0100(da_var, da_time, da_geo_x, da_geo_y,
         values_var = np.zeros(shape=[values_raw.shape[1], values_raw.shape[2], values_raw.shape[0]])
         values_var[:, :, :] = np.nan
         for i in range(0, values_raw.shape[0]):
-            values_tmp = np.flipud(values_raw[i, :, :])
+            if geo_y_lower > geo_y_upper:
+                values_tmp = np.flipud(values_raw[i, :, :])
+            else:
+                values_tmp = values_raw[i, :, :]
             values_var[:, :, i] = values_tmp
 
     else:

@@ -11,6 +11,10 @@ BIN: **hyde_downloader_nwp_gefs_nomads.py**
 
 DRV: **drv_model_griso_exec.py**
     - Bug fixes: integrate mathematical variogram fit procedure
+
+FIX: **HYDE_Model_RFarm.py**
+    - Fix 3d array vertical direction for ecmwf0100
+
 Version 1.9.7 [2021-03-01]
 **************************
 APP: **hyde_data_dynamic_weather_stations_griso.py**
