@@ -17,7 +17,7 @@
       "compressed_gridded_input": false,
       "compress_output": false,
       "overwrite_existing": true,
-      "debug_mode": true
+      "debug_mode": false
     },
     "general": {
       "title": "Modified Coonditional Merging - Radar",
@@ -47,8 +47,8 @@
         "time_frequency": "H"
       },
       "source_gridded": {
-        "filename": "RADAR_{source_gridded_datetime}.tif",
-        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio/dynamic_data/sources/radar/{source_gridded_sub_path_time}",
+        "filename": "RADAR_{source_gridded_datetime}00.tif",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/dynamic_data/sources/radar/{source_gridded_sub_path_time}",
         "file_type": "tif",
         "nc_settings": {
           "var_name": "precip",
@@ -87,13 +87,14 @@
           }
         },
         "point_files":{
-          "filename" : "tabella_pluvio.txt",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio/dynamic_data/sources/pluvio/",
+          "filename" : "pluviometri_{source_point_datetime}",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/dynamic_data/sources/gauge/{source_point_sub_path_time}",
           "non_standard_tab_fields": {
-            "separator": "\t",
-            "latitude": "lat",
-            "longitude": "lon",
-            "data": "pluvio",
+            "separator": ",",
+            "header": false,
+            "latitude": 0,
+            "longitude": 1,
+            "data": 2,
             "station_name": null,
             "station_code": null
           }
@@ -102,16 +103,16 @@
     },
     "ancillary": {
       "filename": "griso_stations_{outcome_datetime}.nc",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio/ancillary_data/{outcome_sub_path_time}"
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/ancillary_data/{outcome_sub_path_time}"
     },
     "outcome": {
       "format": "tif",
       "filename": "radar_merging_{outcome_datetime}.tif",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio/outcome_data/{outcome_sub_path_time}"
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/outcome_data/{outcome_sub_path_time}"
     },
     "log": {
       "filename": "hyde_conditional_merging.txt",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio/"
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/"
     }
   }
 }

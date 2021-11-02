@@ -228,7 +228,7 @@ def read_file_tiff(file_name, var_name='variable', var_nodata=-9999.0, time=None
 
 # -------------------------------------------------------------------------------------
 
-def read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data', sep=','):
+def read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data', sep=',', header=True):
     if st_data is None or st_lon is None or st_lat is None:
         logging.error(" ERROR! Data, longitude and latitudes are required inputs for point files")
         raise IOError
@@ -239,8 +239,12 @@ def read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='
     if sep is None:
         sep = ','
 
-    dfStations = pd.read_csv(point_in_time_step, sep=sep, usecols=var_in)
-    data = pd.read_csv(point_in_time_step, sep=sep, usecols=[st_data]).squeeze()
+    if header is False:
+        dfStations = pd.read_csv(point_in_time_step, sep=sep, usecols=var_in, header=None)
+        data = pd.read_csv(point_in_time_step, sep=sep, usecols=[st_data], header=None).squeeze()
+    else:
+        dfStations = pd.read_csv(point_in_time_step, sep=sep, usecols=var_in)
+        data = pd.read_csv(point_in_time_step, sep=sep, usecols=[st_data]).squeeze()
 
     if st_code is None:
         station_codes = np.arange(1,len(data)+1,1)

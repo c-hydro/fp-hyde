@@ -12,7 +12,6 @@ Version:       '2.0.0'
 import numpy as np
 from skgstat.models import spherical
 from scipy.optimize import curve_fit
-from skgstat import Variogram
 
 # -------------------------------------------------------------------------------------
 # Average conversion of cellsize from degree to kilometers
@@ -72,16 +71,19 @@ def cart2pol(x, y):
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
+def spheric(x,radius,nugget=0, sill=1):
+    return nugget + sill * (1 - 3 / 2 * x / radius + 1 / 2 * (x / radius) ** 3) * (x < radius)
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
 # Function for fit a theoretical variogram to a spherical one with nugget = 0 and sill = 1
-def sphericalFit(x,y,range_min,range_max,range_0, c0=0,c1=1):
-    def spheric(x,radius):
-        return c0 + c1 * (1 - 3 / 2 * x / radius + 1 / 2 * (x / radius) ** 3) * (x < radius)
+def sphericalFit(x,y,range_min,range_max,range_0, nugget=0,sill=1):
 
     x0 = x.flatten('F')[~np.isnan(y.flatten('F'))]
     y0 = y.flatten('F')[~np.isnan(y.flatten('F'))]
 
     radius_opt, _ = curve_fit(spheric, x0, y0, p0 = range_0, bounds=(range_min, range_max))
-    CorrStim = spheric(x,radius_opt)
+    CorrStim = spheric(x,radius_opt,nugget,sill)
 
     return CorrStim, radius_opt
 # -------------------------------------------------------------------------------------

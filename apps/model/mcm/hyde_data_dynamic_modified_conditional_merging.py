@@ -92,7 +92,7 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Check computation setting
-    logging.info(' --> Check computational settings')
+    logging.info(' --> Check settings...')
 
     # Griso correlation type
     computation_settings = [data_settings['algorithm']['flags']["mcm"]['fixed_correlation'], data_settings['algorithm']['flags']["mcm"]['dynamic_correlation']]
@@ -104,6 +104,7 @@ def main():
         corr_type = 'fixed'
     else:
         corr_type = 'dynamic'
+
     logging.info(' --> Griso correlation type: ' + corr_type)
 
     # Gauge data sources
@@ -112,6 +113,25 @@ def main():
         logging.error(' ----> ERROR! Please choose if use local data or download stations trough drops2!')
         raise ValueError("Data sources flags are mutually exclusive!")
 
+    # Debug mode
+    try:
+        debug_mode = data_settings['algorithm']['flags']['debug_mode']
+    except:
+        debug_mode = False
+
+    if debug_mode is True:
+        logging.info(' --> Debug mode ACTIVE. All the figures and the ancillary maps will be saved.')
+        data_settings['algorithm']['flags']['save_griso_ancillary_maps'] = True
+        data_settings['algorithm']['flags']['save_figures'] = True
+
+    # Final correlation
+    corrFin = data_settings['algorithm']['settings']['radius_GRISO_km'] * 2
+    logging.info(' --> Final correlation: ' + str(corrFin) + ' km')
+
+    logging.info(' --> Check settings...DONE')
+    # -------------------------------------------------------------------------------------
+
+    # -------------------------------------------------------------------------------------
     # Import data for drops and time series setup
     if data_settings['algorithm']['flags']["sources"]['use_drops2']:
         logging.info(' --> Station data source: drops2 database')
@@ -130,22 +150,9 @@ def main():
         dfData, dfStations = importTimeSeries(timeseries_settings=data_settings['data']['dynamic']['source_stations']['time_series'], start_time=startRun, end_time=dateRun, time_frequency= data_settings['data']['dynamic']['time']['time_frequency'])
     else:
         logging.info(' --> Station data source: station point files')
-
-    # Identify debug mode
-    try:
-        debug_mode = data_settings['algorithm']['flags']['debug_mode']
-    except:
-        debug_mode = False
-
-    if debug_mode is True:
-        data_settings['algorithm']['flags']['save_griso_ancillary_maps'] = True
-        data_settings['algorithm']['flags']['save_figures'] = True
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
-    corrFin = data_settings['algorithm']['settings']['radius_GRISO_km'] * 2
-    logging.info(' --> Final correlation: ' + str(corrFin) + ' km')
-
     # Loop across time steps
     for timeNow in pd.date_range(start=startRun, end=endRun, freq=data_settings['data']['dynamic']['time']['time_frequency']):
         logging.info(' ---> Computing time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
@@ -210,7 +217,7 @@ def main():
                 if data_settings['algorithm']['flags']["sources"]['non_standard_tab_fields']:
                     fields_dict = data_settings['data']['dynamic']['source_stations']['point_files']['non_standard_tab_fields']
                     dfStations, data = read_point_data(point_in_time_step, st_code=fields_dict["station_code"], st_name=fields_dict["station_name"], st_lon=fields_dict["longitude"],
-                                                       st_lat=fields_dict["latitude"], st_data=fields_dict["data"], sep=fields_dict["separator"])
+                                                       st_lat=fields_dict["latitude"], st_data=fields_dict["data"], sep=fields_dict["separator"], header=fields_dict["header"])
                 else:
                     dfStations, data = read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data')
             else:
@@ -220,12 +227,12 @@ def main():
         except (FileNotFoundError, ValueError) as err:
         # If no data available for the actual time step just copy the input
             if not data_settings['algorithm']['flags']['raise_error_if_no_station_available']:
-                logging.warning(' ----> WARNING! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
+                logging.warning(' ----> WARNING! ' + str(err))
                 sat_out = copy.deepcopy(sat)
                 sat_out.to_netcdf(file_out_time_step)
                 continue
             else:
-                logging.error(' ----> ERROR! No station data available for time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
+                logging.error(' ----> ERROR! ' + str(err))
                 raise err
 
         if not data_settings['algorithm']['flags']["sources"]['use_point_data']:
@@ -257,12 +264,12 @@ def main():
 
         # Calculate GRISO correlation features
         logging.info(' ---> GRISO: Calculate correlation...')
-        correl_features = GrisoCorrel(point_data["rPluvio"], point_data["cPluvio"], corrFin, grid_rain, passoKm, a2dPosizioni, grid.shape[0], grid.shape[1], point_data["gauge_value"], corr_type= corr_type)
+        correl_features = GrisoCorrel(point_data["rPluvio"], point_data["cPluvio"], corrFin, grid_rain, passoKm, a2dPosizioni, point_data["gauge_value"], corr_type= corr_type)
         logging.info(' ---> GRISO: Data preprocessing...DONE')
 
         # GRISO interpolator on observed data
         logging.info(' ---> GRISO: Observed data interpolation...')
-        griso_obs = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["gauge_value"], correl_features["CorrStimata"], corrFin, passoKm, correl_features["FinestraPosizioniExt"],correl_features['PosizioniExt'],correl_features['Rows_cols'])
+        griso_obs = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["gauge_value"], correl_features)
 
         griso_out = copy.deepcopy(sat)
         try:
@@ -281,7 +288,7 @@ def main():
 
         # GRISO interpolator on satellite data
         logging.info(' ---> GRISO: Gridded data interpolation...')
-        griso_sat = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["grid_value"], correl_features["CorrStimata"], corrFin, passoKm, correl_features["FinestraPosizioniExt"],correl_features['PosizioniExt'],correl_features['Rows_cols'])
+        griso_sat = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["grid_value"], correl_features)
         logging.info(' ---> GRISO: Gridded data interpolation...DONE')
 
         ##  Save griso of gridded field - FOR DEBUGGING
