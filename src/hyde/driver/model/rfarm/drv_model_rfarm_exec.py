@@ -78,6 +78,10 @@ class RFarmModel:
     i_max_rf = None
     j_min_rf = None
     j_max_rf = None
+    lon_min_rf = None
+    lon_max_rf = None
+    lat_min_rf = None
+    lat_max_rf = None
 
     data_rf = None
     data_slopes = None
@@ -171,6 +175,7 @@ class RFarmModel:
         [self.lons_rf, self.lats_rf, self.index_rf,
          self.ll_lon_rf, self.ll_lat_rf,
          self.i_min_rf, self.i_max_rf, self.j_min_rf, self.j_max_rf,
+         self.lon_min_rf, self.lon_max_rf, self.lat_min_rf, self.lat_max_rf,
          ratio_s_upd, res_geo_rf,
          res_pixels_rf] = computeGrid(lons_in, lats_in, self.lons_ref, self.lats_ref,
                                       res_lon_ref, res_lat_ref,
@@ -243,6 +248,12 @@ class RFarmModel:
         time_end_ref = pd.to_datetime(self.time_steps_ref[-1])
         time_delta_ref = ((time_end_ref - time_start_ref) / (self.time_steps_ref.__len__() - 1)).seconds
 
+        if self.ct_sf > self.ratio_t:
+            log_stream.error(' ===> The parameter "ct_sf" [' + str(self.ct_sf)
+                             + '] is greater than "ratio_t" [' + str(self.ratio_t))
+            log_stream.error(' ===> The effect is a shift in the disaggregated values. To be investigate and correct.')
+            raise RuntimeError('Case not properly managed to under sample the dataset ')
+
         # Define RF variable(s)
         self.nt = self.time_steps_ref.__len__()
         self.ndelta = time_delta_in * self.ct_sf
@@ -274,15 +285,24 @@ class RFarmModel:
             self.data_slopes = values_in
 
         # DEBUG
+        # DEBUG START (DUMP DATA IN TIFF NETCDF FORMAT)
+        # lon_rf_1d = np.linspace(self.lon_min_rf, self.lon_max_rf, self.nsl, endpoint=True)
+        # lat_rf_1d = np.linspace(self.lat_min_rf, self.lat_max_rf, self.nsl, endpoint=True)
+        # lon_rf_2d, lat_rf_2d = np.meshgrid(lon_rf_1d, lat_rf_1d)
+        # lat_rf_2d = np.flipud(lat_rf_2d)
+        # from src.hyde.model.rfarm.lib_rfarm_utils_generic import writeGeoTiff
+        # file_name = '/home/fabio/test/rfarm/lami_2i_model_cut.tiff'
+        # writeGeoTiff(file_name, self.data_rf[:, :, 1], lon_rf_2d, lat_rf_2d)
+
         # import matplotlib.pylab as plt
         # plt.figure(1)
-        # plt.imshow(values_in[:, :, 2])
+        # plt.imshow(values_in[:, :, 0])
         # plt.colorbar()
-        # plt.clim(0, 20)
+        # plt.clim(0, 10)
         # plt.figure(2)
-        # plt.imshow(self.data_rf[:, :, 2])
+        # plt.imshow(self.data_rf[:, :, 0])
         # plt.colorbar()
-        # plt.clim(0, 20)
+        # plt.clim(0, 10)
         # plt.show()
         # DEBUG
 
@@ -363,12 +383,12 @@ class RFarmModel:
                     # plt.figure(1)
                     # plt.imshow(self.data_rf[:, :, 1])
                     # plt.colorbar()
-                    # plt.clim(0, 100)
+                    # plt.clim(0, 10)
 
                     # plt.figure(2)
                     # plt.imshow(ensemble_rf[:, :, 1])
                     # plt.colorbar()
-                    # plt.clim(0, 100)
+                    # plt.clim(0, 10)
                     # plt.show()
 
                 else:

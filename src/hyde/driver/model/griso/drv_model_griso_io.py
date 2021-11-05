@@ -3,8 +3,9 @@ Library Features:
 
 Name:          drv_model_griso_generic
 Author(s):     Andrea Libertino (andrea.libertino@cimafoundation.org)
-Date:          '20210602'
-Version:       '1.1.0'
+               Flavio Pignone (flavio.pignone@cimafoundation.org)
+Date:          '20211026'
+Version:       '2.0.0'
 """
 # -------------------------------------------------------------------------------------
 import logging
@@ -27,22 +28,22 @@ def importDropsData(drops_settings, start_time, end_time, time_frequency):
 
     # download_OBS_DROPS2
     logging.info(' ---> Getting stations list from server')
-    sensors_list_P = sensors.get_sensor_list(drops_settings['DropsSensor'], geo_win=(
-    drops_settings['lon_left'], drops_settings['lon_right'], drops_settings['lat_bottom'], drops_settings['lat_top']),
-                                             group=drops_settings['DropsGroup'])
+    sensors_list_P = sensors.get_sensor_list(drops_settings['DropsSensor'], geo_win=(drops_settings['lon_left'], drops_settings['lat_bottom'], drops_settings['lon_right'], drops_settings['lat_top']) ,group=drops_settings['DropsGroup']) #drops_settings['lon_left'], drops_settings['lat_bottom'], drops_settings['lon_right'], drops_settings['lat_top'])
     dfStations = pd.DataFrame(np.array([(p.name, p.lat, p.lng) for p in sensors_list_P]),
                               index=np.array([(p.id) for p in sensors_list_P]), columns=['name', 'lat', 'lon'])
     logging.info(' ---> Found ' + str(len(dfStations.index)) + ' stations')
 
     logging.info(' ---> Getting stations data from server')
     dfData = sensors.get_sensor_data(drops_settings['DropsSensor'], sensors_list_P, start_time.strftime("%Y%m%d%H%M"),
-                                     (end_time + pd.Timedelta('1H')).strftime("%Y%m%d%H%M"), as_pandas=True)
+                                     (end_time + pd.Timedelta('1H')).strftime("%Y%m%d%H%M"), aggr_time=3600, as_pandas=True)
 
-    #columnNames = [dfStations.loc[cd]['name'] for cd in dfData.columns]
-    dfData.columns = dfData.columns #[columnNames]
+    # columnNames = [dfStations.loc[cd]['name'] for cd in dfData.columns]
+    # dfData.columns = dfData.columns[columnNames]
 
-    # Shift data back of 1 time step for referring it to the beginning of the time step
-    dfData = dfData.shift(-1)
+    # Shift data back of 1 milliseconds for cumulating the hourly value to the previous time step at the hourly scale
+    # e.g. the rain of the 4:00 time step need to be cumulated as it was 3:59:59 and afrer I should
+    # assign the label to the right side of the interval (4:00)
+    ######## dfData = dfData.set_index(dfData.index-pd.Timedelta(milliseconds=1))
 
     logging.info(' ---> Checking for empty or not-valid series')
     # Check empty stations
@@ -58,7 +59,7 @@ def importDropsData(drops_settings, start_time, end_time, time_frequency):
     dfStations = dfStations.loc[dfStations.index.isin(dfData.columns.values)]
 
     logging.info(' ---> Resampling at hourly scale')
-    dfData = dfData.resample(time_frequency).sum()
+    ######## dfData = dfData.resample(time_frequency, label='right').sum()
 
     dfData = dfData.dropna(axis='rows', how='all')
 
@@ -121,10 +122,10 @@ def check_and_write_dataarray(variable, grid, var_name='precip', lat_var_name='l
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
-# Write ogeotiff
+# Write raster format
 
-def write_geotiff(variable, grid, file_out):
-    with rio.open(file_out, 'w', driver='GTiff',
+def write_raster(variable, grid, file_out, driver='GTiff'):
+    with rio.open(file_out, 'w', driver=driver,
                   height=variable.shape[0], width=variable.shape[1], count=1, dtype=variable.dtype,
                   crs='+proj=latlong', transform=grid.transform) as dst:
         dst.write(variable, 1)
@@ -227,7 +228,7 @@ def read_file_tiff(file_name, var_name='variable', var_nodata=-9999.0, time=None
 
 # -------------------------------------------------------------------------------------
 
-def read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data'):
+def read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data', sep=',', header=True):
     if st_data is None or st_lon is None or st_lat is None:
         logging.error(" ERROR! Data, longitude and latitudes are required inputs for point files")
         raise IOError
@@ -235,8 +236,15 @@ def read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='
     var_names = [st_code, st_name, st_lon, st_lat, st_data]
     var_in = [i for i in var_names if i is not None]
 
-    dfStations = pd.read_csv(point_in_time_step, usecols=var_in)
-    data = pd.read_csv(point_in_time_step, usecols=[st_data]).squeeze()
+    if sep is None:
+        sep = ','
+
+    if header is False:
+        dfStations = pd.read_csv(point_in_time_step, sep=sep, usecols=var_in, header=None)
+        data = pd.read_csv(point_in_time_step, sep=sep, usecols=[st_data], header=None).squeeze()
+    else:
+        dfStations = pd.read_csv(point_in_time_step, sep=sep, usecols=var_in)
+        data = pd.read_csv(point_in_time_step, sep=sep, usecols=[st_data]).squeeze()
 
     if st_code is None:
         station_codes = np.arange(1,len(data)+1,1)

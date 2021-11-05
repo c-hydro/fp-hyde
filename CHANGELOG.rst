@@ -3,11 +3,19 @@ Changelog
 =========
 Version 1.9.8 [2021-08-01]
 **************************
+APP: **hyde_data_dynamic_modified_conditional_merging.py**
+    - Update of the variogram estimation procedure and performance optimization
+
 BIN: **hyde_downloader_nwp_gefs_nomads.py**
     - Release for Hyde package
-    
+
+DRV: **drv_model_griso_exec.py**
+    - Bug fixes: integrate mathematical variogram fit procedure
+
 FIX: **HYDE_Model_RFarm.py**
-    - Fix 3d array vertical direction for ecmwf0100
+    - Fix 3d array vertical direction for the ecmwf0100 nwp
+    - Fix time shift issue for the lami-2i nwp
+    - Fix geographical position issue for the irregulared grid of lami-2i nwp
 
 Version 1.9.7 [2021-03-01]
 **************************

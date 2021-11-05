@@ -21,6 +21,16 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from osgeo import gdal, gdalconst
+
+import cartopy
+
+import matplotlib.pylab as plt
+import cartopy.io.img_tiles as cimgt
+
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
+
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 import src.hyde.model.rfarm.lib_rfarm_utils_regrid as lib_regrid
 
@@ -430,6 +440,7 @@ def computeGrid(a2dGeoX_IN, a2dGeoY_IN,
     # Define output
     return(a2dGeoX_RF, a2dGeoY_RF, a2iIndex_RF, 
            dGeoXLL_RF, dGeoYLL_RF, iIMin_RF, iIMax_RF, iJMin_RF, iJMax_RF,
+           dGeoXMin_RF, dGeoXMax_RF, dGeoYMin_RF, dGeoYMax_RF,
            iRatioS, iResolution_RF, iNPixels_RF)
     # -------------------------------------------------------------------------------------
 
@@ -731,6 +742,82 @@ def checkResult(a3dData_IN, a3Data_RF, iXScale, iTScale):
 
 
 # -------------------------------------------------------------------------------------
+# Method to write geotiff file
+def writeGeoTiff(file_name, map_data, map_geo_x, map_geo_y, map_n=1,
+                 map_metadata=None, map_proj='EPSG:4326', map_format=gdalconst.GDT_Float32):
+
+    # map metadata
+    if map_metadata is None:
+        map_metadata = {'description_field': 'data'}
+
+    # map geotransform
+    map_high = map_data.shape[0]
+    map_wide = map_data.shape[1]
+    map_x_min, map_y_min, map_x_max, map_y_max = [map_geo_x.min(), map_geo_y.min(), map_geo_x.max(), map_geo_y.max()]
+    map_x_res = (map_x_max - map_x_min) / float(map_high)
+    map_y_res = (map_y_max - map_y_min) / float(map_wide)
+    map_geotransform = (map_x_min, map_x_res, 0, map_y_max, 0, -map_y_res)
+
+    # map handle
+    map_handle = gdal.GetDriverByName('GTiff').Create(
+        file_name, map_wide, map_high, map_n, map_format, options=['COMPRESS=DEFLATE'])
+    # map geographical info
+    map_handle.SetGeoTransform(map_geotransform)
+    map_handle.SetProjection(map_proj)
+    # map data
+    map_handle.GetRasterBand(1).WriteArray(map_data)
+    map_handle.GetRasterBand(1).SetMetadata(map_metadata)
+
+    del map_handle
+# -------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# Method to plot result
+def plotResult(map_value, map_geo_x, map_geo_y):
+
+    map_x_west = np.min(map_geo_x)
+    map_x_east = np.max(map_geo_x)
+    map_y_south = np.min(map_geo_y)
+    map_y_north = np.max(map_geo_y)
+
+    plot_crs = cartopy.crs.Mercator()
+    data_crs = cartopy.crs.PlateCarree()
+
+    map_background = cimgt.Stamen('terrain-background')
+
+    fig = plt.figure(figsize=(12, 10))
+    ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection=plot_crs)
+    ax.set_title('debug', size=14, color='black', weight='bold')
+    # ax.coastlines(resolution='10m', color='black')
+    ax.stock_img()
+    ax.set_extent([map_x_west, map_x_east, map_y_south, map_y_north])
+
+    gl = ax.gridlines(crs=data_crs, draw_labels=True,
+                      linewidth=2, color='gray', alpha=0.5, linestyle='--')
+    gl.xlabels_bottom = True
+    gl.xlabels_top = False
+    gl.ylabels_left = True
+    gl.ylabels_right = False
+    gl.xformatter = LONGITUDE_FORMATTER
+    gl.yformatter = LATITUDE_FORMATTER
+    gl.xlabel_style = {'size': 8, 'color': 'gray', 'weight': 'bold'}
+    gl.ylabel_style = {'size': 8, 'color': 'gray', 'weight': 'bold'}
+
+    # Add the Stamen data at zoom level 8.
+    ax.add_image(map_background, 8)
+
+    sc = ax.pcolormesh(map_geo_x, map_geo_y, map_value, zorder=3, transform=data_crs)
+    divider = make_axes_locatable(ax)
+    ax_cb = divider.new_horizontal(size="5%", pad=0.1, axes_class=plt.Axes)
+    fig.add_axes(ax_cb)
+    cb1 = plt.colorbar(sc, cax=ax_cb, extend='both')
+    cb1.set_label('var', size=12, color='gray', weight='normal')
+    cb1.ax.tick_params(labelsize=10, labelcolor='gray')
+
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
 # Method to save model result(s)
 def saveResult(filename, varname, data_in,
                geox_in, geoy_in, time_in,
@@ -766,10 +853,16 @@ def saveResult(filename, varname, data_in,
             data_indexed = data_step.ravel()[geoindex_in.ravel()]
             data_regrid = np.reshape(data_indexed, [geox_out.shape[0], geoy_out.shape[1]])
 
+
+
         # Debug
-        # plt.figure(1); plt.imshow(data_step);plt.colorbar()
-        # plt.figure(2); plt.imshow(data_regrid); plt.colorbar()
-        # plt.show()
+        #import matplotlib.pylab as plt
+        #plt.figure(1); plt.imshow(data_step); plt.colorbar()
+        #plt.figure(2); plt.imshow(data_regrid); plt.colorbar()
+        #plt.figure(3); plt.imshow(data_regrid2); plt.colorbar()
+        #plt.show()
+        #plotResult(data_regrid, geox_out, geoy_out)
+        #plotResult(data_step, geox_in, geoy_in)
 
         # Aggregate data using time ratio between IN and OUT time(s)
         data_agg = data_agg + data_regrid

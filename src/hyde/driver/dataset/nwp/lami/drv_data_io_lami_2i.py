@@ -345,12 +345,14 @@ class DataProductAnalyzer:
 
                                 # -------------------------------------------------------------------------------------
                                 # Debug
+                                # import matplotlib.pylab as plt
+                                # import numpy as np
                                 # plt.figure()
-                                # plt.imshow(a3dVarValue[:, :, iTimeStep]); plt.colorbar(); plt.clim(0, 200)
+                                # plt.imshow(np.flipud(a3dVarValue[:, :, iTimeStep])); plt.colorbar(); plt.clim(0, 20)
                                 # plt.figure()
-                                # plt.imshow(a2dVarValue_INTERP); plt.colorbar(); plt.clim(0, 200)
+                                # plt.imshow(a2dVarValue_INTERP); plt.colorbar(); plt.clim(0, 20)
                                 # plt.figure()
-                                # plt.imshow(a2dVarValue_FILTER); plt.colorbar(); plt.clim(0, 200)
+                                # plt.imshow(a2dVarValue_FILTER); plt.colorbar(); plt.clim(0, 20)
                                 # plt.show()
                                 # -------------------------------------------------------------------------------------
 
@@ -838,6 +840,20 @@ class DataProductBuilder:
 
                                 # Get data values
                                 a3dVarData = oFileDriver.oFileLibrary.getVar3D_LAMI_2i(oFileHandle, sVarComp)[sVarComp]
+
+                                # DEBUG START
+                                # import matplotlib.pylab as plt
+                                # plt.figure()
+                                # plt.imshow(a2dVarGeoX)
+                                # plt.colorbar()
+                                # plt.figure()
+                                # plt.imshow(a2dVarGeoY)
+                                # plt.colorbar()
+                                # plt.figure()
+                                # plt.imshow(a3dVarData[:,:,0])
+                                # plt.colorbar()
+                                # plt.show()
+                                ### DEBUG END
 
                                 # Check data time steps
                                 iVarT = a3dVarData.shape[2] - 1

@@ -8,16 +8,16 @@
       "cleaning_dynamic_data_tmp": true
     },
     "ancillary": {
-      "domain" : "guyana",
-      "process_mp": 20,
+      "domain" : "mozambique",
+      "process_mp": 5,
       "remote_server_hit_per_min": 100,
       "ens_members": 30,
       "type": [
         "surface_rain",
         "other_variables"],
       "vars_in": ["tp","2r","dswrf","10u","10v"],
-      "cdo_exec": "/home/andrea/FP_libs/fp_libs_cdo/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/cdo",
-      "cdo_deps": ["/home/andrea/FP_libs/fp_libs_cdo/eccodes2.17.0/lib/"]
+      "cdo_exec": "/home/fp/library/fp_apps_system/cdo-1.9.8_nc-4.6.0_hdf-1.8.17_eccodes-2.17.0/bin/cdo",
+      "cdo_deps": ["/home/fp/library/fp_libs_system/eccodes2.17.0/"]
     },
     "general": {
       "title": "NWP GEFS 0.25 degree NOMADS",
@@ -46,10 +46,10 @@
   "data": {
     "static": {
       "bounding_box": {
-        "lon_right": -50,
-        "lon_left": -70,
-        "lat_bottom": -5,
-        "lat_top": 15
+        "lon_right": 35.5,
+        "lon_left": 32,
+        "lat_bottom": -21.5,
+        "lat_top": -17
       }
     },
     "dynamic": {
@@ -106,8 +106,8 @@
         ],
         "folder":
         [
-          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}",
-          "/home/andrea/CIMA/DEVELOPEMENT/gfs025/ancillary/gfs_025/{ancillary_sub_path_time}"
+          "/share/fp/fp_mozambique/data/data_dynamic/ancillary/nwp/gefs025/{ancillary_sub_path_time}",
+          "/share/fp/fp_mozambique/data/data_dynamic/ancillary/nwp/gefs025/{ancillary_sub_path_time}"
         ]
       },
       "outcome": {
@@ -117,25 +117,25 @@
             "gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_10m_variables.nc"
           ],
           "folder": [
-            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
-            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}"
+            "/share/fp/fp_mozambique/data/data_dynamic/outcome/nwp/gefs025/global/{outcome_sub_path_time}",
+            "/share/fp/fp_mozambique/data/data_dynamic/outcome/nwp/gefs025/global/{outcome_sub_path_time}"
           ]
         },
         "domain" : {
           "filename": [
-            "{domain}_gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_srf_rain.nc",
-            "{domain}_gep{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_other_variables.nc"
+            "{domain}_gep0{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_srf_rain.nc",
+            "{domain}_gep0{ens_member}.t{run_hour}z.0p25.{outcome_datetime}_other_variables.nc"
           ],
           "folder": [
-            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}",
-            "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{outcome_sub_path_time}"
+            "/share/fp/fp_mozambique/data/data_dynamic/outcome/nwp/gefs025/domain/{outcome_sub_path_time}",
+            "/share/fp/fp_mozambique/data/data_dynamic/outcome/nwp/gefs025/domain/{outcome_sub_path_time}"
           ]
         }
       }
     },
     "log": {
-        "filename": "hyde_downloader_nwp_gfs_025_local_log.txt",
-        "folder": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/source/gfs_025/log/gfs_025/"
+        "filename": "hyde_downloader_nwp_gefs025_nomads.txt",
+        "folder": "/share/fp/fp_mozambique/log/preprocessing/"
       },
     "library": {
       "filename": "",

@@ -29,6 +29,7 @@ from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import convert_data_w
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_json import read_data_expert_forecast, convert_time_expert_forecast
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import write_obj, read_obj
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
+from src.hyde.model.rfarm.lib_rfarm_utils_generic import plotResult
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 
 from src.hyde.model.rfarm.lib_rfarm_utils_generic import computeEnsemble
@@ -173,7 +174,21 @@ class RFarmResult:
 
                 # Extract values and time
                 values_out_raw = da_out.values
+                geo_x_out_raw = da_out['longitude'].values
+                geo_y_out_raw = da_out['latitude'].values
+
                 time_out = pd.to_datetime(list(da_out.time.values))
+
+                # DEBUG START
+                # import matplotlib.pylab as plt
+                # plt.figure()
+                # plt.imshow(values_out_raw[1, :, :])
+                # plt.colorbar()
+                # plt.clim(0, 10)
+                # plt.show()
+                # plotResult(values_out_raw[1, :, :], lons, lats)
+                # plotResult(values_out_raw[1, :, :], geo_x_out_raw, np.flipud(geo_y_out_raw))
+                # DEBUG END
 
                 # Organized values to save in a correct 3D format
                 values_out_def = np.zeros([values_out_raw.shape[0], values_out_raw.shape[1], values_out_raw.shape[2]])
@@ -305,11 +320,11 @@ class RFarmData:
                         raise NotImplementedError('NWP lami 2D dimensions datasets not implemented yet')
                     elif self.var_dims_data == 'var3d':
 
-                        [var_da, time_da, geox_da, geoy_da] = read_data_lami_2i(
+                        [var_da, time_da, geox_obj, geoy_obj] = read_data_lami_2i(
                             self.file_data_first, data_var=self.var_name_data)
 
                         [var_data_adjust,  var_time, var_geox, var_geoy] = adjust_data_lami_2i(
-                            var_da, time_da, geox_da, geoy_da)
+                            var_da, time_da, geox_obj, geoy_obj)
 
                         var_data_cmp = compute_rain_lami_2i(var_data_adjust)
 
@@ -348,7 +363,7 @@ class RFarmData:
 
                         if self.var_type_data == 'accumulated':
                             file_data_list = [self.file_data_first] + self.file_data_list
-                        elif self.var_type_data == 'istantaneous':
+                        elif self.var_type_data == 'instantaneous':
                             file_data_list = self.file_data_list
                         else:
                             log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT ALLOWED!')
@@ -386,7 +401,7 @@ class RFarmData:
                 if self.file_source_data == 'expert_forecast':
                     if self.var_dims_data == 'var1d':
 
-                        if self.var_type_data == 'instantaneous':
+                        if self.var_type_data == 'istantaneous':
                             file_data_list = self.file_data_list
                         else:
                             log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT ALLOWED!')
@@ -420,10 +435,14 @@ class RFarmData:
                     # Dump tmp file
                     write_obj(self.file_tmp, var_obj)
 
-                    # DEBUG STARY
-                    # file_test = self.file_tmp.split()[0] + '.nc'
-                    # dset_test = var_da.to_dataset(name='Rain')
-                    # dset_test.to_netcdf(path=file_test)
+                    # DEBUG START (DUMP DATA IN TIFF NETCDF FORMAT)
+                    #from src.hyde.model.rfarm.lib_rfarm_utils_generic import writeGeoTiff
+                    #file_name = '/home/fabio/test/rfarm/lami_2i_model.tiff'
+                    #writeGeoTiff(file_name, var_data_cmp[:,:,1], var_geox, var_geoy)
+
+                    #file_test = self.file_tmp.split()[0] + '.nc'
+                    #dset_test = var_da.to_dataset(name='Rain')
+                    #dset_test.to_netcdf(path=file_test)
                     # DEBUG END
 
                 elif self.var_dims_data == 'var1d':

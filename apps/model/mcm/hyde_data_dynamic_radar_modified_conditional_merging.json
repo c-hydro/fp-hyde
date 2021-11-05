@@ -2,10 +2,10 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": true,
+        "use_drops2": false,
         "use_timeseries": false,
-        "use_point_data": false,
-        "non_standard_tab_fields": false
+        "use_point_data": true,
+        "non_standard_tab_fields": true
       },
       "mcm": {
         "fixed_correlation": false,
@@ -14,9 +14,10 @@
       "save_griso_ancillary_maps": true,
       "save_figures": true,
       "raise_error_if_no_station_available": false,
-      "compressed_gridded_input": true,
+      "compressed_gridded_input": false,
       "compress_output": false,
-      "overwrite_existing": true
+      "overwrite_existing": true,
+      "debug_mode": false
     },
     "general": {
       "title": "Modified Coonditional Merging - Radar",
@@ -35,7 +36,7 @@
       "outcome_datetime": "%Y%m%d%H%M"
     },
     "settings": {
-      "radius_GRISO_km": 10
+      "radius_GRISO_km": 30
     }
   },
   "data": {
@@ -46,9 +47,9 @@
         "time_frequency": "H"
       },
       "source_gridded": {
-        "filename": "Rain_{source_gridded_datetime}.txt",
-        "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/",
-        "file_type": "AAIGrid",
+        "filename": "RADAR_{source_gridded_datetime}00.tif",
+        "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/dynamic_data/sources/radar/{source_gridded_sub_path_time}",
+        "file_type": "tif",
         "nc_settings": {
           "var_name": "precip",
           "lat_name": "lat",
@@ -61,11 +62,11 @@
           "DropsUser": null,
           "DropsPwd": null,
           "DropsSensor": "PLUVIOMETRO",
-          "DropsGroup": "Dewetra%default",
-          "lon_left": 6,
-          "lon_right": 10.5,
-          "lat_top": 46,
-          "lat_bottom": 42.5,
+          "DropsGroup": "Dewetra%Default",
+          "lon_left": 5.61,
+          "lon_right": 19,
+          "lat_top": 47.56,
+          "lat_bottom": 35.24,
           "codes_not_valid": []
         },
         "time_series": {
@@ -86,12 +87,14 @@
           }
         },
         "point_files":{
-          "filename" : "RAINC_{source_point_datetime}.csv",
-          "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/",
+          "filename" : "pluviometri_{source_point_datetime}",
+          "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/dynamic_data/sources/gauge/{source_point_sub_path_time}",
           "non_standard_tab_fields": {
-            "latitude": "lat.strum",
-            "longitude": "lon.strum",
-            "data": "v.strum",
+            "separator": ",",
+            "header": false,
+            "latitude": 0,
+            "longitude": 1,
+            "data": 2,
             "station_name": null,
             "station_code": null
           }
@@ -99,17 +102,17 @@
       }
     },
     "ancillary": {
-      "filename": "marche_griso_stations_ts_{outcome_datetime}.nc",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/data_dynamic/ancillary/obs/satellite/gsmap_gauge_rt2/domain/{outcome_sub_path_time}"
+      "filename": "griso_stations_{outcome_datetime}.nc",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/ancillary_data/{outcome_sub_path_time}"
     },
     "outcome": {
-      "format": "AAIGrid",
-      "filename": "radar_cm_ts_{outcome_datetime}.txt",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT/ARPAL/data_dynamic/results/{outcome_sub_path_time}"
+      "format": "tif",
+      "filename": "radar_merging_{outcome_datetime}.tif",
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/outcome_data/{outcome_sub_path_time}"
     },
     "log": {
       "filename": "hyde_conditional_merging.txt",
-      "folder": "/home/andrea/CIMA/DEVELOPEMENT_Various/CM/"
+      "folder": "/home/andrea/CIMA/DEVELOPEMENT/conditional_merging/caso_studio2/"
     }
   }
 }

@@ -3,12 +3,15 @@ Library Features:
 
 Name:          drv_model_griso_generic
 Author(s):     Andrea Libertino (andrea.libertino@cimafoundation.org)
-Date:          '20210311'
-Version:       '1.0.0'
+               Flavio Pignone (flavio.pignone@cimafoundation.org)
+Date:          '20211026'
+Version:       '2.0.0'
 """
 # -------------------------------------------------------------------------------------
 # Complete library
 import numpy as np
+from skgstat.models import spherical
+from scipy.optimize import curve_fit
 
 # -------------------------------------------------------------------------------------
 # Average conversion of cellsize from degree to kilometers
@@ -55,6 +58,7 @@ def averageCells(rPluvio,cPluvio,values):
     cPluvio=unq_coo[:,1]
 
     return rPluvio,cPluvio,average_values
+# -------------------------------------------------------------------------------------
 
 # ---------------------------------------------------
 # Linear to polar coordinates
@@ -64,4 +68,50 @@ def cart2pol(x, y):
     r = (x ** 2 + y ** 2) ** .5
     theta = np.degrees(np.arctan2(y,x))
     return r, theta
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+def spheric(x,radius,nugget=0, sill=1):
+    return nugget + sill * (1 - 3 / 2 * x / radius + 1 / 2 * (x / radius) ** 3) * (x < radius)
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+# Function for fit a theoretical variogram to a spherical one with nugget = 0 and sill = 1
+def sphericalFit(x,y,range_min,range_max,range_0, nugget=0,sill=1):
+
+    x0 = x.flatten('F')[~np.isnan(y.flatten('F'))]
+    y0 = y.flatten('F')[~np.isnan(y.flatten('F'))]
+
+    radius_opt, _ = curve_fit(spheric, x0, y0, p0 = range_0, bounds=(range_min, range_max))
+    CorrStim = spheric(x,radius_opt,nugget,sill)
+
+    return CorrStim, radius_opt
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+# Function for fit a theoretical variogram to an empirical one
+def variogramFit(x, y, range_0, sill_0 , range_lim=None, sill_lim=None, type='spherical'):
+    if type=='spherical':
+        def f(h, a, b):
+            return spherical(h, a, b)
+    else:
+        raise NotImplementedError('Only spheric variogram is implemented')
+
+    x0=x.flatten('F')[~np.isnan(y.flatten('F'))]
+    y0=y.flatten('F')[~np.isnan(y.flatten('F'))]
+
+    if range_lim is None:
+        range_lim = np.max(x0)
+
+    if sill_lim is None:
+        sill_lim = np.max(1-y0)
+
+    cof, cov = curve_fit(f, x0, 1 - y0, p0=[range_0, sill_0], bounds=(0, (range_lim, sill_lim)))
+    y1 = 1 - np.array(list(map(lambda x: spherical(x, *cof), x.flatten('F')))).reshape(y.shape, order='F')
+    y1[np.isnan(y)] = 0
+
+    return y1, cof[0]
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
 

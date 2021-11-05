@@ -1,8 +1,8 @@
 {
   "algorithm":{
     "flags": {
-      "cleaning_static_data": true,
-      "cleaning_dynamic_ancillary_in": true,
+      "cleaning_static_data": false,
+      "cleaning_dynamic_ancillary_in": false,
       "cleaning_dynamic_ancillary_out": true,
       "cleaning_dynamic_out": true,
       "cleaning_dynamic_tmp": true,
@@ -28,7 +28,7 @@
       "slope_s": null,
       "slope_t": null,
       "cs_sf": 2,
-      "ct_sf": 2,
+      "ct_sf": 1,
       "multi_core": false,
       "domain_extension": 0,
       "tmp": true
@@ -116,7 +116,7 @@
     "input": {
       "rain_data": {
         "id": {
-          "var_type": ["var3d", "accumulated"],
+          "var_type": ["var3d", "instantaneous"],
           "var_source": "lami_2i",
           "var_format": "grib",
           "var_name": "tp",
