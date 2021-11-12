@@ -359,6 +359,14 @@ class DriverData:
             folder_name_anc_list = list_folder(folder_name_anc_main)
             for folder_name_anc_step in folder_name_anc_list:
                 if os.path.exists(folder_name_anc_step):
+
+                    file_name_tmp = os.listdir(folder_name_anc_step)
+                    if file_name_tmp:
+                        for file_name_step in file_name_tmp:
+                            file_path_step = os.path.join(folder_name_anc_step, file_name_step)
+                            if os.path.exists(file_path_step):
+                                os.remove(file_path_step)
+
                     os.rmdir(folder_name_anc_step)
 
     # -------------------------------------------------------------------------------------
