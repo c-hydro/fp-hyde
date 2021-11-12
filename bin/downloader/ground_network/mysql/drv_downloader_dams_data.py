@@ -190,6 +190,7 @@ class DriverData:
 
             var_tag = var_fields['tag']
             var_download = var_fields['download']
+            var_type = var_fields['type']
 
             if var_tag is not None:
 
@@ -203,9 +204,6 @@ class DriverData:
 
                         logging.info(' ------> Time Step ' + str(time_step) + ' ... ')
 
-                        folder_name_anc_step, file_name_anc_step = os.path.split(file_path_anc_step)
-                        make_folder(folder_name_anc_step)
-
                         if flag_upd_anc:
                             if os.path.exists(file_path_anc_step):
                                 os.remove(file_path_anc_step)
@@ -216,10 +214,14 @@ class DriverData:
 
                         if (not os.path.exists(file_path_anc_step)) and (not os.path.exists(file_path_dst_step)):
 
-                            time_from, time_to = parse_query_time(time_step)
+                            time_from, time_to = parse_query_time(time_step, time_mode=var_type)
                             var_data = get_data_dams(var_tag, time_from, time_to, self.db_settings)
 
                             if var_data:
+
+                                folder_name_anc_step, file_name_anc_step = os.path.split(file_path_anc_step)
+                                make_folder(folder_name_anc_step)
+
                                 write_obj(file_path_anc_step, var_data)
                                 logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
                             else:

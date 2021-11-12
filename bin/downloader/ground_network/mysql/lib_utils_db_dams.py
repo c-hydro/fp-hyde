@@ -8,6 +8,8 @@ import netrc
 
 import numpy as np
 import pandas as pd
+
+from copy import deepcopy
 # -------------------------------------------------------------------------------------
 
 
@@ -221,10 +223,18 @@ def define_db_settings(db_info):
 
 # -------------------------------------------------------------------------------------
 # Method to parse the query time
-def parse_query_time(time_step, time_frequency='H', time_format="%Y-%m-%dT%H:%M:%S.%f"):
+def parse_query_time(time_step, time_frequency='H', time_format="%Y-%m-%dT%H:%M:%S.%f",
+                     time_mode='accumulated'):
 
-    time_to = time_step.strftime(time_format)[:-3]
-    time_from = pd.date_range(end=time_step, freq=time_frequency, periods=2)[0].strftime(time_format)[:-3]
+    if time_mode == 'accumulated':
+        time_to = time_step.strftime(time_format)[:-3]
+        time_from = pd.date_range(end=time_step, freq=time_frequency, periods=2)[0].strftime(time_format)[:-3]
+    elif time_mode == 'instantaneous':
+        time_to = time_step.strftime(time_format)[:-3]
+        time_from = time_step.strftime(time_format)[:-3]
+    else:
+        logging.error(' ===> Time query definition failed')
+        raise IOError('The time mode is not correctly defined')
 
     return time_from, time_to
 
@@ -243,7 +253,7 @@ def define_query_dams_data(var_name='volume', time_from=None, time_to=None):
         db_query += "ORDER BY dighe.id_diga "
 
     else:
-        logging.error(' ===> Dams query definition failed')
+        logging.error(' ===> Data query definition failed')
         raise IOError('Some arguments are not correctly defined')
 
     return db_query
