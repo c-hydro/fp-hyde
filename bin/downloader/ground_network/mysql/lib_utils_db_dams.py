@@ -36,7 +36,7 @@ def order_data(data_frame, data_fields_expected):
 def organize_data_dams(
         time, data_collection, dams_df, data_type='istantaneous',
         data_units='m^3', data_valid_range=None,
-        data_scale_factor=1, data_min_count=1,
+        data_scale_factor=1, data_min_count=1, no_data=-9999.0,
         columns_list_data=None, columns_type_data=None, columns_id_data=None,
         column_join_data='name', column_join_dams='name',
         column_idx_data='id', column_value_data='data', column_time_data='time', column_name_data='name'):
@@ -117,14 +117,18 @@ def organize_data_dams(
     data_df_merged = pd.merge(data_df, dams_df, left_on=column_join_data, right_on=column_join_dams)
 
     data_df_select = data_df_merged[(data_df_merged[column_time_data] == time)]
+    data_df_filter = data_df_select.dropna(subset=[column_value_data])
 
-    if 'units' not in list(data_df_select.columns):
-        data_df_select['units'] = data_units
+    if data_df_filter is not None:
+        if 'units' not in list(data_df_filter.columns):
+            data_df_filter['units'] = data_units
 
-    if data_df_select.empty:
-        data_df_select = None
+        if data_df_filter.empty:
+            data_df_filter = None
+        else:
+            data_df_filter[column_value_data] = data_df_filter[column_value_data].fillna(no_data)
 
-    return data_df_select
+    return data_df_filter
 
 # -------------------------------------------------------------------------------------
 
