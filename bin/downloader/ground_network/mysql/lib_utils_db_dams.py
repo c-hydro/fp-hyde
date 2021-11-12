@@ -118,6 +118,9 @@ def organize_data_dams(
     if 'units' not in list(data_df_select.columns):
         data_df_select['units'] = data_units
 
+    if data_df_select.empty:
+        data_df_select = None
+
     return data_df_select
 
 # -------------------------------------------------------------------------------------

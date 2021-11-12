@@ -303,15 +303,18 @@ class DriverData:
                                                         data_scale_factor=var_scale_factor, data_min_count=var_min_count,
                                                         data_units=var_units, data_valid_range=var_valid_range)
 
-                            var_df = order_data(var_df, var_fields_expected)
+                            if var_df is not None:
+                                var_df = order_data(var_df, var_fields_expected)
 
-                            folder_name_dst_dset, file_name_dst_dset = os.path.split(file_path_dst_step)
-                            make_folder(folder_name_dst_dset)
+                                folder_name_dst_dset, file_name_dst_dset = os.path.split(file_path_dst_step)
+                                make_folder(folder_name_dst_dset)
 
-                            write_file_csv(file_path_dst_step, var_df)
+                                write_file_csv(file_path_dst_step, var_df)
 
-                            logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
-
+                                logging.info(' ------> Time Step ' + str(time_step) + ' ... DONE')
+                            else:
+                                logging.info(' ------> Time Step ' + str(time_step) +
+                                             ' ... SKIPPED. Dumped datasets are null due to the applications of filters')
                         else:
 
                             logging.info(' ------> Time Step ' + str(time_step) + ' ... FAILED. ')
