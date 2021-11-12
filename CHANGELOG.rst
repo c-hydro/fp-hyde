@@ -9,6 +9,9 @@ APP: **hyde_data_dynamic_modified_conditional_merging.py**
 BIN: **hyde_downloader_nwp_gefs_nomads.py**
     - Release for Hyde package
 
+BIN: **hyde_downloader_mysql_dams.py**
+    - Release for Hyde package
+
 DRV: **drv_model_griso_exec.py**
     - Bug fixes: integrate mathematical variogram fit procedure
 

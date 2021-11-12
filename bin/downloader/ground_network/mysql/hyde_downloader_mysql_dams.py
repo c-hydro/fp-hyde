@@ -1,9 +1,8 @@
 #!/usr/bin/python3
-
 """
-HYDE Downloading Tool - ODBC River Stations
+HYDE Downloading Tool - MySQL Dams
 
-__date__ = '20201210'
+__date__ = '20211110'
 __version__ = '2.0.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'HyDE'
@@ -12,8 +11,8 @@ General command line:
 python3 hyde_downloader_mysql_dams.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version:
-20201210 (2.0.0) --> Release 2.0 Beta (HyDE package)
-20151204 (1.0.0) --> Release 1.0 Beta
+20211110 (2.0.0) --> Release 2.0 Beta (HyDE package)
+20160902 (1.0.0) --> Release 1.0 Beta
 """
 # -------------------------------------------------------------------------------------
 
@@ -23,21 +22,21 @@ import logging
 import os
 import time
 
-from bin.downloader.ground_network.odbc.lib_utils_io import read_file_settings
-from bin.downloader.ground_network.odbc.lib_utils_system import make_folder
-from bin.downloader.ground_network.odbc.lib_utils_time import set_time
+from bin.downloader.ground_network.mysql.lib_utils_io import read_file_settings
+from bin.downloader.ground_network.mysql.lib_utils_system import make_folder
+from bin.downloader.ground_network.mysql.lib_utils_time import set_time
 
-from bin.downloader.ground_network.odbc.drv_downloader_rs_geo import DriverGeo
-from bin.downloader.ground_network.odbc.drv_downloader_rs_data import DriverData
+from bin.downloader.ground_network.mysql.drv_downloader_dams_geo import DriverGeo
+from bin.downloader.ground_network.mysql.drv_downloader_dams_data import DriverData
 
 from argparse import ArgumentParser
 # -------------------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------------------
 # Algorithm information
-alg_name = 'HYDE DOWNLOADING TOOL - ODBC RIVER STATIONS'
+alg_name = 'HYDE DOWNLOADING TOOL - MYSQL DAMS'
 alg_version = '2.0.0'
-alg_release = '2020-12-10'
+alg_release = '2021-11-10'
 # Algorithm parameter(s)
 time_format = '%Y-%m-%d %H:%M'
 # -------------------------------------------------------------------------------------
@@ -81,7 +80,7 @@ def main():
     # -------------------------------------------------------------------------------------
     # Get geographical information
     driver_geo = DriverGeo(src_dict=data_settings['data']['static'])
-    sections_collections = driver_geo.read_data()
+    dams_collections = driver_geo.read_data()
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ def main():
         # -------------------------------------------------------------------------------------
         # Get datasets information
         driver_data = DriverData(time_step,
-                                 sections_collection=sections_collections,
+                                 dams_collection=dams_collections,
                                  src_dict=data_settings['data']['dynamic']['source'],
                                  ancillary_dict=data_settings['data']['dynamic']['ancillary'],
                                  dst_dict=data_settings['data']['dynamic']['destination'],

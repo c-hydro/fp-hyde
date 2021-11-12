@@ -12,8 +12,8 @@ import pandas as pd
 
 
 # -------------------------------------------------------------------------------------
-# Method to get weather station dataset
-def get_data_ws(var_name, time_from, time_to, db_line_settings, flag_type='automatic'):
+# Method to get river stations dataset
+def get_data_rs(var_name, time_from, time_to, db_line_settings, flag_type='automatic'):
 
     # Define DB query
     db_query = define_query_ws(var_name, time_from, time_to, flag_type)
