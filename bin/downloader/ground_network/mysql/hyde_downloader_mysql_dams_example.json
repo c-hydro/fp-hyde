@@ -45,7 +45,7 @@
       "destination": {
         "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/dams/{destination_sub_path_time}",
         "file_name": "{destination_var_name}_{domain_name}_{destination_datetime}.csv",
-        "fields": ["longitude", "latitude", "dam_volume", "time", "units", "catchment", "name", "tag", "type",
+        "fields": ["longitude", "latitude", "data", "time", "units", "catchment", "name", "tag", "type",
           "code", "hmc_id_x", "hmc_id_y"]
       }
     }
@@ -60,7 +60,7 @@
       "download": true,
       "name": "dam_volume",
       "units": "m^3",
-      "tag": "livelli.volume",
+      "tag": "volume",
       "type": "instantaneous",
       "valid_range": [0, null],
       "min_count": 1,
@@ -70,7 +70,7 @@
       "download": true,
       "name": "dam_level",
       "units": "m",
-      "tag": "livelli.livello",
+      "tag": "livello",
       "type": "instantaneous",
       "valid_range": [0, null],
       "min_count": 1,
