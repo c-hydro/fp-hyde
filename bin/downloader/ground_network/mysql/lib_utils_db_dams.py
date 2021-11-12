@@ -110,8 +110,9 @@ def organize_data_dams(
 
     data_df = pd.DataFrame(data_workspace, columns=columns_list_select)
 
-    data_df[column_join_data] = data_df[column_join_data].str.capitalize()
-    dams_df[column_join_dams] = dams_df[column_join_dams].str.capitalize()
+    # Adapt names on database qith names in the shapefile
+    data_df[column_join_data] = data_df[column_join_data].str.title()
+    data_df[column_join_data] = data_df[column_join_data].str.replace('_','')
 
     data_df_merged = pd.merge(data_df, dams_df, left_on=column_join_data, right_on=column_join_dams)
 
