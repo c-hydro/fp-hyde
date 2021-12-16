@@ -401,7 +401,7 @@ class RFarmData:
                 if self.file_source_data == 'expert_forecast':
                     if self.var_dims_data == 'var1d':
 
-                        if self.var_type_data == 'istantaneous':
+                        if self.var_type_data == 'instantaneous':
                             file_data_list = self.file_data_list
                         else:
                             log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT ALLOWED!')

@@ -19,7 +19,7 @@ from os.path import exists
 from shutil import copy2, rmtree
 from random import randint
 
-from src.common.driver.configuration.drv_configuration_debug import Exc
+from drv_configuration_debug import Exc
 
 # Logging
 oLogStream = logging.getLogger(__name__)
