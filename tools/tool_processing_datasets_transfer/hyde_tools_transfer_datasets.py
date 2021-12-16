@@ -169,24 +169,31 @@ def main():
                     logging.warning(' ===> Destination file(s) are defined using the name of source file(s)')
                     file_name_dst_tmp = None
 
-                if file_name_dst_tmp is not None:
+                if (file_name_dst_tmp is not None) and ('*' not in file_name_dst_tmp):
 
                     file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_dst_tmp)
                     file_path_dst_def = file_path_dst_tmp.format(**template_time_filled)
 
-                elif file_name_dst_tmp is None:
+                elif (file_name_dst_tmp is None) and ('*' in file_path_src_def):
 
                     file_path_dst_def = []
-                    if '*' in file_path_src_def:
-                        for file_path_src_tmp in file_list_src_def:
-                            folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
-                            file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
-                            file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
-                            file_path_dst_def.append(file_path_dst_filled)
+                    for file_path_src_tmp in file_list_src_def:
+                        folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
+                        file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
+                        file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
+                        file_path_dst_def.append(file_path_dst_filled)
 
-                    else:
-                        logging.error(' ===> File destination name is not defined')
-                        raise NotImplementedError('Case not implemented yet')
+                elif (file_name_dst_tmp is not None) and ('*' in file_name_dst_tmp):
+                    file_path_dst_def = []
+                    for file_path_src_tmp in file_list_src_def:
+                        folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
+                        file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
+                        file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
+                        file_path_dst_def.append(file_path_dst_filled)
+
+                else:
+                    logging.error(' ===> File destination name is not defined')
+                    raise NotImplementedError('Case not implemented yet')
 
                 if isinstance(file_path_dst_def, str):
                     file_list_dst_def = [file_path_dst_def]
