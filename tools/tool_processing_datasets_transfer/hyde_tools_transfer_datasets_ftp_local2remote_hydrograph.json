@@ -17,7 +17,7 @@
       },
       "command_ancillary": {"create_folder":  null},
       "command_exec": "lftp -c",
-      "command_line": "open ftp://{nachine_user}:{machine_pwd}@{ftp_host}; cd {machine_folder}; mkdir -fp {machine_folder}/{folder_name_dst}; put {folder_name_src}/{file_name_src} -o {machine_folder}/{folder_name_dst}/{file_name_dst}; close; quit"
+      "command_line": "open ftp://{machine_user}:{machine_pwd}@{machine_host}; cd {machine_folder}; mkdir -fp {machine_folder}/{folder_name_dst}; put {folder_name_src}/{file_name_src} -o {machine_folder}/{folder_name_dst}/{file_name_dst}; close; quit"
     },
     "rsync": {
       "settings": {},
@@ -34,22 +34,30 @@
     "time_frequency": "H",
     "time_rounding": "H"
   },
+  "log": {
+  	"folder_name": "/hydro/log/ftp/",
+  	"file_name": "hyde_datatransfer_hydrograph.txt"
+  },
   "source": {
     "datasets_ecmwf0100_type_01": {
       "folder_name": "/hydro/archive/nwp_ecmwf0100_realtime_marche/{dset_sub_path_src}/collections/",
-      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_src}.json"
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
     },
     "datasets_ecmwf0100_type_02": {
       "folder_name": "/hydro/archive/nwp_ecmwf0100_realtime_marche/{dset_sub_path_src}/collections/",
-      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_src}.json"
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
     },
     "datasets_lami2i_type_01": {
       "folder_name": "/hydro/archive/nwp_lami-2i_realtime_marche/{dset_sub_path_src}/collections/",
-      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_src}.json"
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
     },
     "datasets_lami2i_type_02": {
       "folder_name": "/hydro/archive/nwp_lami-2i_realtime_marche/{dset_sub_path_src}/collections/",
-      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_src}.json"
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
     }
   },
   "destination": {

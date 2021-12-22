@@ -34,6 +34,10 @@
     "time_frequency": "H",
     "time_rounding": "H"
   },
+  "log": {
+  	"folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/log/",
+  	"file_name": "hyde_datatransfer_hydrograph.txt"
+  },
   "source": {
     "datasets_discharge_simulated": {
       "folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/data_repository/risultatiDRiFt/",
