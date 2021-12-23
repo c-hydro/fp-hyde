@@ -16,6 +16,7 @@ DRV: **drv_model_griso_exec.py**
     - Bug fixes: integrate mathematical variogram fit procedure
 
 FIX: **HYDE_Model_RFarm.py**
+	- Add resampling of outcome datasets according with the time delta settings
     - Fix 3d array vertical direction for the ecmwf0100 nwp
     - Fix time shift issue for the lami-2i nwp
     - Fix geographical position issue for the irregulared grid of lami-2i nwp

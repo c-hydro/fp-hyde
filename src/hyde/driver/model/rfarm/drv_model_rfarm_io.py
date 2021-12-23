@@ -10,6 +10,9 @@ Version:       '1.1.0'
 # Library
 import logging
 import os
+import re
+
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -58,7 +61,7 @@ class RFarmResult:
                  ensemble_n=None, ensemble_format='{:03d}',
                  ensemble_zip=False, ext_zip_type='.gz',
                  folder_out=None, filename_out='rfarm_{ensemble}.nc',
-                 var_name='Rain', var_dims='var3d', var_attrs=None,
+                 var_name='Rain', var_dims='var3d', var_attrs=None, var_freq='H',
                  dim_x_name='west_east', dim_y_name='south_north', write_engine='netcdf4'):
 
         if ensemble_n is None:
@@ -76,6 +79,7 @@ class RFarmResult:
 
         self.var_name = var_name
         self.var_dims = var_dims
+        self.var_freq = var_freq
         self.var_attrs_dict = {var_name: var_attrs}
 
         self.folder_out = folder_out
@@ -158,6 +162,7 @@ class RFarmResult:
 
         # Var attributes
         var_attrs_dict = self.var_attrs_dict
+        var_freq_expected = self.var_freq
 
         # Iterate over ensemble(s)
         for filename_id, (ensemble_name, filename_in, filename_out) in enumerate(
@@ -170,14 +175,47 @@ class RFarmResult:
             if os.path.exists(filename_in):
 
                 # Get data
-                da_out = read_obj(filename_in)
+                log_stream.info(' -----> Get dataset object ... ')
+                da_tmp = read_obj(filename_in)
+                log_stream.info(' -----> Get dataset object ... DONE')
+
+                # Adjust time frequency
+                log_stream.info(' -----> Adjust dataset time frequency ... ')
+                var_freq_tmp = pd.to_datetime(list(da_tmp.time.values)).inferred_freq
+                if isinstance(var_freq_tmp, str):
+                    if not re.findall('\d+', var_freq_expected):
+                        var_freq_expected = str(1) + var_freq_expected
+                    if not re.findall('\d+', var_freq_tmp):
+                        var_freq_tmp = str(1) + var_freq_tmp
+                else:
+                    log_stream.info(' ----> Dump ensemble ' + str(ensemble_name) + ' ... FAILED.')
+                    log_stream.error(' ===> Frequency format is not allowed')
+                    raise NotImplementedError('Case not implemented yet')
+
+                if pd.to_timedelta(var_freq_expected) > pd.to_timedelta(var_freq_tmp):
+                    log_stream.info(' ------> Resample datasets from object frequency "' + var_freq_tmp +
+                                    '" to the expected frequency "' + var_freq_expected + '" ... ')
+                    da_out = da_tmp.resample(time=var_freq_expected, closed='right', label='right').sum()
+                    log_stream.info(' ------> Resample datasets from object frequency "' + var_freq_tmp +
+                                    '" to the expected frequency "' + var_freq_expected + '" ... DONE')
+                elif pd.to_timedelta(var_freq_expected) == pd.to_timedelta(var_freq_tmp):
+                    log_stream.info(' ------> Resample datasets is not activated. ' +
+                                    'The object frequency is equal to the expected frequency.')
+                    da_out = deepcopy(da_tmp)
+                else:
+                    log_stream.info(' ----> Dump ensemble ' + str(ensemble_name) + ' ... FAILED.')
+                    log_stream.error(' ===> Resampling type is not allowed by the procedure to save result')
+                    raise NotImplementedError('Case not implemented yet')
+
+                log_stream.info(' -----> Adjust dataset time frequency ... DONE')
 
                 # Extract values and time
+                log_stream.info(' -----> Extract dataset values ... ')
                 values_out_raw = da_out.values
                 geo_x_out_raw = da_out['longitude'].values
                 geo_y_out_raw = da_out['latitude'].values
-
                 time_out = pd.to_datetime(list(da_out.time.values))
+                log_stream.info(' -----> Extract dataset values ... DONE')
 
                 # DEBUG START
                 # import matplotlib.pylab as plt
@@ -190,7 +228,8 @@ class RFarmResult:
                 # plotResult(values_out_raw[1, :, :], geo_x_out_raw, np.flipud(geo_y_out_raw))
                 # DEBUG END
 
-                # Organized values to save in a correct 3D format
+                # Organizing values to save in a correct 3D format
+                log_stream.info(' -----> Organize dataset values ... ')
                 values_out_def = np.zeros([values_out_raw.shape[0], values_out_raw.shape[1], values_out_raw.shape[2]])
                 values_out_def[:, :, :] = np.nan
                 for id in range(0, values_out_raw.shape[0]):
@@ -208,8 +247,10 @@ class RFarmResult:
                     # plt.clim(0, 100)
                     # plt.show()
                     # DEBUG
+                log_stream.info(' -----> Organize dataset values ... DONE')
 
-                # Create dset
+                # Create and write dset
+                log_stream.info(' -----> Save dataset values ... ')
                 dset_out = create_dset(time_out, values_out_def,
                                        np.flipud(terrain), lons, np.flipud(lats),
                                        var_name=self.var_name,
@@ -218,9 +259,10 @@ class RFarmResult:
                                        terrain_attrs=terrain_attr_dict[terrain_name],
                                        dim_x_name=self.dim_x_name,
                                        dim_y_name=self.dim_y_name)
-                # Write dset
+
                 write_dset(filename_out, dset_out, attrs=mergeDict(var_attrs_dict, terrain_attr_dict),
                            compression=compression_level, engine=self.write_engine)
+                log_stream.info(' -----> Save dataset values ... DONE')
 
                 # Ending info
                 log_stream.info(' ----> Dump ensemble ' + str(ensemble_name) + ' ... DONE')
