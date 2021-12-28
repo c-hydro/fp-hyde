@@ -155,7 +155,7 @@ def main():
     # -------------------------------------------------------------------------------------
     # Loop across time steps
     for timeNow in pd.date_range(start=startRun, end=endRun, freq=data_settings['data']['dynamic']['time']['time_frequency']):
-        logging.info(' ---> Computing time step ' + timeNow.strftime("%Y-%m-%d %H:00:00"))
+        logging.info(' ---> Computing time step ' + timeNow.strftime("%Y-%m-%d %H:%M:00"))
 
         # Compute time step file names
         file_out_time_step = os.path.join(data_settings['data']['outcome']['folder'], data_settings['data']['outcome']['filename'])
@@ -173,7 +173,7 @@ def main():
             if data_settings['algorithm']['flags']['overwrite_existing']:
                 pass
             else:
-                logging.info(' ---> Time step ' + timeNow.strftime("%Y-%m-%d %H:00:00") + ' already exist, skipping...')
+                logging.info(' ---> Time step ' + timeNow.strftime("%Y-%m-%d %H:%M:00") + ' already exist, skipping...')
                 continue
 
         # Make output dir
@@ -221,7 +221,7 @@ def main():
                 else:
                     dfStations, data = read_point_data(point_in_time_step, st_code='code', st_name='name', st_lon='longitude', st_lat='latitude', st_data='data')
             else:
-                data = dfData.loc[timeNow.strftime("%Y-%m-%d %H:00:00")].values
+                data = dfData.loc[timeNow.strftime("%Y-%m-%d %H:%M:00")].values
                 if len(data[~np.isnan(data)]) == 0:
                     raise ValueError
         except (FileNotFoundError, ValueError) as err:
