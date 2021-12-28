@@ -10,6 +10,9 @@ Version:       '1.1.0'
 # Library
 import logging
 import os
+import re
+
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -29,6 +32,7 @@ from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_netcdf import convert_data_w
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_json import read_data_expert_forecast, convert_time_expert_forecast
 from src.hyde.algorithm.io.model.rfarm.lib_rfarm_io_generic import write_obj, read_obj
 from src.hyde.algorithm.utils.rfarm.lib_rfarm_generic import fill_tags2string
+from src.hyde.model.rfarm.lib_rfarm_utils_generic import plotResult
 from src.hyde.algorithm.settings.model.rfarm.lib_rfarm_args import logger_name
 
 from src.hyde.model.rfarm.lib_rfarm_utils_generic import computeEnsemble
@@ -57,7 +61,7 @@ class RFarmResult:
                  ensemble_n=None, ensemble_format='{:03d}',
                  ensemble_zip=False, ext_zip_type='.gz',
                  folder_out=None, filename_out='rfarm_{ensemble}.nc',
-                 var_name='Rain', var_dims='var3d', var_attrs=None,
+                 var_name='Rain', var_dims='var3d', var_attrs=None, var_freq='H',
                  dim_x_name='west_east', dim_y_name='south_north', write_engine='netcdf4'):
 
         if ensemble_n is None:
@@ -75,6 +79,7 @@ class RFarmResult:
 
         self.var_name = var_name
         self.var_dims = var_dims
+        self.var_freq = var_freq
         self.var_attrs_dict = {var_name: var_attrs}
 
         self.folder_out = folder_out
@@ -157,6 +162,7 @@ class RFarmResult:
 
         # Var attributes
         var_attrs_dict = self.var_attrs_dict
+        var_freq_expected = self.var_freq
 
         # Iterate over ensemble(s)
         for filename_id, (ensemble_name, filename_in, filename_out) in enumerate(
@@ -169,13 +175,61 @@ class RFarmResult:
             if os.path.exists(filename_in):
 
                 # Get data
-                da_out = read_obj(filename_in)
+                log_stream.info(' -----> Get dataset object ... ')
+                da_tmp = read_obj(filename_in)
+                log_stream.info(' -----> Get dataset object ... DONE')
+
+                # Adjust time frequency
+                log_stream.info(' -----> Adjust dataset time frequency ... ')
+                var_freq_tmp = pd.to_datetime(list(da_tmp.time.values)).inferred_freq
+                if isinstance(var_freq_tmp, str):
+                    if not re.findall('\d+', var_freq_expected):
+                        var_freq_expected = str(1) + var_freq_expected
+                    if not re.findall('\d+', var_freq_tmp):
+                        var_freq_tmp = str(1) + var_freq_tmp
+                else:
+                    log_stream.info(' ----> Dump ensemble ' + str(ensemble_name) + ' ... FAILED.')
+                    log_stream.error(' ===> Frequency format is not allowed')
+                    raise NotImplementedError('Case not implemented yet')
+
+                if pd.to_timedelta(var_freq_expected) > pd.to_timedelta(var_freq_tmp):
+                    log_stream.info(' ------> Resample datasets from object frequency "' + var_freq_tmp +
+                                    '" to the expected frequency "' + var_freq_expected + '" ... ')
+                    da_out = da_tmp.resample(time=var_freq_expected, closed='right', label='right').sum()
+                    log_stream.info(' ------> Resample datasets from object frequency "' + var_freq_tmp +
+                                    '" to the expected frequency "' + var_freq_expected + '" ... DONE')
+                elif pd.to_timedelta(var_freq_expected) == pd.to_timedelta(var_freq_tmp):
+                    log_stream.info(' ------> Resample datasets is not activated. ' +
+                                    'The object frequency is equal to the expected frequency.')
+                    da_out = deepcopy(da_tmp)
+                else:
+                    log_stream.info(' ----> Dump ensemble ' + str(ensemble_name) + ' ... FAILED.')
+                    log_stream.error(' ===> Resampling type is not allowed by the procedure to save result')
+                    raise NotImplementedError('Case not implemented yet')
+
+                log_stream.info(' -----> Adjust dataset time frequency ... DONE')
 
                 # Extract values and time
+                log_stream.info(' -----> Extract dataset values ... ')
                 values_out_raw = da_out.values
+                geo_x_out_raw = da_out['longitude'].values
+                geo_y_out_raw = da_out['latitude'].values
                 time_out = pd.to_datetime(list(da_out.time.values))
+                log_stream.info(' -----> Extract dataset values ... DONE')
 
-                # Organized values to save in a correct 3D format
+                # DEBUG START
+                # import matplotlib.pylab as plt
+                # plt.figure()
+                # plt.imshow(values_out_raw[1, :, :])
+                # plt.colorbar()
+                # plt.clim(0, 10)
+                # plt.show()
+                # plotResult(values_out_raw[1, :, :], lons, lats)
+                # plotResult(values_out_raw[1, :, :], geo_x_out_raw, np.flipud(geo_y_out_raw))
+                # DEBUG END
+
+                # Organizing values to save in a correct 3D format
+                log_stream.info(' -----> Organize dataset values ... ')
                 values_out_def = np.zeros([values_out_raw.shape[0], values_out_raw.shape[1], values_out_raw.shape[2]])
                 values_out_def[:, :, :] = np.nan
                 for id in range(0, values_out_raw.shape[0]):
@@ -193,8 +247,10 @@ class RFarmResult:
                     # plt.clim(0, 100)
                     # plt.show()
                     # DEBUG
+                log_stream.info(' -----> Organize dataset values ... DONE')
 
-                # Create dset
+                # Create and write dset
+                log_stream.info(' -----> Save dataset values ... ')
                 dset_out = create_dset(time_out, values_out_def,
                                        np.flipud(terrain), lons, np.flipud(lats),
                                        var_name=self.var_name,
@@ -203,9 +259,10 @@ class RFarmResult:
                                        terrain_attrs=terrain_attr_dict[terrain_name],
                                        dim_x_name=self.dim_x_name,
                                        dim_y_name=self.dim_y_name)
-                # Write dset
+
                 write_dset(filename_out, dset_out, attrs=mergeDict(var_attrs_dict, terrain_attr_dict),
                            compression=compression_level, engine=self.write_engine)
+                log_stream.info(' -----> Save dataset values ... DONE')
 
                 # Ending info
                 log_stream.info(' ----> Dump ensemble ' + str(ensemble_name) + ' ... DONE')
@@ -305,11 +362,11 @@ class RFarmData:
                         raise NotImplementedError('NWP lami 2D dimensions datasets not implemented yet')
                     elif self.var_dims_data == 'var3d':
 
-                        [var_da, time_da, geox_da, geoy_da] = read_data_lami_2i(
+                        [var_da, time_da, geox_obj, geoy_obj] = read_data_lami_2i(
                             self.file_data_first, data_var=self.var_name_data)
 
                         [var_data_adjust,  var_time, var_geox, var_geoy] = adjust_data_lami_2i(
-                            var_da, time_da, geox_da, geoy_da)
+                            var_da, time_da, geox_obj, geoy_obj)
 
                         var_data_cmp = compute_rain_lami_2i(var_data_adjust)
 
@@ -348,7 +405,7 @@ class RFarmData:
 
                         if self.var_type_data == 'accumulated':
                             file_data_list = [self.file_data_first] + self.file_data_list
-                        elif self.var_type_data == 'istantaneous':
+                        elif self.var_type_data == 'instantaneous':
                             file_data_list = self.file_data_list
                         else:
                             log_stream.error(' ----> Get data ... FAILED! FILE SOURCE TYPE NOT ALLOWED!')
@@ -420,10 +477,14 @@ class RFarmData:
                     # Dump tmp file
                     write_obj(self.file_tmp, var_obj)
 
-                    # DEBUG STARY
-                    # file_test = self.file_tmp.split()[0] + '.nc'
-                    # dset_test = var_da.to_dataset(name='Rain')
-                    # dset_test.to_netcdf(path=file_test)
+                    # DEBUG START (DUMP DATA IN TIFF NETCDF FORMAT)
+                    #from src.hyde.model.rfarm.lib_rfarm_utils_generic import writeGeoTiff
+                    #file_name = '/home/fabio/test/rfarm/lami_2i_model.tiff'
+                    #writeGeoTiff(file_name, var_data_cmp[:,:,1], var_geox, var_geoy)
+
+                    #file_test = self.file_tmp.split()[0] + '.nc'
+                    #dset_test = var_da.to_dataset(name='Rain')
+                    #dset_test.to_netcdf(path=file_test)
                     # DEBUG END
 
                 elif self.var_dims_data == 'var1d':

@@ -1,9 +1,9 @@
 {
   "algorithm":{
     "flags": {
-      "cleaning_static_data": true,
-      "cleaning_dynamic_ancillary_in": true,
-      "cleaning_dynamic_ancillary_out": true,
+      "cleaning_static_data": false,
+      "cleaning_dynamic_ancillary_in": false,
+      "cleaning_dynamic_ancillary_out": false,
       "cleaning_dynamic_out": true,
       "cleaning_dynamic_tmp": true,
       "zipping_dynamic_out": true
@@ -17,18 +17,18 @@
       "title": "RFarm Model",
       "web-site": "",
       "source": "Python library developed by CIMA Research Foundation",
-      "history": "4.0.0 [20190902]",
+      "history": "4.0.3 [20210503]",
       "project-info": "Hydrological Data Engines - HyDE Library/Project",
       "algorithm": "Processing tool developed by CIMA Research Foundation"
     },
     "parameters": {
-      "ensemble": {"start": 1, "end": 3},
+      "ensemble": {"start": 1, "end": 1},
       "ratio_s": 4,
-      "ratio_t": 1,
+      "ratio_t": 3,
       "slope_s": null,
       "slope_t": null,
-      "cs_sf": 2,
-      "ct_sf": 2,
+      "cs_sf": 4,
+      "ct_sf": 1,
       "multi_core": false,
       "domain_extension": 0,
       "tmp": true
@@ -116,7 +116,7 @@
     "input": {
       "rain_data": {
         "id": {
-          "var_type": ["var3d", "accumulated"],
+          "var_type": ["var3d", "instantaneous"],
           "var_source": "lami_2i",
           "var_format": "grib",
           "var_name": "tp",
@@ -145,7 +145,8 @@
           "var_name": "Rain",
           "var_file": "rfarm_data",
           "var_colormap": null,
-          "var_parameters": null
+          "var_parameters": null,
+          "var_frequency": "H"
         },
         "attributes": {
           "long_name": "",

@@ -47,8 +47,8 @@ log_stream = logging.getLogger(logger_name)
 # Algorithm information
 alg_project = 'HyDE'
 alg_name = 'RainFarm Processing Tool'
-alg_version = '4.0.2'
-alg_release = '2021-02-02'
+alg_version = '4.0.3'
+alg_release = '2021-05-03'
 alg_type = 'Model'
 # Algorithm parameter(s)
 time_format = '%Y-%m-%d %H:%M'

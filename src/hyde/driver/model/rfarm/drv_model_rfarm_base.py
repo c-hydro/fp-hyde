@@ -183,7 +183,9 @@ class ModelRunner:
             self.var_domain_name = var_domain_name
             self.var_domain_id = var_domain_id
         else:
-            raise NotImplementedError('Domain name format not permitted')
+            log_stream.error(' ===> Domain name format not permitted')
+            raise NotImplementedError('Case not implemented yet')
+
         self.file_dim_type = file_dim_type
 
         # Data input file
@@ -201,7 +203,8 @@ class ModelRunner:
                 file_in_raw = fill_tags2string(file_in, self.model_tags_template, model_tags_in_values)
                 self.folder_in_raw, self.filename_in_raw = os.path.split(file_in_raw)
             else:
-                raise NotImplementedError('File dim type not allowed')
+                log_stream.error(' ===> File dimensions type is not allowed')
+                raise NotImplementedError('Case not implemented yet')
 
             if self.file_dim_type == 'time':
                 self.folder_in_list = []
@@ -223,12 +226,15 @@ class ModelRunner:
                     self.folder_in_list.append(folder_in_list)
                     self.filename_in_list.append(filename_in_list)
             else:
-                raise NotImplementedError('File dim type not allowed')
+                log_stream.error(' ===> File dimensions type is not allowed')
+                raise NotImplementedError('Case not implemented yet')
         else:
+            log_stream.error(' ===> File input is defined by NoneType')
             raise TypeError('File input are not correctly defined')
 
         if not os.path.exists(self.folder_in_raw):
-            raise FileNotFoundError(' Path does not exist [' + self.folder_in_raw + ']')
+            log_stream.error(' ===> Input folder "' + self.folder_in_raw + '" does not exist')
+            raise FileNotFoundError('Check your settings to search the right location.')
 
         # Ancillary input file
         if file_ancillary_in is not None:
@@ -306,6 +312,12 @@ class ModelRunner:
             model_algorithm=self.tag_model_algorithm
         )
 
+        if 'var_frequency' in self.var_info_out['id']:
+            var_frequency = self.var_info_out['id']['var_frequency']
+        else:
+            log_stream.warning(' ===> Result variable frequency is not set. Use default hourly frequency "H"')
+            var_frequency = 'H'
+
         # Model driver of saving RFarm result(s)
         self.driver_rf_result = RFarmResult(
             self.driver_rf_model.ensemble_filename,
@@ -314,6 +326,7 @@ class ModelRunner:
             folder_out=self.folder_out_raw,
             filename_out=self.filename_out_raw,
             var_name=self.var_info_out['id']['var_name'],
+            var_freq=var_frequency,
             var_dims=self.var_info_in['id']['var_type'][0],
             var_attrs=self.var_info_out['attributes'],
             ensemble_zip=file_out_zipping,

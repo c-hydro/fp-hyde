@@ -1,0 +1,81 @@
+{
+  "template": {
+    "dset_datetime_src": "%Y%m%d%H%M",
+    "dset_sub_path_src": "%Y/%m/%d/%H",
+    "dset_datetime_dst": "%Y%m%d%H%M",
+    "dset_sub_path_dst": "%Y/%m"
+  },
+  "method": {
+    "__comment__": "mode: [local2remote, remote2local, local2local]",
+    "mode": "local2remote",
+    "ftp": {
+      "settings": {
+        "machine_host": "10.6.2.232",
+        "machine_user": "utenteprotciv",
+        "machine_pwd": "prot07civ",
+        "machine_folder": "/ProtCivFTP/CNR-ISMAR/"
+      },
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "lftp -c",
+      "command_line": "open ftp://{machine_user}:{machine_pwd}@{machine_host}; cd {machine_folder}; mkdir -fp {machine_folder}/{folder_name_dst}; put {folder_name_src}/{file_name_src} -o {machine_folder}/{folder_name_dst}/{file_name_dst}; close; quit"
+    },
+    "rsync": {
+      "settings": {},
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "rsync -avr --progress",
+      "command_line": "{folder_name_src}/{file_name_src} {folder_name_dst}/{file_name_dst}"
+    }
+  },
+  "time": {
+    "time_run": null,
+    "time_start": null,
+    "time_end": null,
+    "time_period": 120,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "log": {
+  	"folder_name": "/hydro/log/ftp/",
+  	"file_name": "hyde_datatransfer_hydrograph.txt"
+  },
+  "source": {
+    "datasets_ecmwf0100_type_01": {
+      "folder_name": "/hydro/archive/nwp_ecmwf0100_realtime_marche/{dset_sub_path_src}/collections/",
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
+    },
+    "datasets_ecmwf0100_type_02": {
+      "folder_name": "/hydro/archive/nwp_ecmwf0100_realtime_marche/{dset_sub_path_src}/collections/",
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
+    },
+    "datasets_lami2i_type_01": {
+      "folder_name": "/hydro/archive/nwp_lami-2i_realtime_marche/{dset_sub_path_src}/collections/",
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
+    },
+    "datasets_lami2i_type_02": {
+      "folder_name": "/hydro/archive/nwp_lami-2i_realtime_marche/{dset_sub_path_src}/collections/",
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_src}.json",
+      "method": "ftp"
+    }
+  },
+  "destination": {
+    "datasets_ecmwf0100_type_01": {
+      "folder_name": "/ecmwf0100_realtime/{dset_sub_path_dst}",
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_dst}.json"
+    },
+    "datasets_ecmwf0100_type_02": {
+      "folder_name": "/ecmwf0100_realtime/{dset_sub_path_dst}",
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_dst}.json"
+    },
+    "datasets_lami2i_type_01": {
+      "folder_name": "/lami2i_realtime/{dset_sub_path_dst}",
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_dst}.json"
+    },
+    "datasets_lami2i_type_02": {
+      "folder_name": "/lami2i_realtime/{dset_sub_path_dst}",
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_dst}.json"
+    }
+  }
+}

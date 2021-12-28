@@ -2,8 +2,8 @@
   "algorithm":{
     "flags": {
       "cleaning_static_ancillary_data": false,
-      "cleaning_dynamic_ancillary_data": false,
-      "cleaning_dynamic_ancillary_archive": false,
+      "cleaning_dynamic_ancillary_data": true,
+      "cleaning_dynamic_ancillary_archive": true,
       "cleaning_dynamic_product_data": true
     },
     "ancillary": {

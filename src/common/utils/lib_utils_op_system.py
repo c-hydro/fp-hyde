@@ -19,10 +19,8 @@ from os.path import exists
 from shutil import copy2, rmtree
 from random import randint
 
-from src.common.driver.configuration.drv_configuration_debug import Exc
-
 # Logging
-oLogStream = logging.getLogger(__name__)
+log_stream = logging.getLogger(__name__)
 
 # Debug
 # import matplotlib.pylab as plt
@@ -94,7 +92,7 @@ def createTemp(sPathTemp=None, iMethodTemp=1):
     else:
         # -------------------------------------------------------------------------------------
         # Exit with warning (method unknown)
-        Exc.getExc(' =====> WARNING: invalid choice for temporary folder method!', 2, 1)
+        log_stream.warning(' =====> WARNING: invalid choice for temporary folder method!')
         sFolderTemp = None
         # -------------------------------------------------------------------------------------
 

@@ -1,0 +1,61 @@
+{
+  "template": {
+    "dset_datetime_src": "%Y%m%d%H00",
+    "dset_sub_path_src": "%Y/%m/%d/",
+    "dset_datetime_dst": "%Y%m%d%H%M",
+    "dset_sub_path_dst": "%Y/%m/%d"
+  },
+  "method": {
+    "__comment__": "mode: [local2remote, remote2local, local2local]",
+    "mode": "local2remote",
+    "ftp": {
+      "settings": {
+        "machine_host": "10.6.2.232",
+        "machine_user": "utenteprotciv",
+        "machine_pwd": "prot07civ",
+        "machine_folder": "/ProtCivFTP/CNR-ISMAR/"
+      },
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "lftp -c",
+      "command_line": "open ftp://{machine_user}:{machine_pwd}@{machine_host}; cd {machine_folder}; mkdir -fp {machine_folder}/{folder_name_dst}; put {folder_name_src}/{file_name_src} -o {machine_folder}/{folder_name_dst}/{file_name_dst}; close; quit"
+    },
+    "rsync": {
+      "settings": {
+        "machine_host": "10.198.26.22",
+        "machine_user": "user"
+      },
+      "command_ancillary": {
+      	"create_folder":  "ssh {machine_user}@{machine_host} mkdir -p {folder_name_dst}",
+      	"find_file": "ssh {machine_user}@{machine_host} test -f {folder_name_dst}/{file_name_dst}",
+      	"uncompress_file": "ssh {machine_user}@{machine_host} gzip -fd {folder_name_dst}/{file_name_dst}",
+      	"remove_file": "ssh {machine_user}@{machine_host} rm {folder_name_dst}/{file_name_dst}",
+      "command_exec": "rsync -avr --progress",
+      "command_line": "{folder_name_src}/{file_name_src} {machine_user}@{machine_host}:{folder_name_dst}/{file_name_dst}"
+    }
+  },
+  "time": {
+    "time_run": null,
+    "time_start": null,
+    "time_end": null,
+    "time_period": 120,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "log": {
+  	"folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hmc-ws/opchain_marche/log/",
+  	"file_name": "hmc_datatransfer_mod_s3m_realtime.txt"
+  },
+  "source": {
+    "datasets_s3m": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hmc-ws/opchain_marche/data/data_dynamic/outcome/s3m/{dset_sub_path_src}",
+      "file_name": "s3m.mod.{dset_datetime_src}.nc.gz",
+      "method": "rsync"
+    }
+  },
+  "destination": {
+    "datasets_s3m": {
+      "folder_name": "/share/hydro/grid/s3m_realtime/{dset_sub_path_dst}",
+      "file_name": "s3m.mod.{dset_datetime_dst}.nc.gz"
+    }
+  }
+}

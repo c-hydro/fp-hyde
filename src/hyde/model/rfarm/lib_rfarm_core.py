@@ -69,6 +69,7 @@ def exec_nwp(X, xscale, tscale, cssf, ctsf,
     # file = 'rain_debug.mat'
     # data = {'data': pa}
     # savemat(join(path,file), data)
+    # import matplotlib.pylab as plt
     # plt.figure(1)
     # plt.imshow(pa[:, : ,0], interpolation='none'); plt.colorbar()
     # plt.show()
