@@ -2,9 +2,9 @@
   "algorithm": {
     "flags": {
       "sources": {
-        "use_drops2": false,
+        "use_drops2": true,
         "use_timeseries": false,
-        "use_point_data": true,
+        "use_point_data": false,
         "non_standard_tab_fields": true
       },
       "compressed_gridded_input": false,

@@ -17,7 +17,6 @@ import pyresample
 import logging
 from scipy.signal import correlate
 from copy import deepcopy
-from skimage import measure
 import pandas as pd
 from itertools import combinations
 import xarray as xr
@@ -229,7 +228,7 @@ def GrisoLocalKernel(ind, dict_griso_settings, dict_correlation_outcomes):
             corr_sample_window[corr_sample_window<0] = 0
 
             corr_sample_window[dist_km > (dict_griso_settings["corr_max_radius_km"])] = 0
-            corr_fit_window, radius_fit = sphericalFit(dist_km,corr_sample_window,dict_griso_settings["corr_null_radius_km"],dict_griso_settings["corr_max_radius_km"], dict_griso_settings["corr_max_radius_km"]-dict_griso_settings["cellsize_km"])
+            corr_fit_window, radius_fit = sphericalFit(dist_km,corr_sample_window,dict_griso_settings["corr_null_radius_km"],dict_griso_settings["corr_max_radius_km"], dict_griso_settings["corr_max_radius_km"]-dict_griso_settings["cellsize_km"], corr_null=corr_null_fit_window)
             corr_fit_window[dist_km > (dict_griso_settings["corr_max_radius_km"])] = 0
         else:
             corr_fit_window = deepcopy(corr_null_fit_window)

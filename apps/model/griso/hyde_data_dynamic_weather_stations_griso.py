@@ -31,6 +31,7 @@ import pandas as pd
 import json
 import time
 import netrc
+from copy import deepcopy
 
 from src.hyde.driver.model.griso.drv_model_griso_exec import GrisoCorrel, GrisoInterpola, GrisoPreproc
 from src.hyde.driver.model.griso.drv_model_griso_io import importDropsData, importTimeSeries, check_and_write_dataarray, write_raster, read_point_data
@@ -167,24 +168,34 @@ def main():
             logging.warning(' ----> Skip time step' + timeNow.strftime("%Y-%m-%d %H:00:00"))
             continue
 
+        if not data_settings['algorithm']['flags']["sources"]['use_point_data']:
+            # Check if station data with nan values are present and, in the case, remove station from Station dataframe
+            # (only if not point data are used, in this case, no further cleaning is needed)
+            logging.info(' ----> Check null values for time step ...')
+            avail_time_step = len(dfData.columns[~np.isnan(data)])
+            logging.info(' ----> Available data for the time step ...' + str(avail_time_step))
+            dfStations_available = dfStations.loc[dfData.columns[~np.isnan(data)]]
+            data = data[~np.isnan(data)]
+        else:
+            dfStations_available = deepcopy(dfStations)
+
         # Data preprocessing for GRISO
         logging.info(' ---> GRISO: Data preprocessing...')
-        point_data, a2dPosizioni, grid_rain, grid, passoKm = GrisoPreproc(corrFin, dfStations.lon.astype(np.float),
-                                                                          dfStations.lat.values.astype(np.float), data, Grid=grid_in)
+        point_data, a2dPosizioni, grid_rain, grid, passoKm = GrisoPreproc(corrFin,dfStations_available.lon.astype(np.float),dfStations_available.lat.values.astype(np.float), data, Grid=grid_in)
+
         logging.info(' ---> GRISO: Data preprocessing... DONE')
 
         # Calculate GRISO correlation features
         logging.info(' ---> GRISO: Calculate correlation...')
         correl_features = GrisoCorrel(point_data["rPluvio"], point_data["cPluvio"], corrFin, grid_rain, passoKm,
-                                      a2dPosizioni, grid.shape[0], grid.shape[1], point_data["gauge_value"],
-                                      corr_type='fixed')
+                                      a2dPosizioni, point_data["gauge_value"], corr_type= 'fixed')
+
         logging.info(' ---> GRISO: Data preprocessing...DONE')
 
         # GRISO interpolation
         logging.info(' ---> GRISO: Observed data interpolation...')
         griso_obs = GrisoInterpola(point_data["rPluvio"], point_data["cPluvio"], point_data["gauge_value"],
-                                   correl_features["CorrStimata"], corrFin, passoKm,
-                                   correl_features["FinestraPosizioniExt"])
+                                   correl_features)
         logging.info(' ---> GRISO: Observed data interpolation...DONE')
 
         if data_settings['data']['outcome']['format'].lower() == 'netcdf' or data_settings['data']['outcome']['format'].lower() == 'nc':
@@ -195,7 +206,7 @@ def main():
 
         elif data_settings['data']['outcome']['format'].lower() == 'tif' or data_settings['data']['outcome']['format'].lower() == 'tiff' or data_settings['data']['outcome']['format'].lower() == 'gtiff':
             logging.info(' ---> Saving outfile in GTiff format ' + os.path.basename(file_out_time_step))
-            write_raster(griso_obs, grid, file_out_time_step, driver='GTiff')
+            write_raster(griso_obs, grid_in, file_out_time_step, driver='GTiff')
         else:
             logging.error('ERROR! Unknown or unsupported output format! ')
             raise ValueError("Supported output formats are netcdf and GTiff")

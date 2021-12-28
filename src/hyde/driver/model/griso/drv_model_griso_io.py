@@ -125,9 +125,10 @@ def check_and_write_dataarray(variable, grid, var_name='precip', lat_var_name='l
 # Write raster format
 
 def write_raster(variable, grid, file_out, driver='GTiff'):
+    variable = variable.astype(np.float32)
     with rio.open(file_out, 'w', driver=driver,
                   height=variable.shape[0], width=variable.shape[1], count=1, dtype=variable.dtype,
-                  crs='+proj=latlong', transform=grid.transform) as dst:
+                  crs='+proj=latlong', transform=grid.transform, compress='DEFLATE') as dst:
         dst.write(variable, 1)
 
 # --------------------------------------------------------------------------------------
