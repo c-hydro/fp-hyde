@@ -11,6 +11,7 @@ import pandas as pd
 from src.hyde.algorithm.io.ground_network.lib_rs_io_generic import create_darray_2d
 
 logging.getLogger('rasterio').setLevel(logging.WARNING)
+logging.getLogger('fiona').setLevel(logging.WARNING)
 # -------------------------------------------------------------------------------------
 
 
@@ -30,6 +31,7 @@ def read_shapefile_points(file_name, columns_name_expected=None, columns_name_ty
 
     file_obj = {}
     for column_name, column_type, column_tag in zip(columns_name_expected, columns_name_type, columns_name_tag):
+        logging.info(' ----> Get shapefile field "' + column_name + '" ... ')
         if column_name in file_dframe_raw.columns:
             column_data_tmp = file_dframe_raw[column_name].values.tolist()
 
@@ -57,6 +59,8 @@ def read_shapefile_points(file_name, columns_name_expected=None, columns_name_ty
                 raise NotImplementedError('Datatype not implemented yet')
 
         file_obj[column_tag] = column_data
+
+        logging.info(' ----> Get shapefile field "' + column_name + '" ... DONE')
 
     section_df = pd.DataFrame(file_obj, columns=columns_name_tag)
 

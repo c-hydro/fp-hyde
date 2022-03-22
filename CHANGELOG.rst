@@ -1,6 +1,13 @@
 =========
 Changelog
 =========
+
+Version 1.9.9 [2022-03-21]
+**************************
+APP: **HYDE_DynamicData_GroundNetwork_RS.py**
+    - Add fields in configuration file for parsering the csv input file;
+    - Add fields in configuration file for writing the txt output file.
+
 Version 1.9.8 [2021-08-01]
 **************************
 APP: **hyde_data_dynamic_modified_conditional_merging.py**

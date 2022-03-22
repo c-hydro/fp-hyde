@@ -53,7 +53,9 @@ class DriverData:
 
         self.tag_folder_name = 'folder_name'
         self.tag_file_name = 'file_name'
-        self.tag_file_fields = 'file_fields'
+        self.tag_file_fields_columns = 'file_fields_columns'
+        self.tag_file_fields_types = 'file_fields_types'
+        self.tag_file_fields_format = 'file_fields_format'
         self.tag_file_compression = 'file_compression'
 
         self.domain_name = info_dict['domain']
@@ -70,7 +72,7 @@ class DriverData:
             file_path_src_dset_list = self.collect_file_list(folder_name_src_dset_raw, file_name_src_dset_raw,
                                                              variable_step)
 
-            self.file_fields_collections[variable_step] = self.src_dict[variable_step][self.tag_file_fields]
+            self.file_fields_collections[variable_step] = self.src_dict[variable_step][self.tag_file_fields_columns]
             self.file_path_src_dset_collections[variable_step] = file_path_src_dset_list
 
         self.folder_name_anc_dset_raw = self.ancillary_dict[self.tag_folder_name]
@@ -84,6 +86,22 @@ class DriverData:
         self.file_name_dst_dset_raw = self.dst_dict[self.tag_file_name]
         self.file_path_dst_dset_collections = self.collect_file_list(
             self.folder_name_dst_dset_raw, self.file_name_dst_dset_raw)
+
+        if self.tag_file_fields_columns in list(self.dst_dict.keys()):
+            self.file_fields_columns = self.dst_dict[self.tag_file_fields_columns]
+        else:
+            self.file_fields_columns = ['code', 'discharge', 'tag']
+
+        if self.tag_file_fields_format in list(self.dst_dict.keys()):
+            self.file_fields_format = self.dst_dict[self.tag_file_fields_format]
+        else:
+            self.file_fields_format = ['%10.0f', '%10.1f', '%s']
+
+        if self.tag_file_fields_types in list(self.dst_dict.keys()):
+            self.file_fields_types = self.dst_dict[self.tag_file_fields_types]
+        else:
+            self.file_fields_types = ['int', 'float', 'str']
+        self.file_fields_write_engine = self.convert_fields_type2write(self.file_fields_types)
 
         if self.tag_file_compression in list(self.dst_dict.keys()):
             self.file_compression_dst = self.dst_dict[self.tag_file_compression]
@@ -99,9 +117,24 @@ class DriverData:
 
         self.tag_dim_geo_x = 'longitude'
         self.tag_dim_geo_y = 'latitude'
+    # -------------------------------------------------------------------------------------
 
-        self.tag_var_file = ['code', 'discharge', 'tag']
-
+    # -------------------------------------------------------------------------------------
+    # Method to convert type to write engine
+    @staticmethod
+    def convert_fields_type2write(file_fields_type):
+        file_fields_write_engine = []
+        for field_type in file_fields_type:
+            if field_type == 'int':
+                file_fields_write_engine.append('i')
+            elif field_type == 'float':
+                file_fields_write_engine.append('f')
+            elif field_type == 'str':
+                file_fields_write_engine.append('U256')
+            else:
+                logging.error(' ===> Name "' + field_type + '" is not supported by known write engine')
+                raise NotImplementedError('Case not implemented yet')
+        return file_fields_write_engine
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -249,7 +282,7 @@ class DriverData:
                             var_value_list = []
                             for var_da_step in var_da_anc:
                                 var_row_list = []
-                                for var_file in self.tag_var_file:
+                                for var_file in self.file_fields_columns:
                                     var_value_tmp = var_da_step[var_file].values[0]
                                     var_row_list.append(var_value_tmp)
                                 var_value_list.append(var_row_list)
@@ -266,8 +299,12 @@ class DriverData:
                     var_folder_name_dst, var_file_name_dst = os.path.split(var_file_path_dst)
                     make_folder(var_folder_name_dst)
                     for (var_dst, data_dst), attrs_dst in zip(var_data_dict.items(), var_attrs_dict.values()):
-                        write_file_ascii(var_file_path_dst, data_dst,
-                                         file_fields=self.tag_var_file, file_attrs=attrs_dst)
+                        write_file_ascii(
+                            var_file_path_dst, data_dst,
+                            file_fields=self.file_fields_columns,
+                            file_write_engine=self.file_fields_write_engine,
+                            file_format=self.file_fields_format,
+                            file_attrs=attrs_dst)
                     logging.info(' ------> Save file ascii ... DONE')
 
                     logging.info(' ------> Zip file ... ')
@@ -361,7 +398,7 @@ class DriverData:
                                 raise NotImplementedError('Case not implemented yet')
 
                             var_dict[var_tag] = convert_values2points(var_file_data_src, geo_collections,
-                                                                      tag_file_fields=self.tag_var_file)
+                                                                      tag_file_fields=self.file_fields_columns)
 
                             logging.info(' -------> Compute data ... DONE')
                             logging.info(' ------> Variable ' + var_key + ' ... DONE')

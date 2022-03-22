@@ -15,7 +15,7 @@
       "algorithm": "River stations preprocessing tools"
     },
     "info": {
-      "domain": "marche"
+      "domain": "liguria"
     },
     "template": {
       "domain_name": "string_domain",
@@ -31,45 +31,58 @@
     "static": {
       "source" : {
         "sections": {
-          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/shapefile/",
-          "file_name": "fp_sections_marche.shp"
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/liguria/data_static/shapefile/",
+          "file_name": "fp_sections_liguria.shp",
+          "file_fields_columns": [
+            "ID", "HMC_X", "HMC_Y", "LON", "LAT", "BASIN", "SEC_NAME", "SEC_RS", "SEC_TAG",
+            "TYPE", "AREA", "Q_THR1", "Q_THR2", "ADMIN_B_L1", "ADMIN_B_L2", "ADMIN_B_L3"
+          ],
+          "file_fields_types": [
+            "int", "int", "int", "float", "float", "str", "str", "str", "str",
+            "str", "float", "float", "float", "str", "str", "str"],
+          "file_fields_tags": [
+            "id", "hmc_id_x", "hmc_id_y", "longitude", "latitude", "catchment", "name", "code", "tag",
+            "type", "area", "discharge_thr1", "discharge_thr2", "boundary_limit_01", "boundary_limit_02", "boundary_limit_03"]
         }
       },
       "ancillary": {
         "points" : {
-          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/river_stations/",
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/liguria/data_static/ancillary/",
           "file_name": "rs_points.workspace"
         }
       }
     },
     "dynamic": {
       "time": {
-        "time_period": 200,
+        "time_period": 2,
         "time_frequency": "H",
         "time_rounding": "H"
       },
       "source": {
         "discharge": {
-          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/river_stations/{source_sub_path_time}",
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/liguria/data_dynamic/source/river_stations/{source_sub_path_time}",
           "file_name": "discharge_{domain_name}_{source_datetime}.csv",
-          "file_fields": ["longitude", "latitude", "discharge", "time", "units", "catchment", "name", "tag", "type",
+          "file_fields_columns": ["longitude", "latitude", "discharge", "time", "units", "catchment", "name", "tag", "type",
           "code", "hmc_id_x", "hmc_id_y"]
         }
       },
       "ancillary" : {
-        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/obs/river_stations/{ancillary_sub_path_time}",
-        "file_name": "rs_{domain_name}_{ancillary_datetime}.workspace"
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/liguria/data_dynamic/ancillary/river_stations/{ancillary_sub_path_time}",
+        "file_name": "rs.{domain_name}.{ancillary_datetime}.workspace"
       },
       "destination": {
-        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/obs/river_stations/{destination_sub_path_time}",
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/liguria/data_dynamic/outcome/river_stations/{destination_sub_path_time}",
         "file_name": "rs.db.{destination_datetime}.txt",
+        "file_fields_columns": ["code", "discharge", "tag"],
+        "file_fields_format": ["%10.0f", "%10.1f", "%s"],
+        "file_fields_types": ["float", "float", "str"],
         "file_compression": false
       }
     }
   },
   "log": {
-      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/river_stations/",
-      "file_name": "hyde_preprocessing_river_stations_log.txt",
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/liguria/log/river_stations/",
+      "file_name": "hyde_preprocessing_river_stations.txt",
       "file_history": true
   },
   "time": {

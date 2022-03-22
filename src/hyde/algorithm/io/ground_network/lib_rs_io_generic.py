@@ -65,28 +65,30 @@ def create_filename_tmp(prefix='tmp_', suffix='.tiff', folder=None):
 # -------------------------------------------------------------------------------------
 # Method to write ascii 1d
 def write_file_ascii(file_name, file_data, file_fields=None,
-                     file_attrs=None, file_format='%10.0f %10.1f %s', file_type='i f U256', file_new_line='\n'):
+                     file_attrs=None, file_format=None, file_write_engine=None, file_new_line='\n'):
 
     if file_fields is None:
         file_fields = ['code', 'discharge', 'tag']
+    if file_format is None:
+        file_format = ['%10.0f', '%10.1f', '%s']
+    if file_write_engine is None:
+        file_write_engine = ['i', 'f', 'U256']
 
-    file_format_cols = file_format.split(' ')
-    file_type_cols = file_type.split(' ')
-    if file_format_cols.__len__() != file_fields.__len__():
-        logging.error(' ===> Columns format length is not equal to fields length')
-        raise IOError('Bad file format definition')
-    if file_type_cols.__len__() != file_fields.__len__():
-        logging.error(' ===> Columns type length is not equal to fields length')
-        raise IOError('Bad file type definition')
+    if file_format.__len__() != file_fields.__len__():
+        logging.error(' ===> Columns "format" length is not equal to fields length')
+        raise IOError('Bad "file format" definition')
+    if file_write_engine.__len__() != file_fields.__len__():
+        logging.error(' ===> Columns "write engine" length is not equal to fields length')
+        raise IOError('Bad "file write engine" definition')
 
     file_dict_generic = {}
     file_type = []
     for id_data_rows, file_data_cols in enumerate(file_data):
-        for col_id, (col_format, col_type, col_value) in enumerate(zip(file_format_cols, file_type_cols, file_data_cols)):
+        for col_id, (col_format, col_write_engine, col_value) in enumerate(zip(file_format, file_write_engine, file_data_cols)):
             col_var = 'var' + str(col_id)
             if col_var not in list(file_dict_generic.keys()):
                 file_dict_generic[col_var] = [col_value]
-                file_type.append(tuple([col_var, col_type]))
+                file_type.append(tuple([col_var, col_write_engine]))
             else:
                 col_data_tmp = file_dict_generic[col_var]
                 col_data_tmp.append(col_value)

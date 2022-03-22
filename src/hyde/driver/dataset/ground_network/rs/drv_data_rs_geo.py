@@ -31,6 +31,8 @@ class DriverGeo:
 
     def __init__(self, src_dict, ancillary_dict, dst_dict=None,
                  tag_folder_name='folder_name', tag_file_name='file_name',
+                 tag_file_fields_columns='file_fields_columns', tag_file_fields_types='file_fields_types',
+                 tag_file_fields_tags='file_fields_tags',
                  tag_src_data='sections',
                  tag_ancillary_data='points',
                  flag_updating_ancillary=True):
@@ -41,6 +43,9 @@ class DriverGeo:
 
         self.tag_folder_name = tag_folder_name
         self.tag_file_name = tag_file_name
+        self.tag_file_fields_columns = tag_file_fields_columns
+        self.tag_file_fields_types = tag_file_fields_types
+        self.tag_file_fields_tags = tag_file_fields_tags
 
         self.tag_src_data = tag_src_data
         self.tag_ancillary_data = tag_ancillary_data
@@ -58,18 +63,48 @@ class DriverGeo:
         self.tag_dim_geo_x = 'longitude'
         self.tag_dim_geo_y = 'latitude'
 
-        self.columns_name_expected = ['ID', 'HMC_X', 'HMC_Y', 'LON', 'LAT',
-                                      'BASIN', 'SEC_NAME', 'SEC_RS', 'SEC_TAG', 'TYPE', 'AREA', 'Q_THR1', 'Q_THR2',
-                                      'ADMIN_B_L1', 'ADMIN_B_L2', 'ADMIN_B_L3']
+        if self.tag_file_fields_columns in list(src_dict[self.tag_src_data].keys()):
+            self.columns_name_expected = src_dict[self.tag_src_data][self.tag_file_fields_columns]
+        else:
+            self.columns_name_expected = [
+                'ID', 'HMC_X', 'HMC_Y', 'LON', 'LAT',
+                'BASIN', 'SEC_NAME', 'SEC_RS', 'SEC_TAG', 'TYPE', 'AREA', 'Q_THR1', 'Q_THR2',
+                'ADMIN_B_L1', 'ADMIN_B_L2', 'ADMIN_B_L3']
 
-        self.columns_name_type = [np.int, np.int, np.int, np.float, np.float,
-                                  str, str, np.int, str, str, np.float, np.float, np.float,
-                                  str, str, str]
+        if self.tag_file_fields_types in list(src_dict[self.tag_src_data].keys()):
+            columns_name_tmp = src_dict[self.tag_src_data][self.tag_file_fields_types]
+            self.columns_name_type = self.convert_name2type(columns_name_tmp)
+        else:
+            self.columns_name_type = [
+                np.int, np.int, np.int, np.float, np.float,
+                str, str, np.int, str, str, np.float, np.float, np.float,
+                str, str, str]
 
-        self.columns_name_tag = ['id', 'hmc_id_x', 'hmc_id_y', 'longitude', 'latitude',
-                                 'catchment', 'name', 'code', 'tag', 'type', 'area', 'discharge_thr1', 'discharge_thr2',
-                                 'boundary_limit_01', 'boundary_limit_02', 'boundary_limit_03']
+        if self.tag_file_fields_tags in list(src_dict[self.tag_src_data].keys()):
+            self.columns_name_tag = src_dict[self.tag_src_data][self.tag_file_fields_tags]
+        else:
+            self.columns_name_tag = [
+                'id', 'hmc_id_x', 'hmc_id_y', 'longitude', 'latitude',
+                'catchment', 'name', 'code', 'tag', 'type', 'area', 'discharge_thr1', 'discharge_thr2',
+                'boundary_limit_01', 'boundary_limit_02', 'boundary_limit_03']
+    # -------------------------------------------------------------------------------------
 
+    # -------------------------------------------------------------------------------------
+    # Method to convert name in type format
+    @staticmethod
+    def convert_name2type(columns_list_name):
+        columns_list_type = []
+        for field_name in columns_list_name:
+            if field_name == 'int':
+                columns_list_type.append(np.int)
+            elif field_name == 'float':
+                columns_list_type.append(np.float)
+            elif field_name == 'str':
+                columns_list_type.append(str)
+            else:
+                logging.error(' ===> Name "' + field_name + '" is not supported by known type')
+                raise NotImplementedError('Case not implemented yet')
+        return columns_list_type
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------

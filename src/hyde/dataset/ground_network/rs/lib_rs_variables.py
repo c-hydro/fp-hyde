@@ -60,6 +60,11 @@ def convert_values2points(data_collections, geo_collections,
 
             if row_geo[tag_code_section].values == row_data[tag_code_data].values:
                 df_data = row_data[tag_file_fields]
+
+                if df_data.index.size == 1:
+                    if np.isnan(df_data[tag_name_data].values[0]):
+                        df_data[tag_name_data] = no_data
+
                 logging.info(' --------> Get data for point: ' + tag_section + ' ... DONE')
             else:
                 logging.warning(' ===> Code of section and data is not equal. Init value with ' + str(missing_data))
