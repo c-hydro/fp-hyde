@@ -1,6 +1,9 @@
 {
   "ancillary": {
-    "tag_name_list": ["med_d09", "med_d10"]
+    "tag_name_list": 
+	["med_d01", "med_d02", "med_d03", "med_d04", "med_d05", "med_d06", "med_d07", "med_d08", "med_d09",
+ 	"med_d10", "med_d11", "med_d12", "med_d13", "med_d14", "med_d15", "med_d16", "med_d17", "med_d18", 
+	"med_d19", "med_d20", "med_d21", "med_d22", "med_d23", "med_d24", "med_d25"]
   },
   "template_string": {
     "tag_name": "tag_name_string"
@@ -44,19 +47,28 @@
     "time_rounding": "H"
   },
   "log": {
-  	"folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dte/log/",
-  	"file_name": "hyde_datatranfer_continuum.txt"
+  	"folder_name": "/home/dte/log/utils/",
+  	"file_name": "hmc_datatranfer_dte_log.txt"
   },
   "source": {
-    "datasets_med_{tag_name}_static": {
+     "datasets_med_{tag_name}_static": {
       "folder_name": "/share/idrologia/DTE_Evo/static_data/output/{tag_name}/",
+      "file_name": "",
+      "method": "rsync"
+    },
+    "datasets_med_{tag_name}_dynamic": {
+      "folder_name": "/share/idrologia/DTE_Evo/data/forcings/{tag_name}/ERA5/",
       "file_name": "",
       "method": "rsync"
     }
   },
   "destination": {
     "datasets_med_{tag_name}_static": {
-      "folder_name": "/home/fp/volume_source/{tag_name}/data_static/",
+      "folder_name": "/home/dte/volume_source/{tag_name}/data_static/",
+      "file_name": ""
+    },
+    "datasets_med_{tag_name}_dynamic": {
+      "folder_name": "/home/dte/volume_source/{tag_name}/data_dynamic/gridded/",
       "file_name": ""
     }
   }

@@ -2,22 +2,27 @@
 
 #-----------------------------------------------------------------------------------------
 # Script information
-script_name='HYDE TOOLS - TRANSFER DATASETS BY FTP - REALTIME'
+script_name='HYDE TOOLS - TRANSFER DATASETS - HISTORY'
 script_version="1.0.0"
 script_date='2021/11/18'
 
-virtualenv_folder='/hydro/library/fp_libs_python3/'
-virtualenv_name='virtualenv_python3'
-script_folder='/hydro/library/fp_package_hmc/'
+# Virtualenv default definition(s)
+virtualenv_folder='/home/dte/library/fp_system_env_conda/'
+virtualenv_name='fp_system_conda_python3_hmc_libraries'
+
+# Default script folder(s)
+script_folder='/home/dte/library/fp_package_hyde/tools/tool_processing_datasets_transfer/'
+configuration_folder='/home/dte/utils/'
+package_folder='/home/dte/library/fp_package_hyde/'
 
 # Execution example:
-# python3 hyde_tools_transfer_datasets_ftp.py -settings_algorithm configuration.json -time "2020-11-02 12:00"
+# python3 hyde_tools_transfer_datasets.py -settings_algorithm configuration.json -time "2020-11-02 12:00"
 #-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------
 # Get file information
-script_file='/hydro/library/fp_package_hyde/bin/utils/hyde_tools_transfer_datasets_ftp.py'
-settings_file='/hydro/fp_tools_system/hyde_tools_transfer_datasets_ftp_local2remote_hydrograph.json'
+script_file=${script_folder}'hyde_tools_transfer_datasets.py'
+settings_file=${configuration_folder}'hyde_tools_transfer_datasets_rsync_remote2local_hmc.json'
 
 # Get information (-u to get gmt time)
 time_now=$(date -u +"%Y-%m-%d %H:00")
@@ -30,6 +35,7 @@ source activate $virtualenv_name
 
 # Add path to pythonpath
 export PYTHONPATH="${PYTHONPATH}:$script_folder"
+export PYTHONPATH="${PYTHONPATH}:$package_folder"
 #-----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
