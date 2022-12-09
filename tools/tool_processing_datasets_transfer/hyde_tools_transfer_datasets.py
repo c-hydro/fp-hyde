@@ -3,8 +3,8 @@
 """
 HYDE PROCESSING TOOLS - File Transfer
 
-__date__ = '20211222'
-__version__ = '1.2.0'
+__date__ = '20221209'
+__version__ = '1.3.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'HyDE'
 
@@ -18,12 +18,14 @@ import logging
 import time
 import argparse
 import os
+import re
 import json
 import glob
 import subprocess
 
 import pandas as pd
 
+from datetime import date
 from copy import deepcopy
 
 # Logging
@@ -42,10 +44,10 @@ time_format_algorithm = '%y-%m-%d %H:%M'
 # -------------------------------------------------------------------------------------
 # Algorithm information
 project_name = 'HyDE'
-alg_name = 'File Transfer'
+alg_name = 'Datasets Transfer'
 alg_type = 'Processing Tool'
-alg_version = '1.2.0'
-alg_release = '2021-12-22'
+alg_version = '1.3.0'
+alg_release = '2022-12-09'
 # -------------------------------------------------------------------------------------
 
 
@@ -81,10 +83,18 @@ def main():
 
     # -------------------------------------------------------------------------------------
     # Info algorithm start
-    log_stream.info(' ---> Transfer file(s) by source to destination location(s) ... ')
+    log_stream.info(' ---> Transfer datasets from source to destination location(s) ... ')
+
+    # Configure ancillary information
+    if 'ancillary' in list(settings_data.keys()):
+        ancillary_raw = settings_data['ancillary']
+    else:
+        ancillary_raw['ancillary'] = {}
+        ancillary_raw['ancillary']['tag_name_list'] = ['datasets']
 
     # Configure template information
-    template_time_raw = settings_data['template']
+    template_time_raw = settings_data['template_time']
+    template_string_raw = settings_data['template_string']
 
     # Configure datasets information
     data_src_settings = settings_data['source']
@@ -118,213 +128,245 @@ def main():
         # Iterate over datasets
         for (dset_key, dset_fields_src), dset_fields_dst in zip(data_src_settings.items(), data_dst_settings.values()):
 
-            # Info dataset start
-            log_stream.info(' -----> Dataset "' + dset_key + '" ... ')
+            # Iterate over name list
+            for tag_value in ancillary_raw['tag_name_list']:
 
-            template_time_filled = {}
-            for time_key, time_format in template_time_raw.items():
-                template_time_filled[time_key] = time_step.strftime(time_format)
+                # Filled the structure with
+                dset_key_step = fill_object(data_structure_raw=dset_key,
+                                                     tag_name='tag_name', tag_value=tag_value)
 
-            # Transfer method
-            file_method_src = dset_fields_src[tag_method]
+                dset_fields_src_step = fill_object(data_structure_raw=dset_fields_src,
+                                                     tag_name='tag_name', tag_value=tag_value)
+                dset_fields_dst_step = fill_object(data_structure_raw=dset_fields_dst,
+                                                     tag_name='tag_name', tag_value=tag_value)
 
-            if file_method_src in list(data_src_methods.keys()):
-                method_mode = data_src_methods['mode']
-                method_info = data_src_methods[file_method_src]['settings']
-                method_command_ancillary = data_src_methods[file_method_src]['command_ancillary']
-                method_command_exec = data_src_methods[file_method_src]['command_exec']
-                method_command_line = data_src_methods[file_method_src]['command_line']
-            else:
-                log_stream.error(' ===> Method "' + file_method_src + ' is not defined in the settings file.')
-                raise IOError('Check your settings file and insert the method and its fields')
+                # Info dataset start
+                log_stream.info(' -----> Dataset "' + dset_key_step + '" ... ')
 
-            # File path source
-            folder_name_src_tmp = dset_fields_src[tag_folder_name]
-            file_name_src_tmp = dset_fields_src[tag_file_name]
-            file_path_src_tmp = os.path.join(folder_name_src_tmp, file_name_src_tmp)
-            file_path_src_def = file_path_src_tmp.format(**template_time_filled)
+                template_time_filled = {}
+                for time_key, time_format in template_time_raw.items():
+                    template_time_filled[time_key] = time_step.strftime(time_format)
 
-            if '*' in file_path_src_def:
-                file_list_src_def = glob.glob(file_path_src_def)
-            elif '*' not in file_path_src_def:
-                if isinstance(file_path_src_def, str):
-                    file_list_src_def = [file_path_src_def]
-                elif isinstance(file_path_src_def, list):
+                # Transfer method
+                file_method_src = dset_fields_src_step[tag_method]
+
+                if file_method_src in list(data_src_methods.keys()):
+                    method_mode = data_src_methods['mode']
+                    method_info = data_src_methods[file_method_src]['settings']
+                    method_command_ancillary = data_src_methods[file_method_src]['command_ancillary']
+                    method_command_exec = data_src_methods[file_method_src]['command_exec']
+                    method_command_line = data_src_methods[file_method_src]['command_line']
+                else:
+                    log_stream.error(' ===> Method "' + file_method_src + ' is not defined in the settings file.')
+                    raise IOError('Check your settings file and insert the method and its fields')
+
+                # File path source
+                folder_name_src_tmp = dset_fields_src_step[tag_folder_name]
+                file_name_src_tmp = dset_fields_src_step[tag_file_name]
+                file_path_src_tmp = os.path.join(folder_name_src_tmp, file_name_src_tmp)
+                file_path_src_def = file_path_src_tmp.format(**template_time_filled)
+
+                if '*' in file_path_src_def:
+                    file_list_src_def = glob.glob(file_path_src_def)
+                elif '*' not in file_path_src_def:
+                    if isinstance(file_path_src_def, str):
+                        file_list_src_def = [file_path_src_def]
+                    elif isinstance(file_path_src_def, list):
+                        file_list_src_def = deepcopy(file_path_src_def)
+                    else:
+                        log_stream.error(' ===> File format source is not in supported format')
+                        raise NotImplementedError('Case not implemented yet')
+                else:
                     file_list_src_def = deepcopy(file_path_src_def)
-                else:
-                    log_stream.error(' ===> File format source is not in supported format')
-                    raise NotImplementedError('Case not implemented yet')
-            else:
-                file_list_src_def = deepcopy(file_path_src_def)
 
-            # Check the list source file(s)
-            if file_list_src_def:
+                # Check the list source file(s)
+                if file_list_src_def:
 
-                # File path destination
-                folder_name_dst_tmp = dset_fields_dst[tag_folder_name]
-                file_name_dst_tmp = dset_fields_dst[tag_file_name]
+                    # File path destination
+                    folder_name_dst_tmp = dset_fields_dst_step[tag_folder_name]
+                    file_name_dst_tmp = dset_fields_dst_step[tag_file_name]
 
-                if ('*' in file_name_src_tmp) and ('*' not in file_name_dst_tmp):
-                    log_stream.warning(
-                        ' ===> Symbol "*" defined in the source file(s), but not in the destination file(s).')
-                    log_stream.warning(' ===> Destination file(s) are defined using the name of source file(s)')
-                    file_name_dst_tmp = None
+                    if ('*' in file_name_src_tmp) and ('*' not in file_name_dst_tmp):
+                        log_stream.warning(
+                            ' ===> Symbol "*" defined in the source file(s), but not in the destination file(s).')
+                        log_stream.warning(' ===> Destination file(s) are defined using the name of source file(s)')
+                        file_name_dst_tmp = None
 
-                if (file_name_dst_tmp is not None) and ('*' not in file_name_dst_tmp):
+                    if (file_name_dst_tmp is not None) and ('*' not in file_name_dst_tmp):
 
-                    file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_dst_tmp)
-                    file_path_dst_def = file_path_dst_tmp.format(**template_time_filled)
+                        file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_dst_tmp)
+                        file_path_dst_def = file_path_dst_tmp.format(**template_time_filled)
 
-                elif (file_name_dst_tmp is None) and ('*' in file_path_src_def):
+                    elif (file_name_dst_tmp is None) and ('*' in file_path_src_def):
 
-                    file_path_dst_def = []
-                    for file_path_src_tmp in file_list_src_def:
-                        folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
-                        file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
-                        file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
-                        file_path_dst_def.append(file_path_dst_filled)
+                        file_path_dst_def = []
+                        for file_path_src_tmp in file_list_src_def:
+                            folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
+                            file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
+                            file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
+                            file_path_dst_def.append(file_path_dst_filled)
 
-                elif (file_name_dst_tmp is not None) and ('*' in file_name_dst_tmp):
-                    file_path_dst_def = []
-                    for file_path_src_tmp in file_list_src_def:
-                        folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
-                        file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
-                        file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
-                        file_path_dst_def.append(file_path_dst_filled)
-
-                else:
-                    log_stream.error(' ===> File destination name is not defined')
-                    raise NotImplementedError('Case not implemented yet')
-
-                if isinstance(file_path_dst_def, str):
-                    file_list_dst_def = [file_path_dst_def]
-                elif isinstance(file_path_dst_def, list):
-                    file_list_dst_def = deepcopy(file_path_dst_def)
-                else:
-                    log_stream.error(' ===> File format source is not in supported format')
-                    raise NotImplementedError('Case not implemented yet')
-
-                # Cycles over source and destination file(s)
-                for file_path_src_step, file_path_dst_step in zip(file_list_src_def, file_list_dst_def):
-
-                    # Define folder and file name(s)
-                    folder_name_src_step, file_name_src_step = os.path.split(file_path_src_step)
-                    folder_name_dst_step, file_name_dst_step = os.path.split(file_path_dst_step)
-
-                    # Method settings
-                    file_info = {
-                        'folder_name_src': folder_name_src_step, 'file_name_src': file_name_src_step,
-                        'folder_name_dst': folder_name_dst_step, 'file_name_dst': file_name_dst_step}
-
-                    template_command_line = {**method_info, **file_info}
-
-                    method_cmd_create_folder = None
-                    if (method_mode == 'local2local') or (method_mode == 'remote2local'):
-                        make_folder(folder_name_dst_step)
-                    elif method_mode == 'local2remote':
-
-                        method_cmd_create_folder = None
-                        if 'create_folder' in list(method_command_ancillary.keys()):
-                            method_cmd_create_folder = method_command_ancillary['create_folder']
-                        if method_cmd_create_folder is None:
-                            log_stream.warning(' ===> Transfer mode "' + method_mode + ' needs to create remote folder.')
-                            log_stream.warning(' ===> Check if the command settings are able to create a remote folder.')
-                        else:
-                            method_cmd_create_folder = deepcopy(method_cmd_create_folder.format(**template_command_line))
-
-                        method_cmd_uncompress_file = None
-                        if 'uncompress_file' in list(method_command_ancillary.keys()):
-                            method_cmd_uncompress_file = method_command_ancillary['uncompress_file']
-                        if method_cmd_uncompress_file is None:
-                            log_stream.warning(' ===> Transfer mode "' + method_mode + ' will not uncompress file.')
-                            log_stream.warning(' ===> Check if the file must be compressed or not.')
-                        else:
-                            method_cmd_uncompress_file = deepcopy(method_cmd_uncompress_file.format(**template_command_line))
-
-                        method_cmd_find_file = None
-                        if 'find_file' in list(method_command_ancillary.keys()):
-                            method_cmd_find_file = method_command_ancillary['find_file']
-                        if method_cmd_find_file is None:
-                            log_stream.warning(' ===> Transfer mode "' + method_mode + ' will not uncompress file.')
-                            log_stream.warning(' ===> Check if the file must be compressed or not.')
-                        else:
-                            method_cmd_find_file = deepcopy(method_cmd_find_file.format(**template_command_line))
-
-                        method_cmd_remove_file = None
-                        if 'remove_file' in list(method_command_ancillary.keys()):
-                            method_cmd_remove_file = method_command_ancillary['remove_file']
-                        if method_cmd_remove_file is None:
-                            log_stream.warning(' ===> Transfer mode "' + method_mode + ' will not uncompress file.')
-                            log_stream.warning(' ===> Check if the file must be compressed or not.')
-                        else:
-                            method_cmd_remove_file = deepcopy(method_cmd_remove_file.format(**template_command_line))
+                    elif (file_name_dst_tmp is not None) and ('*' in file_name_dst_tmp):
+                        file_path_dst_def = []
+                        for file_path_src_tmp in file_list_src_def:
+                            folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
+                            file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
+                            file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
+                            file_path_dst_def.append(file_path_dst_filled)
 
                     else:
-                        log_stream.error(' ===> Transfer mode "' + method_mode + '" is unknown')
+                        log_stream.error(' ===> File destination name is not defined')
                         raise NotImplementedError('Case not implemented yet')
 
-                    method_cmd_transfer_exec = deepcopy(method_command_exec.format(**template_command_line))
-                    method_cmd_transfer_command = method_command_line.format(**template_command_line)
-
-                    if file_method_src == 'ftp':
-                        method_cmd_transfer = method_cmd_transfer_exec + ' "' + method_cmd_transfer_command + '"'
-                    elif file_method_src == 'rsync':
-                        method_cmd_transfer = method_cmd_transfer_exec + ' ' + method_cmd_transfer_command
+                    if isinstance(file_path_dst_def, str):
+                        file_list_dst_def = [file_path_dst_def]
+                    elif isinstance(file_path_dst_def, list):
+                        file_list_dst_def = deepcopy(file_path_dst_def)
                     else:
-                        method_cmd_transfer = method_cmd_transfer_exec + ' ' + method_cmd_transfer_command
+                        log_stream.error(' ===> File format source is not in supported format')
+                        raise NotImplementedError('Case not implemented yet')
 
-                    # Transfer file from local to remote
-                    log_stream.info(' ------> Transfer source file "' + file_name_src_step + '" to destination file "' +
-                                 file_name_dst_step + '" ... ')
+                    # Cycles over source and destination file(s)
+                    for file_path_src_step, file_path_dst_step in zip(file_list_src_def, file_list_dst_def):
 
-                    if os.path.exists(file_path_src_step):
+                        # Define folder and file name(s)
+                        folder_name_src_step, file_name_src_step = os.path.split(file_path_src_step)
+                        folder_name_dst_step, file_name_dst_step = os.path.split(file_path_dst_step)
 
-                        if method_cmd_create_folder is not None:
-                            execute_command(method_cmd_create_folder,
-                                            command_type='Create remote folder')
+                        # Method settings
+                        file_info = {
+                            'folder_name_src': folder_name_src_step, 'file_name_src': file_name_src_step,
+                            'folder_name_dst': folder_name_dst_step, 'file_name_dst': file_name_dst_step}
 
-                        execute_command(method_cmd_transfer,
-                                        command_type='Transfer source file "' +
-                                                     file_name_src_step + '" to destination file "' +
-                                                     file_name_dst_step + '"')
+                        template_command_line = {**method_info, **file_info}
 
-                        if method_cmd_uncompress_file is not None:
-                            execute_command(method_cmd_uncompress_file,
-                                            command_type='Extract compressed destination file "' + file_name_dst_step + '"')
+                        method_cmd_create_folder, method_cmd_uncompress_file = None, None
+                        method_cmd_find_file, method_cmd_remove_file = None, None
+                        if (method_mode == 'local2local') or (method_mode == 'remote2local'):
+                            make_folder(folder_name_dst_step)
+                        elif method_mode == 'local2remote':
 
-                        if method_cmd_remove_file is not None:
+                            if 'create_folder' in list(method_command_ancillary.keys()):
+                                method_cmd_create_folder = method_command_ancillary['create_folder']
+                            if method_cmd_create_folder is None:
+                                log_stream.warning(' ===> Transfer mode "' + method_mode + ' needs to create remote folder.')
+                                log_stream.warning(' ===> Check if the command settings are able to create a remote folder.')
+                            else:
+                                method_cmd_create_folder = deepcopy(method_cmd_create_folder.format(**template_command_line))
 
-                            command_find_file_code = execute_command(
-                                method_cmd_find_file,
-                                command_type='Find compressed destination file "' + file_name_dst_step + '"')
+                            if 'uncompress_file' in list(method_command_ancillary.keys()):
+                                method_cmd_uncompress_file = method_command_ancillary['uncompress_file']
+                            if method_cmd_uncompress_file is None:
+                                log_stream.warning(' ===> Transfer mode "' + method_mode + ' will not uncompress file.')
+                                log_stream.warning(' ===> Check if the file must be compressed or not.')
+                            else:
+                                method_cmd_uncompress_file = deepcopy(method_cmd_uncompress_file.format(**template_command_line))
 
-                            if command_find_file_code:
-                                execute_command(
-                                    method_cmd_remove_file,
-                                    command_type='Remove compressed destination file "' + file_name_dst_step + '"')
+                            if 'find_file' in list(method_command_ancillary.keys()):
+                                method_cmd_find_file = method_command_ancillary['find_file']
+                            if method_cmd_find_file is None:
+                                log_stream.warning(' ===> Transfer mode "' + method_mode + ' will not uncompress file.')
+                                log_stream.warning(' ===> Check if the file must be compressed or not.')
+                            else:
+                                method_cmd_find_file = deepcopy(method_cmd_find_file.format(**template_command_line))
+
+                            if 'remove_file' in list(method_command_ancillary.keys()):
+                                method_cmd_remove_file = method_command_ancillary['remove_file']
+                            if method_cmd_remove_file is None:
+                                log_stream.warning(' ===> Transfer mode "' + method_mode + ' will not uncompress file.')
+                                log_stream.warning(' ===> Check if the file must be compressed or not.')
+                            else:
+                                method_cmd_remove_file = deepcopy(method_cmd_remove_file.format(**template_command_line))
+
+                        else:
+                            log_stream.error(' ===> Transfer mode "' + method_mode + '" is unknown')
+                            raise NotImplementedError('Case not implemented yet')
+
+                        method_cmd_transfer_exec = deepcopy(method_command_exec.format(**template_command_line))
+                        method_cmd_transfer_command = method_command_line.format(**template_command_line)
+
+                        if file_method_src == 'ftp':
+                            method_cmd_transfer = method_cmd_transfer_exec + ' "' + method_cmd_transfer_command + '"'
+                        elif file_method_src == 'rsync':
+                            method_cmd_transfer = method_cmd_transfer_exec + ' ' + method_cmd_transfer_command
+                        else:
+                            method_cmd_transfer = method_cmd_transfer_exec + ' ' + method_cmd_transfer_command
 
                         # Transfer file from local to remote
                         log_stream.info(
-                            ' ------> Transfer source file "' + file_name_src_step + '" to destination file "' +
-                            file_name_dst_step + '" ... DONE')
+                            adjust_comment(' ------> Transfer source datasets "' + file_name_src_step +
+                                           '" to destination datasets "' + file_name_dst_step + '" ... '))
 
-                    else:
-                        log_stream.info(' ------> Transfer source file "' + file_name_src_step + '" to destination file "' +
-                                     file_name_dst_step + '" ... SKIPPED. File source does not exists. ')
+                        # Check datasets source
+                        if (method_mode == 'local2local') or (method_mode == 'local2remote'):
+                            if os.path.exists(file_path_src_step):
+                                check_dataset_source = True
+                            else:
+                                check_dataset_source = False
+                        elif method_mode == 'remote2local':
+                            check_dataset_source = True
+                        else:
+                            log_stream.error(' ===> Transfer mode "' + method_mode + '" is unknown')
+                            raise NotImplementedError('Case not implemented yet')
 
-                # Info dataset end (done)
-                log_stream.info(' -----> Dataset "' + dset_key + '" ... DONE')
+                        # Condition to transfer datasets
+                        if check_dataset_source:
 
-            else:
-                # Info dataset end (skipped)
-                log_stream.info(' -----> Dataset "' + dset_key + '" ... SKIPPED. File(s) source not found')
+                            # Execute command to create remote folder
+                            if method_cmd_create_folder is not None:
+                                execute_command(
+                                    method_cmd_create_folder, command_prefix=' -------> ',
+                                    command_type='Create remote folder')
+
+                            # Execute command to transfer datasets
+                            execute_command(
+                                method_cmd_transfer, command_prefix=' -------> ',
+                                command_type='Transfer source datasets "' +
+                                             file_name_src_step + '" to destination datasets "' +
+                                             file_name_dst_step + '"')
+
+                            # Execute command to uncompress datasets
+                            if method_cmd_uncompress_file is not None:
+                                execute_command(
+                                    method_cmd_uncompress_file, command_prefix=' -------> ',
+                                    command_type='Extract compressed destination datasets "' + file_name_dst_step + '"')
+
+                            # Execute command to remove datasets
+                            if method_cmd_remove_file is not None:
+
+                                command_find_file_code = execute_command(
+                                    method_cmd_find_file, command_prefix=' -------> ',
+                                    command_type='Find compressed destination datasets "' + file_name_dst_step + '"')
+
+                                if command_find_file_code:
+                                    execute_command(
+                                        method_cmd_remove_file, command_prefix=' -------> ',
+                                        command_type='Remove compressed destination datasets "' + file_name_dst_step + '"')
+
+                            # Transfer datasets from local to remote
+                            log_stream.info(
+                                adjust_comment(' ------> Transfer source datasets "' + file_name_src_step +
+                                               '" to destination datasets "' + file_name_dst_step + '" ... DONE'))
+
+                        else:
+                            log_stream.info(
+                                adjust_comment(' ------> Transfer source datasets "' + file_name_src_step +
+                                            '" to destination datasets "' + file_name_dst_step + '" ... SKIPPED. '
+                                            'File source does not exists.'))
+
+                    # Info dataset end (done)
+                    log_stream.info(' -----> Dataset "' + dset_key_step + '" ... DONE')
+
+                else:
+                    # Info dataset end (skipped)
+                    log_stream.info(' -----> Dataset "' + dset_key_step + '" ... SKIPPED. File(s) source not found')
 
         # Info time end
         log_stream.info(' ----> Time "' + time_step.strftime(format=time_format_algorithm) + '" ... DONE')
         # -------------------------------------------------------------------------------------
 
     # # Info algorithm end
-    log_stream.info(' ---> Transfer file from source to destination location(s) ... DONE')
+    log_stream.info(' ---> Transfer datasets from source to destination location(s) ... DONE')
     # -------------------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------------------
@@ -345,27 +387,49 @@ def main():
 
 # -------------------------------------------------------------------------------------
 # Method to execute command line
-def execute_command(command_line, command_type='Execute command'):
+def execute_command(command_line, command_prefix=' ---> ', command_type='Execute command',
+                    command_st_out=subprocess.DEVNULL, command_st_err=subprocess.DEVNULL):
 
     # Info start
-    log_stream.info(' ---> ' + command_type + ' ... ')
+    log_stream.info(command_prefix + adjust_comment(command_type) + ' ... ')
 
     # call command line
+    log_stream.info(command_prefix + 'Execute: "' + command_line + '"')
     command_code = subprocess.call(
         command_line, shell=True,
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        stdout=command_st_out, stderr=command_st_err)
 
     # method_return_code = os.system(method_cmd) # old code
     if command_code == 0:
-        log_stream.info(' ---> ' + command_type + ' ... DONE')
+        log_stream.info(command_prefix + adjust_comment(command_type) + ' ... DONE')
         return True
     else:
         log_stream.warning(' ===> Execution return with non-zero code for the submitted command line.')
-        log_stream.info(' ---> ' + command_type + ' ... SKIPPED. ')
+        log_stream.info(command_prefix + adjust_comment(command_type) + ' ... SKIPPED. ')
         return False
 
 # -------------------------------------------------------------------------------------
 
+
+# -------------------------------------------------------------------------------------
+# Method to fill object
+def fill_object(data_structure_raw, tag_name='tag_name', tag_value='datasets'):
+
+    tag_dict = {tag_name: tag_value}
+
+    if isinstance(data_structure_raw, str):
+        data_structure_filled = deepcopy(data_structure_raw.format(**tag_dict))
+    elif isinstance(data_structure_raw, dict):
+        data_structure_filled = {}
+        for data_key_raw, data_value_raw in data_structure_raw.items():
+            data_key_filled = data_key_raw.format(**tag_dict)
+            data_value_filled = data_value_raw.format(**tag_dict)
+            data_structure_filled[data_key_filled] = data_value_filled
+    else:
+        log_stream.error(' ===> Object is not supported by the filling method')
+        raise NotImplementedError('Case not implemented yet')
+
+    return data_structure_filled
 
 # -------------------------------------------------------------------------------------
 # Method to make folder
@@ -381,6 +445,14 @@ def read_file_settings(file_name):
     with open(file_name) as file_handle:
         file_data = json.load(file_handle)
     return file_data
+# -------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------
+# Method to adjust string comment
+def adjust_comment(string_comment):
+    string_comment = string_comment.replace('""','')
+    string_comment = re.sub("\s\s+", " ", string_comment)
+    return string_comment
 # -------------------------------------------------------------------------------------
 
 
@@ -412,7 +484,7 @@ def set_log(logger_name='hyde_tools_transfer_datasets', logger_file_name="hyde_t
 
 # -------------------------------------------------------------------------------------
 # Method to set time run
-def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:$M',
+def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:%M',
              time_run_file_start=None, time_run_file_end=None,
              time_period=1, time_frequency='H', time_rounding='H', time_reverse=True):
 
@@ -443,7 +515,7 @@ def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:$M
             time_range = pd.date_range(end=time_run, periods=time_period, freq=time_frequency)
         else:
             log_stream.warning(' ===> TimePeriod must be greater then 0. TimePeriod is set automatically to 1')
-            time_range = pd.DatetimeIndex([time_now], freq=time_frequency)
+            time_range = pd.DatetimeIndex([time_run], freq=time_frequency)
 
         log_stream.info(' -----> Time info defined by "time_run" argument ... DONE')
 

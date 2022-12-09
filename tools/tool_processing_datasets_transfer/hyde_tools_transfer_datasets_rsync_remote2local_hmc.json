@@ -1,0 +1,63 @@
+{
+  "ancillary": {
+    "tag_name_list": ["med_d09", "med_d10"]
+  },
+  "template_string": {
+    "tag_name": "tag_name_string"
+  },
+  "template_time": {
+    "dset_datetime_src": "%y%j%H",
+    "dset_sub_path_src": "%Y/%m/%d/%H",
+    "dset_datetime_dst": "%Y%m%d%H%",
+    "dset_sub_path_dst": "%Y%m%d"
+  },
+  "method": {
+    "__comment__": "mode: [local2remote, remote2local, local2local]",
+    "mode": "remote2local",
+    "ftp": {
+      "settings": {
+        "machine_host": "",
+        "machine_user": "",
+        "machine_pwd": "",
+        "machine_folder": ""
+      },
+      "command_ancillary": "",
+      "command_exec": "",
+      "command_line": ""
+    },
+    "rsync": {
+      "settings": {
+      	"machine_host": "130.251.104.64",
+        "machine_user": "idrologia"
+      },
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "rsync -avr --progress",
+      "command_line": "{machine_user}@{machine_host}:{folder_name_src}/{file_name_src} {folder_name_dst}/{file_name_dst}"
+    }
+  },
+  "time": {
+    "time_run": "2021-12-31 23:00",
+    "time_start": null,
+    "time_end": null,
+    "time_period": 0,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "log": {
+  	"folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/dte/log/",
+  	"file_name": "hyde_datatranfer_continuum.txt"
+  },
+  "source": {
+    "datasets_med_{tag_name}_static": {
+      "folder_name": "/share/idrologia/DTE_Evo/static_data/output/{tag_name}/",
+      "file_name": "",
+      "method": "rsync"
+    }
+  },
+  "destination": {
+    "datasets_med_{tag_name}_static": {
+      "folder_name": "/home/fp/volume_source/{tag_name}/data_static/",
+      "file_name": ""
+    }
+  }
+}

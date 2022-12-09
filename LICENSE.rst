@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2020, CIMA Research Foundation, Department of Hydrology and Hydraulics
+Copyright (c) 2022, CIMA Research Foundation, Department of Hydrology and Hydraulics
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
