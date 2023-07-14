@@ -12,6 +12,7 @@ import logging
 import inspect
 
 import numpy as np
+import pandas as pd
 
 from copy import deepcopy
 
@@ -66,7 +67,7 @@ class DriverVariable:
             self.ref_cellsize_x, self.ref_cellsize_y, self.ref_nodata = self.get_ref_attributes()
 
         self.fx_nodata, self.fx_interp_name, self.fx_interp_radius_x, self.fx_interp_radius_y, \
-            self.fx_regression_radius_influence, self.fx_cpu = self.get_fx_attributes()
+            self.fx_regression_radius_influence, self.fx_cpu, self.fx_idw_coeff = self.get_fx_attributes()
         self.fx_obj = self.get_fx_method()
 
     # -------------------------------------------------------------------------------------
@@ -98,11 +99,25 @@ class DriverVariable:
 
         if self.var_valid_range is not None:
             if self.var_valid_range[0] is not None:
-                var_dframe = var_dframe[var_dframe[self.tag_var_ws_data] >= self.var_valid_range[0]]
+                try:
+                    var_dframe = var_dframe[var_dframe[self.tag_var_ws_data] >= self.var_valid_range[0]]
+                except KeyError:
+                    if var_dframe[self.tag_var_ws_data] >= self.var_valid_range[0]:
+                        pass
+                    else:
+                        var_dframe = []
             if self.var_valid_range[1] is not None:
-                var_dframe = var_dframe[var_dframe[self.tag_var_ws_data] <= self.var_valid_range[1]]
+                try:
+                    var_dframe = var_dframe[var_dframe[self.tag_var_ws_data] <= self.var_valid_range[1]]
+                except KeyError:
+                    if var_dframe[self.tag_var_ws_data] >= self.var_valid_range[0]:
+                        pass
+                    else:
+                        var_dframe = []
         else:
             logging.warning(' ===> Skipping data filtering due to an undefined valid range attribute')
+        if isinstance(var_dframe, pd.Series):
+            var_dframe = var_dframe.to_frame().T
         var_dframe = var_dframe.dropna()
         return var_dframe
 
@@ -202,8 +217,11 @@ class DriverVariable:
         fx_cpu = 1
         if 'cpu' in list(self.fx_parameters.keys()):
             fx_cpu = self.fx_parameters['cpu']
+        fx_idw_coeff = None
+        if 'idw_coeff' in list(self.fx_parameters.keys()):
+            fx_idw_coeff = self.fx_parameters['idw_coeff']
 
-        return fx_nodata, fx_interp_name, fx_interp_radius_x, fx_interp_radius_y, fx_regression_radius_influence, fx_cpu
+        return fx_nodata, fx_interp_name, fx_interp_radius_x, fx_interp_radius_y, fx_regression_radius_influence, fx_cpu, fx_idw_coeff
 
     # -------------------------------------------------------------------------------------
 
@@ -264,6 +282,7 @@ class DriverVariable:
                        'var_missing_value': self.var_missing_value, 'var_fill_value': self.var_fill_value,
                        'fx_nodata': self.fx_nodata, 'fx_interp_name': self.fx_interp_name,
                        'fx_interp_radius_x': self.fx_interp_radius_x, 'fx_interp_radius_y': self.fx_interp_radius_y,
+                       'fx_idw_coeff': self.fx_idw_coeff,
                        'fx_regression_radius_influence': self.fx_regression_radius_influence,
                        'ref_geo_x': ref_obj[self.tag_ref_geo_x].values,
                        'ref_geo_y': ref_obj[self.tag_ref_geo_y].values,

@@ -27,7 +27,7 @@ from src.hyde.algorithm.utils.ground_network.lib_ws_process import exec_process
 # -------------------------------------------------------------------------------------
 # Method to interpolate point data to grid
 def interp_point2grid(data_in_1d, geox_in_1d, geoy_in_1d, geox_out_2d, geoy_out_2d, epsg_code='4326',
-                      interp_no_data=-9999.0, interp_radius_x=None, interp_radius_y=None,
+                      interp_no_data=-9999.0, interp_radius_x=None, interp_radius_y=None, idwCoeff=None,
                       interp_method='nearest', interp_option=None,
                       folder_tmp=None, var_name_data='values', var_name_geox='x', var_name_geoy='y',
                       n_cpu=1):
@@ -72,6 +72,10 @@ def interp_point2grid(data_in_1d, geox_in_1d, geoy_in_1d, geox_out_2d, geoy_out_
     # Create vrt file
     create_point_vrt(file_name_vrt, file_name_csv, var_name_layer, var_name_data, var_name_geox, var_name_geoy)
 
+    if idwCoeff is None:
+        logging.warning("WARNING! IDW Coefficient has not been set! It is considered equal to 2!")
+        idwCoeff = 2
+
     # Grid option(s)
     if interp_method == 'nearest':
         if interp_option is None:
@@ -79,7 +83,7 @@ def interp_point2grid(data_in_1d, geox_in_1d, geoy_in_1d, geox_out_2d, geoy_out_
                              str(interp_radius_y) + ':angle=0.0:nodata=' + str(interp_no_data))
     elif interp_method == 'idw':
         if interp_option is None:
-            interp_option = ('-a invdist:power=2.0:smoothing=0.0:radius1=' + str(interp_radius_x) + ':radius2=' +
+            interp_option = ('-a invdist:power=' + str(idwCoeff) + ':smoothing=0.0:radius1=' + str(interp_radius_x) + ':radius2=' +
                              str(interp_radius_y) + ':angle=0.0:nodata=' + str(interp_no_data))
     else:
         interp_option = None

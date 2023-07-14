@@ -81,7 +81,12 @@ def read_file_raster(file_name, file_proj='epsg:4326', var_name='land',
 
                 #Get ancillary info
                 crs = dset.crs
-                proj = dset.crs.wkt
+                if crs is None:
+                    from rasterio.crs import CRS
+                    logging.warning(" --> WARNING! Source file has no crs set! Set it to EPGS:4326!")
+                    crs = CRS.from_epsg(4326)
+
+                proj = crs.wkt
                 bounds = rasterio.transform.array_bounds(data.shape[-2], data.shape[-1], transform)
                 bounds = rasterio.coords.BoundingBox(bounds[0], bounds[1], bounds[2], bounds[3])
                 no_data = dset.nodata

@@ -10,6 +10,8 @@ General command line:
 python3 HYDE_DynamicData_GroundNetwork_WS.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version:
+20230712 (3.0.1) --> Add possibility of choose idw coefficient
+                     Add support to AIIGrid input raster
 20201102 (3.0.0) --> Update code(s) for RegioneMarche operational chain
 20200625 (2.5.1) --> Update code(s) for LEXIS project
 20180914 (2.5.0) --> Beta release for HyDE library
