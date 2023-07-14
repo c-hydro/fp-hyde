@@ -33,20 +33,22 @@
           "source_folder": "/share/fp/fp_volta/data/data_dynamic/outcome/obs/imerg/early/{source_sub_path_time}",
           "source_filename": "volta_imerg_{source_datetime}_mm_30min.tif",
           "destination_folder": "/share/fp/fp_volta/data/data_dynamic/outcome/obs/imerg/early_1h/{destination_sub_path_time}",
-          "destination_filename": "volta_imerg_{destination_datetime}_mm_1h.tif"
+          "destination_filename": "volta_imerg_{destination_datetime}_mm_1h.tif",
+          "correction_map_filename": "/home/fp/share/fp_volta/data/data_static/volta/meteo/imerg/corr_2022_chirps.tif"
         },
         "imerg_late": {
           "source_folder": "/share/fp/fp_volta/data/data_dynamic/outcome/obs/imerg/late/{source_sub_path_time}",
           "source_filename": "volta_imerg_{source_datetime}_mm_30min.tif",
           "destination_folder": "/share/fp/fp_volta/data/data_dynamic/outcome/obs/imerg/late_1h/{destination_sub_path_time}",
-          "destination_filename": "volta_imerg_{destination_datetime}_mm_1h.tif"
+          "destination_filename": "volta_imerg_{destination_datetime}_mm_1h.tif",
+          "correction_map_filename": "/home/fp/share/fp_volta/data/data_static/volta/meteo/imerg/corr_2022_chirps.tif"
         }
       }
-    },
-    "log": {
-      "folder_name": "/share/fp/fp_volta/log/preprocessing/",
-      "file_name": "hyde_preprocessing_cumulate_imerg.txt"
     }
+  },
+  "log": {
+    "folder_name": "/share/fp/fp_volta/log/preprocessing/",
+    "file_name": "hyde_preprocessing_cumulate_imerg.txt"
   }
 }
 

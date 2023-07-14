@@ -31,7 +31,7 @@ def compute_rain(var_data, var_geo_x, var_geo_y,
                  ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
                  var_units='mm', var_missing_value=-9999.0, var_fill_value=-9999.0,
                  fx_nodata=-9999.0, fx_interp_name='idw',
-                 fx_interp_radius_x=None, fx_interp_radius_y=None,
+                 fx_interp_radius_x=None, fx_interp_radius_y=None, fx_idw_coeff=None,
                  fx_cpu=1):
 
     if var_units is None:
@@ -58,7 +58,7 @@ def compute_rain(var_data, var_geo_x, var_geo_y,
     grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
                                   interp_no_data=fx_nodata, interp_method=fx_interp_name,
                                   interp_radius_x=fx_interp_radius_x,
-                                  interp_radius_y=fx_interp_radius_y, n_cpu=fx_cpu)
+                                  interp_radius_y=fx_interp_radius_y, idwCoeff=fx_idw_coeff, n_cpu=fx_cpu)
 
     # Filter data nan and over domain
     grid_data[np.isnan(grid_data)] = var_missing_value
@@ -75,7 +75,7 @@ def compute_air_temperature(var_data, var_geo_x, var_geo_y, var_geo_z,
                             ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
                             var_units='C', var_missing_value=-9999.0, var_fill_value=-9999.0,
                             fx_nodata=-9999.0, fx_interp_name='idw',
-                            fx_interp_radius_x=None, fx_interp_radius_y=None,
+                            fx_interp_radius_x=None, fx_interp_radius_y=None, fx_idw_coeff=None,
                             fx_cpu=1):
 
     if var_units is None:
@@ -119,7 +119,7 @@ def compute_air_temperature(var_data, var_geo_x, var_geo_y, var_geo_z,
                                       epsg_code=ref_epsg,
                                       interp_no_data=fx_nodata, interp_method=fx_interp_name,
                                       interp_radius_x=fx_interp_radius_x,
-                                      interp_radius_y=fx_interp_radius_y, n_cpu=fx_cpu)
+                                      interp_radius_y=fx_interp_radius_y, idwCoeff=fx_idw_coeff, n_cpu=fx_cpu)
 
     # Interpolate polynomial parameters on z map
     grid_poly_z = np.polyval(var_poly_parameters, ref_geo_z)
@@ -149,7 +149,7 @@ def compute_wind_speed(var_data, var_geo_x, var_geo_y,
                        ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
                        var_units='m s-1', var_missing_value=-9999.0, var_fill_value=-9999.0,
                        fx_nodata=-9999.0, fx_interp_name='idw',
-                       fx_interp_radius_x=None, fx_interp_radius_y=None,
+                       fx_interp_radius_x=None, fx_interp_radius_y=None, fx_idw_coeff=None,
                        fx_cpu=1):
 
     if var_units is None:
@@ -176,7 +176,7 @@ def compute_wind_speed(var_data, var_geo_x, var_geo_y,
     grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
                                   interp_no_data=fx_nodata, interp_method=fx_interp_name,
                                   interp_radius_x=fx_interp_radius_x,
-                                  interp_radius_y=fx_interp_radius_y, n_cpu=fx_cpu)
+                                  interp_radius_y=fx_interp_radius_y, idwCoeff=fx_idw_coeff, n_cpu=fx_cpu)
 
     # Filter data nan and over domain
     grid_data[np.isnan(grid_data)] = var_missing_value
@@ -200,7 +200,7 @@ def compute_incoming_radiation(var_data, var_geo_x, var_geo_y,
                                ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
                                var_units='W m-2', var_missing_value=-9999.0, var_fill_value=-9999.0,
                                fx_nodata=-9999.0, fx_interp_name='idw',
-                               fx_interp_radius_x=None, fx_interp_radius_y=None,
+                               fx_interp_radius_x=None, fx_interp_radius_y=None, fx_idw_coeff=None,
                                fx_cpu=1):
 
     if var_units is None:
@@ -227,7 +227,7 @@ def compute_incoming_radiation(var_data, var_geo_x, var_geo_y,
     grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
                                   interp_no_data=fx_nodata, interp_method=fx_interp_name,
                                   interp_radius_x=fx_interp_radius_x,
-                                  interp_radius_y=fx_interp_radius_y, n_cpu=fx_cpu)
+                                  interp_radius_y=fx_interp_radius_y, idwCoeff=fx_idw_coeff, n_cpu=fx_cpu)
 
     # Filter data nan and over domain
     grid_data[np.isnan(grid_data)] = var_missing_value
@@ -251,7 +251,7 @@ def compute_relative_humidity(var_data, var_geo_x, var_geo_y,
                               ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
                               var_units='%', var_missing_value=-9999.0, var_fill_value=-9999.0,
                               fx_nodata=-9999.0, fx_interp_name='idw',
-                              fx_interp_radius_x=None, fx_interp_radius_y=None,
+                              fx_interp_radius_x=None, fx_interp_radius_y=None, fx_idw_coeff=None,
                               fx_cpu=1):
 
     if var_units is None:
@@ -278,7 +278,7 @@ def compute_relative_humidity(var_data, var_geo_x, var_geo_y,
     grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
                                   interp_no_data=fx_nodata, interp_method=fx_interp_name,
                                   interp_radius_x=fx_interp_radius_x,
-                                  interp_radius_y=fx_interp_radius_y, n_cpu=fx_cpu)
+                                  interp_radius_y=fx_interp_radius_y, idwCoeff=fx_idw_coeff, n_cpu=fx_cpu)
 
     # Filter data nan and over domain
     grid_data[np.isnan(grid_data)] = var_missing_value
@@ -302,7 +302,7 @@ def compute_air_pressure(var_data, var_geo_x, var_geo_y,
                          ref_geo_x, ref_geo_y, ref_geo_z, ref_epsg='4326', ref_no_data=-9999.0,
                          var_units='hPa', var_missing_value=-9999.0, var_fill_value=-9999.0,
                          fx_nodata=-9999.0, fx_interp_name='idw',
-                         fx_interp_radius_x=None, fx_interp_radius_y=None,
+                         fx_interp_radius_x=None, fx_interp_radius_y=None, fx_idw_coeff=None,
                          fx_cpu=1):
 
     if var_units is None:
@@ -329,7 +329,7 @@ def compute_air_pressure(var_data, var_geo_x, var_geo_y,
     grid_data = interp_point2grid(var_data, var_geo_x, var_geo_y, grid_geo_x, grid_geo_y, epsg_code=ref_epsg,
                                   interp_no_data=fx_nodata, interp_method=fx_interp_name,
                                   interp_radius_x=fx_interp_radius_x,
-                                  interp_radius_y=fx_interp_radius_y, n_cpu=fx_cpu)
+                                  interp_radius_y=fx_interp_radius_y, idwCoeff=fx_idw_coeff, n_cpu=fx_cpu)
 
     # Filter data nan and over domain
     grid_data[np.isnan(grid_data)] = var_missing_value

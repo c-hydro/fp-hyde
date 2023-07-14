@@ -76,6 +76,14 @@ def main():
         for prod in data_settings['data']['dynamic']['products'].keys():
             logging.info(' ---> Compute product: ' + prod)
 
+            if data_settings['data']['dynamic']['products'][prod]['correction_map_filename'] is not None:
+                logging.info(" --> Load data correction map!")
+                correction_map = xr.open_rasterio(data_settings['data']['dynamic']['products'][prod]['correction_map_filename'])
+                apply_correction = True
+            else:
+                logging.info(" --> No correction to data applied!")
+                apply_correction = False
+
             file_in_time_step = os.path.join(data_settings['data']['dynamic']['products'][prod]['source_folder'],
                                               data_settings['data']['dynamic']['products'][prod]['source_filename']).format(**template_time_step)
             file_out_time_step = os.path.join(data_settings['data']['dynamic']['products'][prod]['destination_folder'],
@@ -95,7 +103,10 @@ def main():
                                                      'source_filename']).format(**template_prev_time_step)
                 if os.path.isfile(file_in_prev_time_step):
                     logging.info(' ----> All necessary file for the time step are available!')
-                    rain_now_mm_h = xr.open_rasterio(file_in_time_step) + xr.open_rasterio(file_in_prev_time_step)
+                    if apply_correction is True:
+                        rain_now_mm_h = (xr.open_rasterio(file_in_time_step) + xr.open_rasterio(file_in_prev_time_step)) * correction_map.reindex_like(xr.open_rasterio(file_in_time_step), method="nearest")
+                    else:
+                        rain_now_mm_h = (xr.open_rasterio(file_in_time_step) + xr.open_rasterio(file_in_prev_time_step))
                 else:
                     logging.warning(' ----> WARNING! Previous time step is not available!')
                     continue
@@ -105,6 +116,7 @@ def main():
 
             os.makedirs(os.path.dirname(file_out_time_step), exist_ok=True)
             rain_now_mm_h.rio.to_raster(file_out_time_step, compress="DEFLATE")
+            logging.info(' ----> Save output...DONE!')
 
     # -------------------------------------------------------------------------------------
     # Info algorithm
