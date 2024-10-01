@@ -1,0 +1,64 @@
+{
+  "template": {
+    "dset_datetime_src": "%y%j%H",
+    "dset_sub_path_src": "%Y/%m/%d/%H",
+    "dset_datetime_dst": "%Y%m%d%H%M",
+    "dset_sub_path_dst": "%Y%m%d"
+  },
+  "method": {
+    "__comment__": "mode: [local2remote, remote2local, local2local]",
+    "mode": "local2local",
+    "ftp": {
+      "settings": {
+        "machine_host": "10.6.2.232",
+        "machine_user": "utenteprotciv",
+        "machine_pwd": "prot07civ",
+        "machine_folder": "/ProtCivFTP/CNR-ISMAR/"
+      },
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "lftp -c",
+      "command_line": "open ftp://{nachine_user}:{machine_pwd}@{ftp_host}; cd {machine_folder}; mkdir -fp {machine_folder}/{folder_name_dst}; put {folder_name_src}/{file_name_src} -o {machine_folder}/{folder_name_dst}/{file_name_dst}; close; quit"
+    },
+    "rsync": {
+      "settings": {},
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "rsync -avr --progress",
+      "command_line": "{folder_name_src}/{file_name_src} {folder_name_dst}/{file_name_dst}"
+    }
+  },
+  "time": {
+    "time_run": null,
+    "time_start": null,
+    "time_end": null,
+    "time_period": 120,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "log": {
+  	"folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/log/",
+  	"file_name": "hyde_datatransfer_hydrograph.txt"
+  },
+  "source": {
+    "datasets_discharge_simulated": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/data_repository/risultatiDRiFt/",
+      "file_name": "idro_*_{dset_datetime_src}*.txt",
+      "method": "rsync"
+    },
+    "datasets_discharge_observed": {
+      "__comment__": "idro_213330000_21335040006",
+      "folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/data_repository/risultatiDRiFt/",
+      "file_name": "idro_*_{dset_datetime_src}*.txt",
+      "method": "rsync"
+    }
+  },
+  "destination": {
+    "datasets_discharge_simulated": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/data_dynamic/source/discharge_run_obs_ws/{dset_sub_path_dst}",
+      "file_name": "hydrograph_Arzilla_Arzilla_{dset_datetime_dst}.json"
+    },
+    "datasets_discharge_observed": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_ARPAL/floods-ws/data_dynamic/source/discharge_run_obs_ws/{dset_sub_path_dst}",
+      "file_name": "hydrograph_FoceArzilla_Arzilla_{dset_datetime_dst}.json"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+Annex A - Hydrological Model Continuum
+======================================
+
+Hydrological Model Continuum (HMC) is a distributed model based on a space-filling representation of the network, directly derived from a DEM. The DEM resolution coincides with the model resolution. The mass and energy balances are solved at cell scale referring to a scheme with two soil layers (subsurface and water table) and one vegetation layer (interception). The overland and channel flow are described by a linear and a non-linear tank schematization respectively. 
+
+.. figure:: img/hmc_physics/hmc_scheme_flux_partition.png
+    :height: 800px
+    :width: 1000px
+    :scale: 50 %
+    :alt: scheme of hmc flux partition.
+    :align: center
+
+    Sketch of flux partition in the HMC model. Two consecutive pixels are illustrated.
+
+The main characteristics of the presented model and its advantages respect most of the existing models can be summarized as follows:
+
+1. A reduced number of territorial data is needed for the implementation (DEM and CN maps are the essential information needed).
+2. There are a reduced number of calibration parameters reducing the problem of parameter identification
+3. The capability of exploiting the possibilities offered by remote sensing (e.g. satellite data, better clarified in the following sections) smoothing the problem of equifinality by augmenting the model’s constraints 4 The capability of modeling a large number of state variables, similarly to more complex models
+
+Six model parameters need calibration on the basis of input-output time series: cf, ct, uh, uc, Rf, VWmax (see table below). The first two parameters cf, and ct mainly rule the generation of runoff and the movement of water in the different soil layers, while uh and uc control the surface water motion, VWmax represents the maximum storage capacity of the aquifer and Rf summarizes the effect of soil porosity as well as of the ratio between vertical and horizontal saturated soil conductivity.
+
+.. table:: Summary of the model parameters that need calibration with their brief description
+    :widths: auto
+    
+    +------------+------------+-----------------------------------------------------+
+    | Parameters |    Units   |                     Description                     |
+    +------------+------------+-----------------------------------------------------+
+    |     uh     |    [s-1]   | Flow motion coefficient in hillslopes               |
+    +------------+------------+-----------------------------------------------------+
+    |     uc     | [m-0.5s-1] | Friction coefficient in channels                    |
+    +------------+------------+-----------------------------------------------------+
+    |     cf     |     [-]    | Defines the infiltration capacity at saturation     |
+    +------------+------------+-----------------------------------------------------+
+    |     ct     |     [-]    | Defines the mean field capacity                     |
+    +------------+------------+-----------------------------------------------------+
+    |     Rf     |     [-]    | Related to anisotropy between the vertical and      |
+    |            |            | horizontal saturated conductivity, and to porosity  |
+    +------------+------------+-----------------------------------------------------+
+    |    VWmax   |    [mm]    | Maximum water capacity of the aquifer on the whole  |
+    |            |            | investigated area                                   |
+    +------------+------------+-----------------------------------------------------+
+
+
+Further details on the HMC are reported in library hmc documentation. 

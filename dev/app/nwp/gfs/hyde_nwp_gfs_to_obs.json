@@ -1,0 +1,73 @@
+{
+  "algorithm": {
+    "general": {
+      "title": "HyDE Processing Tool - NWP GFS to OBS",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.1.0 [20210311]",
+      "project-info": "HyDE - Hydrological Data Engines",
+      "algorithm": "Weather stations preprocessing tools"
+    },
+    "info": {
+      "domain": "guyana"
+    },
+    "template": {
+      "domain_name": "guyana",
+      "source_run_date": "%Y%m%d",
+      "source_sub_path_time": "%Y/%m/%d/",
+      "destination_datetime": "%Y%m%d%H%M",
+      "destination_sub_path_time": "%Y/%m/%d/"
+    }
+  },
+  "data": {
+    "dynamic": {
+      "time": {
+        "time_period": 23,
+        "period_unit": "H",
+        "time_frequency": "H"
+      },
+      "source": {
+        "rain_data": {
+          "compute": false,
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
+          "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_srf_rain.nc",
+          "var_name": "tp"
+        },
+        "air_temperature_data": {
+          "compute": true,
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
+          "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_2m_temperature.nc",
+          "var_name": "2t_C"
+        },
+        "incoming_radiation_data": {
+          "compute": true,
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
+          "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_srf_radiation.nc",
+          "var_name": "dswrf"
+        },
+        "wind_data": {
+          "compute": true,
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
+          "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_10m_wind.nc",
+          "var_name": "10wind"
+        },
+        "relative_humidity_data": {
+          "compute": true,
+          "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/gfs_025/{source_sub_path_time}",
+          "file_name": "{domain_name}_gfs.t00z.0p25.{source_run_date}_2m_relative_humidity.nc",
+          "var_name": "2r"
+        }
+      },
+      "destination": {
+        "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/gfs025/outcome/obs_gfs_025/{destination_sub_path_time}",
+        "file_name": "hmc.forcing-grid.{destination_datetime}.nc",
+        "file_compression": false
+      }
+    }
+  },
+  "log": {
+    "folder_name": "/home/andrea/CIMA/DEVELOPEMENT/log",
+    "file_name": "hyde_preprocessing_weather_stations_log.txt"
+  }
+}
+

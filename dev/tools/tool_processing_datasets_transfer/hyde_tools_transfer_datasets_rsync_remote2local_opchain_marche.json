@@ -1,0 +1,113 @@
+{
+  "ancillary": {
+    "tag_name_list": 
+	["rfarm_ecmwf0100_realtime_marche", "rfarm_lami-2i_realtime_marche", "weather_stations_realtime_marche", "nwp_lami-2i_realtime_marche", "nwp_ecmwf0100_realtime_marche", 
+	"radar_mcm_realtime_marche", "mod_s3m_realtime_marche", 
+	"rfarm_ecmwf0100_realtime_nera", "rfarm_lami-2i_realtime_nera", "weather_stations_realtime_nera", "nwp_lami-2i_realtime_nera", "nwp_ecmwf0100_realtime_nera", 
+	"radar_mcm_realtime_nera", "mod_s3m_realtime_nera", "nwp_lami-2i_realtime_laminazione", "nwp_ecmwf0100_realtime_laminazione",
+	"rfarm_expert_forecast_realtime_marche"]
+  },
+  "template_string": {
+    "tag_name": "tag_name_string"
+  },
+  "template_time": {
+    "dset_datetime_src": "%Y%m%d%H%M",
+    "dset_sub_path_src": "%Y/%m/%d/%H",
+    "dset_datetime_dst": "%Y%m%d%H%M",
+    "dset_sub_path_dst": "%Y/%m/%d/"
+  },
+  "method": {
+    "__comment__": "mode: [local2remote, remote2local, local2local]",
+    "mode": "remote2local",
+    "ftp": {
+      "settings": {
+        "machine_host": "",
+        "machine_user": "",
+        "machine_pwd": "",
+        "machine_folder": ""
+      },
+      "command_ancillary": "",
+      "command_exec": "",
+      "command_line": ""
+    },
+    "rsync": {
+      "settings": {
+      	"machine_host": "10.198.26.21",
+        "machine_user": "user"
+      },
+      "command_ancillary": {"create_folder":  null},
+      "command_exec": "rsync -ahvrz --progress",
+      "command_line": "{machine_user}@{machine_host}:{folder_name_src}/{file_name_src} {folder_name_dst}/{file_name_dst}"
+    }
+  },
+  "time": {
+    "time_run": null,
+    "time_start": null,
+    "time_end": null,
+    "time_period": 24,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "log": {
+  	"folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/log/",
+  	"file_name": "hmc_datatranfer_remote2local.txt"
+  },
+  "source": {
+    "datasets_{tag_name}_probabilistic_run_info": {
+      "folder_name": "/hydro/run/{tag_name}/probabilistic_001/exec/",
+      "file_name": "*.txt",
+      "method": "rsync"
+    },
+    "datasets_{tag_name}_probabilistic_run_exec": {
+      "folder_name": "/hydro/run/{tag_name}/probabilistic_001/exec/",
+      "file_name": "*.x",
+      "method": "rsync"
+    },
+    "datasets_{tag_name}_probabilistic_archive": {
+      "folder_name": "/hydro/archive/{tag_name}/{dset_sub_path_src}/probabilistic_ensemble/collections",
+      "file_name": "*.json",
+      "method": "rsync"
+    },
+    "datasets_{tag_name}_deterministic_run_info": {
+      "folder_name": "/hydro/run/{tag_name}/deterministic/exec/",
+      "file_name": "*.txt",
+      "method": "rsync"
+    },
+    "datasets_{tag_name}_deterministic_run_exec": {
+      "folder_name": "/hydro/run/{tag_name}/deterministic/exec/",
+      "file_name": "*.x",
+      "method": "rsync"
+    },
+   "datasets_{tag_name}_deterministic_archive": {
+      "folder_name": "/hydro/archive/{tag_name}/{dset_sub_path_src}/collections/",
+      "file_name": "*.json",
+      "method": "rsync"
+    }
+  },
+  "destination": {
+    "datasets_{tag_name}_probabilistic_run_info": {
+      "folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/run_202303231100/{tag_name}/probabilistic_001/exec/",
+      "file_name": null
+    },
+    "datasets_{tag_name}_probabilistic_run_exec": {
+      "folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/run_202303231100/{tag_name}/probabilistic_001/exec/",
+      "file_name": null
+    },
+    "datasets_{tag_name}_probabilistic_archive": {
+      "folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/archive/{tag_name}/{dset_sub_path_src}/probabilistic_ensemble/collections/",
+      "file_name": null
+    },
+    "datasets_{tag_name}_deterministic_run_info": {
+      "folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/run_202303231100/{tag_name}/deterministic/exec/",
+      "file_name": null
+    },
+    "datasets_{tag_name}_deterministic_run_exec": {
+      "folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/run_202303231100/{tag_name}/deterministic/exec/",
+      "file_name": null
+    },
+    "datasets_{tag_name}_deterministic_archive": {
+      "folder_name": "/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/PyCharm_Workspace/hat-ws/opchain_marche/archive/{tag_name}/{dset_sub_path_src}/collections/",
+      "file_name": null
+    }
+  }
+}
