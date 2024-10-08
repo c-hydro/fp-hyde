@@ -1,0 +1,279 @@
+{
+  "flags": {
+    "reset_datasets_ancillary_raw": true,
+    "reset_datasets_ancillary_def": false,
+    "reset_datasets_destination": true,
+    "reset_logs": true
+  },
+  "template": {
+    "info": {
+      "domain_name": "string_domain_name"
+    },
+    "time": {
+      "datetime_source": "%Y%m%d",
+      "sub_path_source": "",
+      "datetime_ancillary": "%Y%m%d",
+      "sub_path_ancillary": "%Y/%m/%d/",
+      "datetime_destination": "%Y%m%d",
+      "sub_path_destination": "%Y/%m/"
+    }
+  },
+  "info": {
+    "domain_name": "marche"
+  },
+  "variables": {
+    "rain": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "float", "type_out": "float",
+      "min_value": 0, "max_value": null,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "Kg m**-2"
+    },
+    "air_temperature": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "float", "type_out": "float",
+      "min_value": null, "max_value": null,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "K"
+    },
+    "relative_humidity": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "float", "type_out": "float",
+      "min_value": 0, "max_value": 100,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "%"
+    },
+    "incoming_radiation": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "int", "type_out": "int",
+      "min_value": 0, "max_value": null,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "W m**-2"
+    },
+    "wind_u": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "int", "type_out": "int",
+      "min_value": 0, "max_value": null,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "m s**-1"
+    },
+    "wind_v": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "int", "type_out": "int",
+      "min_value": 0, "max_value": null,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "m s**-1"
+    },
+    "albedo": {
+      "mask_in": null,  "mask_out": null,  "mask_meaning": null,
+      "type_in": "int", "type_out": "int",
+      "min_value": 0, "max_value": null,
+      "no_data": null,
+      "scale_factor": 1,
+      "missing_value": -9999.0,
+      "fill_value": -9999.0,
+      "format": "f4",
+      "units": "%"
+    },
+    "longitude": {
+      "mask_in": null, "mask_out": null, "mask_meaning": null,
+      "type_in": "float", "type_out": "float",
+      "min_value": -180, "max_value": 180,
+      "no_data": -9999,
+      "scale_factor": 1,
+      "missing_value": 0,
+      "fill_value": -9999,
+      "format": "f4",
+      "units": "degrees_east"
+    },
+    "latitude": {
+      "mask_in": null, "mask_out": null, "mask_meaning": null,
+      "type_in": "float", "type_out": "float",
+      "min_value": -90, "max_value": 90,
+      "no_data": -9999,
+      "scale_factor": 1,
+      "missing_value": 0,
+      "fill_value": -9999,
+      "format": "f4",
+      "units": "degrees_north"
+    }
+  },
+  "methods": {
+    "organize_data": {
+      "air_temperature": {"fx": "compute_air_temperature", "type": "instantaneous", "period": null},
+      "rain": {"fx": "compute_rain", "type": "accumulated", "period": 1},
+      "relative_humidity": {"fx": "compute_relative_humidity", "type": "instantaneous", "period": null},
+      "incoming_radiation": {"fx": "compute_incoming_radiation", "type": "average", "period": 1},
+      "wind_u": {"fx": "compute_wind_component", "type": "instantaneous", "period": null},
+      "wind_v": {"fx": "compute_wind_component", "type": "instantaneous", "period": null},
+      "albedo": {"fx": "compute_surface_albedo", "type": "instantaneous", "period": null}
+    },
+    "compose_data": {
+      "air_temperature": {"variables": ["air_temperature"],"fx": null},
+      "rain": {"variables": ["rain"], "fx": null},
+      "relative_humidity": {"variables": ["relative_humidity"], "fx": null},
+      "incoming_radiation": {"variables": ["incoming_radiation"], "fx": null},
+      "wind_speed": {"variables": ["wind_u", "wind_v"], "fx": "compute_wind_speed"},
+      "albedo": {"variables": ["albedo"], "fx": null}
+    },
+    "resample_data": {
+      "air_temperature": {"min_neighbours": 1, "neighbours": 8, "search_rad": 25000, "method": "nn", "fill_value": -9999.0},
+      "rain": {"min_neighbours": 1, "neighbours": 8, "search_rad": 25000, "method": "nn", "fill_value": -9999.0},
+      "relative_humidity": {"min_neighbours": 1, "neighbours": 8, "search_rad": 25000, "method": "nn", "fill_value": -9999.0},
+      "incoming_radiation": {"min_neighbours": 1, "neighbours": 8, "search_rad": 25000, "method": "nn", "fill_value": -9999.0},
+      "wind_speed": {"min_neighbours": 1, "neighbours": 8, "search_rad": 25000, "method": "nn", "fill_value": -9999.0},
+      "albedo": {"min_neighbours": 1, "neighbours": 8, "search_rad": 25000, "method": "nn", "fill_value": -9999.0}
+    },
+    "mask_data": {
+      "air_temperature": {"var_min": null, "var_max": null, "no_data": null},
+      "rain": {"var_min": 0, "var_max": null, "no_data": null},
+      "relative_humidity": {"var_min": 0, "var_max": 100, "no_data": null},
+      "incoming_radiation": {"var_min": 0, "var_max": null, "no_data": -9999},
+      "wind_speed": {"var_min": 0, "var_max": null, "no_data": -9999},
+      "albedo": {"var_min": 0, "var_max": null, "no_data": -9999}
+    }
+  },
+  "datasets": {
+    "static": {
+      "grid_source" : {
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_static/lami/",
+        "file_name": "lami.staticdata.nc"
+      },
+      "grid_destination" : {
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_static/gridded/",
+        "file_name": "marche.dem.txt"
+      }
+    },
+    "dynamic" : {
+      "time": {
+        "data_hour_reference": 0,
+        "data_steps": 48
+      },
+      "source": {
+        "air_temperature_collections": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/lami-2i/",
+          "file_name": "{datetime_source}-lami-2i.t00z.T2m",
+          "compression": false,
+          "variables": {
+            "air_temperature": "t2m",
+            "longitude": "longitude",
+            "latitude": "latitude"
+          }
+        },
+        "rain_collections": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/lami-2i/",
+          "file_name": "{datetime_source}-lami-2i.t00z.PRECI1",
+          "compression": false,
+          "variables": {
+            "rain": "tp",
+            "longitude": "longitude",
+            "latitude": "latitude"
+          }
+        },
+        "relative_humidity_collections": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/lami-2i/",
+          "file_name": "{datetime_source}-lami-2i.t00z.RH2m",
+          "compression": false,
+          "variables": {
+            "relative_humidity": "r",
+            "longitude": "longitude",
+            "latitude": "latitude"
+          }
+        },
+        "incoming_radiation_collections": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/lami-2i/",
+          "file_name": "{datetime_source}-lami-2i.t00z.SWH",
+          "compression": false,
+          "variables": {
+            "incoming_radiation": "asob_s",
+            "longitude": "longitude",
+            "latitude": "latitude"
+          }
+        },
+        "wind_collections": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/lami-2i/",
+          "file_name": "{datetime_source}-lami-2i.t00z.VENTO10m",
+          "compression": false,
+          "variables": {
+            "wind_u": "u10",
+            "wind_v": "v10",
+            "longitude": "longitude",
+            "latitude": "latitude"
+          }
+        },
+        "albedo_collections": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/lami-2i/",
+          "file_name": "{datetime_source}-lami-2i.t00z.ALB",
+          "compression": false,
+          "variables": {
+              "albedo": "alb_rad",
+              "longitude": "longitude",
+              "latitude": "latitude"
+          }
+        }
+      },
+      "ancillary": {
+        "raw": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/ancillary/nwp/lami-2i//{sub_path_ancillary}",
+          "file_name": "nwp_lami-2i_{domain_name}_{datetime_ancillary}.raw.workspace"
+        },
+        "def": {
+          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/ancillary/nwp/lami-2i//{sub_path_ancillary}",
+          "file_name": "nwp_lami-2i_{domain_name}_{datetime_ancillary}.def.workspace"
+        }
+      },
+      "destination": {
+        "__comment__": "format: [netcdf_xarray, netcdf_base]",
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/destination/{sub_path_destination}",
+        "file_name": "nwp_lami-2i_{domain_name}_{datetime_destination}.nc",
+        "compression": true,
+        "format": "netcdf_base",
+        "variables": {
+          "rain": "Rain",
+          "air_temperature": "Air_Temperature",
+          "incoming_radiation": "Incoming_Radiation",
+          "relative_humidity": "Relative_Humidity",
+          "wind_speed": "Wind",
+          "albedo": "Albedo"
+        }
+      }
+    }
+  },
+  "time": {
+    "time_now": null,
+    "time_frequency": "H",
+    "time_rounding" : "H"
+  },
+  "log": {
+    "folder_name" : "/home/fabio/Desktop/Workspace/Hyde_Package/ws/marche/log/",
+    "file_name": "app_nwp_lami_2i_local.txt"
+  },
+  "tmp": {
+    "folder_name" : "/home/fabio/Desktop/Workspace/Hyde_Package/ws/marche/tmp/",
+    "file_name": null
+  }
+}

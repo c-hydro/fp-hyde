@@ -22,8 +22,8 @@ virtual_env_name='virtualenv_python3'
 # Get file information
 
 # LOCAL
-script_file='/home/fabio/Desktop/PyCharm_Workspace/hyde-master/apps/lami/HYDE_DynamicData_NWP_LAMI_2i.py'
-setting_file='/home/fabio/Desktop/PyCharm_Workspace/hyde-master/apps/lami/hyde_configuration_nwp_lami_2i_local.json'
+script_file='/home/fabio/Desktop/PyCharm_Workspace/hyde-master/apps/lami_old/HYDE_DynamicData_NWP_LAMI_2i.py'
+setting_file='/home/fabio/Desktop/PyCharm_Workspace/hyde-master/apps/lami_old/hyde_configuration_nwp_lami_2i_local.json'
 
 # SERVER
 # script file='/hydro/hmc_tools_datacreator/nwp_lami-2i/FP_DynamicData_NWP_LAMI_2i.py'

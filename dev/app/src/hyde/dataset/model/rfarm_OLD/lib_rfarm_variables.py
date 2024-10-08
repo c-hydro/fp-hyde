@@ -61,7 +61,7 @@ def compute_rain_ecmwf_0100(var_data_in, var_units='m', var_type='accumulated'):
 
 
 # -------------------------------------------------------------------------------------
-# Method to compute lami-2i rain
+# Method to compute lami_old-2i rain
 def compute_rain_lami_2i(var_data_in, var_units='mm', var_type='accumulated'):
 
     if (var_units == 'kg m**-2') or (var_units == 'Kg m**-2'):

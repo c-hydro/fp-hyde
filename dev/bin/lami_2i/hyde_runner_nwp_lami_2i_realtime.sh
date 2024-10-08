@@ -17,8 +17,8 @@ virtual_env_name='fp_env_python'
 # Get file information
 
 # LOCAL
-script_file='/home/dpc-marche/library/hyde-master/apps/lami/HYDE_DynamicData_NWP_LAMI_2i.py'
-setting_file='/home/dpc-marche/library/hyde-master/apps/lami/hyde_configuration_nwp_lami_2i_realtime.json'
+script_file='/home/dpc-marche/library/hyde-master/apps/lami_old/HYDE_DynamicData_NWP_LAMI_2i.py'
+setting_file='/home/dpc-marche/library/hyde-master/apps/lami_old/hyde_configuration_nwp_lami_2i_realtime.json'
 
 file_lock_start='nwp_dynamicdata_lami-2i_lock_local_START.txt'
 file_lock_end='nwp_dynamicdata_lami-2i_lock_local_END.txt'
@@ -32,7 +32,7 @@ file_list=(
 "%YYYY%MM%DD-lami-2i.t00z.VENTO10m"
 )
 
-folder_data_raw='/hydro/data/dynamic_data/source/nwp/lami-2i/'
+folder_data_raw='/hydro/data/dynamic_data/source/nwp/lami_old-2i/'
 folder_lock_raw='/home/dpc-marche/lock/'
 
 # Get information (-u to get gmt time)
