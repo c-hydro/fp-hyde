@@ -22,8 +22,8 @@ time_format_algorithm = '%Y-%m-%d %H:%M'
 time_machine = pd.Timestamp.now
 
 # log information
-logger_name = 'nwp_lami_2i_logger'
-logger_file = 'nwp_lami_2i_log.txt'
+logger_name = 'nwp_icon_2i_logger'
+logger_file = 'nwp_icon_2i_log.txt'
 logger_handle = 'file'  # 'file' or 'stream'
 logger_format = '%(asctime)s %(name)-12s %(levelname)-8s ' \
                 '%(message)-80s %(filename)s:[%(lineno)-6s - %(funcName)-20s()] '
@@ -54,11 +54,11 @@ zip_extension = '.gz'
 
 # definition of file information
 file_conventions = "CF-1.7"
-file_title = "NWP LAMI-2i Product"
+file_title = "NWP ICON-2i Product"
 file_institution = "CIMA Research Foundation - www.cimafoundation.org"
 file_web_site = ""
 file_source = "Python library developed by CIMA Research Foundation"
-file_history = "1.5.0 [20241001]"
+file_history = "1.0.0 [20241001]"
 file_references = "http://cf-pcmdi.llnl.gov/ ; http://cf-pcmdi.llnl.gov/documents/cf-standard-names/"
 file_comment = "Author(s): Fabio Delogu"
 file_email = "fabio.delogu@cimafoundation.org"

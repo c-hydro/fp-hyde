@@ -1,20 +1,19 @@
 #!/usr/bin/python3
 
 """
-HYDE APP - NWP LAMI-2I PRODUCT  - HYdrolagical Data Engines
+HYDE APP - NWP ICON-2I PRODUCT  - HYdrolagical Data Engines
 
 __date__ = '20241001'
-__version__ = '1.5.0'
+__version__ = '1.0.0'
 __author__ =
     'Fabio Delogu (fabio.delogu@cimafoundation.org)'
 __library__ = 'hyde'
 
 General command line:
-python app_nwp_lami_2i_main.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
+python app_nwp_icon_2i_main.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
-20241001 (1.5.0) --> Refactor and update code for hyde package
-20181203 (1.0.0) --> Beta release for hyde package
+20241001 (1.0.0) --> Beta release for hyde package
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -41,9 +40,9 @@ alg_logger = logging.getLogger(logger_name)
 # ----------------------------------------------------------------------------------------------------------------------
 # algorithm information
 project_name = 'hyde'
-alg_name = 'Application for processing nwp lami-2i'
+alg_name = 'Application for processing nwp icon-2i'
 alg_type = 'Package'
-alg_version = '1.5.0'
+alg_version = '1.0.0'
 alg_release = '2024-10-01'
 # ----------------------------------------------------------------------------------------------------------------------
 

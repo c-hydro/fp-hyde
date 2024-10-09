@@ -24,7 +24,7 @@ from lib_utils_time import set_time_run
 from lib_utils_generic import make_folder, reset_folder
 from lib_data_io_pickle import read_file_obj, write_file_obj
 from lib_data_io_grib import read_file_grib, organize_file_grib
-from lib_data_io_nc import (read_file_nc, organize_file_nc_xarray, organize_file_nc_library,
+from lib_data_io_nc import (organize_file_nc_xarray, organize_file_nc_library,
                             write_file_nc_xarray, write_file_nc_library)
 
 from lib_data_io_gzip import zip_filename, unzip_filename
