@@ -1,0 +1,33 @@
+20240930-ecmwf0100.t00z.PRECI3
+edition      centre       typeOfLevel  level        dataDate     stepRange    dataType     shortName    packingType  gridType     
+1            ecmf         surface      0            20240930     0-3          fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     3-6          fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     6-9          fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     9-12         fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     12-15        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     15-18        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     18-21        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     21-24        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     24-27        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     27-30        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     30-33        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     33-36        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     36-39        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     39-42        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     42-45        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     45-48        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     48-51        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     51-54        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     54-57        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     57-60        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     60-63        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     63-66        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     66-69        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     69-72        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     72-75        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     75-78        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     78-81        fc           tp           grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     81-84        fc           tp           grid_simple  regular_ll  
+28 of 28 messages in 20240930-ecmwf0100.t00z.PRECI3
+
+28 of 28 total messages in 1 files

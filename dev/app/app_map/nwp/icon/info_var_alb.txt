@@ -1,0 +1,30 @@
+20240930-icon-2i.t00z.ALB
+edition      centre       date         dataType     gridType     stepRange    typeOfLevel  level        shortName    packingType  
+2            cnmc         20240930     fc           regular_ll   0            surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   3            surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   6            surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   9            surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   12           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   15           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   18           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   21           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   24           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   27           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   30           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   33           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   36           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   39           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   42           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   45           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   48           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   51           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   54           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   57           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   60           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   63           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   66           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   69           surface      0            alb_rad      grid_simple 
+2            cnmc         20240930     fc           regular_ll   72           surface      0            alb_rad      grid_simple 
+25 of 25 messages in 20240930-icon-2i.t00z.ALB
+
+25 of 25 total messages in 1 files

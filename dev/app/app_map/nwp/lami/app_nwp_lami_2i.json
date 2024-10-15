@@ -1,7 +1,7 @@
 {
   "flags": {
-    "reset_datasets_ancillary_raw": false,
-    "reset_datasets_ancillary_def": false,
+    "reset_datasets_ancillary_raw": true,
+    "reset_datasets_ancillary_def": true,
     "reset_datasets_destination": true,
     "reset_logs": true
   },
@@ -124,13 +124,20 @@
   },
   "methods": {
     "organize_data": {
-      "air_temperature": {"fx": "compute_air_temperature", "type": "instantaneous", "period": null},
-      "rain": {"fx": "compute_rain", "type": "accumulated", "period": 1},
-      "relative_humidity": {"fx": "compute_relative_humidity", "type": "instantaneous", "period": null},
-      "incoming_radiation": {"fx": "compute_incoming_radiation", "type": "average", "period": 1},
-      "wind_u": {"fx": "compute_wind_component", "type": "instantaneous", "period": null},
-      "wind_v": {"fx": "compute_wind_component", "type": "instantaneous", "period": null},
-      "albedo": {"fx": "compute_surface_albedo", "type": "instantaneous", "period": null}
+      "air_temperature": {"fx": "compute_air_temperature", "type": "instantaneous",
+        "period": [1, 49], "frequency": "1H"},
+      "rain": {"fx": "compute_rain", "type": "accumulated",
+        "period": [0, 48], "frequency": "1H"},
+      "relative_humidity": {"fx": "compute_relative_humidity", "type": "instantaneous",
+        "period": [1, 49], "frequency": "1H"},
+      "incoming_radiation": {"fx": "compute_incoming_radiation", "type": "average",
+        "period": [0, 48], "frequency": "1H"},
+      "wind_u": {"fx": "compute_wind_component", "type": "instantaneous",
+        "period": [1, 49], "frequency": "1H"},
+      "wind_v": {"fx": "compute_wind_component", "type": "instantaneous",
+        "period": [1, 49], "frequency": "1H"},
+      "albedo": {"fx": "compute_surface_albedo", "type": "instantaneous",
+        "period": [1, 49], "frequency": "1H"}
     },
     "compose_data": {
       "air_temperature": {"variables": ["air_temperature"],"fx": null},
@@ -249,7 +256,7 @@
       "destination": {
         "__comment__": "format: [netcdf_xarray, netcdf_base]",
         "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/destination/nwp/lami-2i/{sub_path_destination}",
-        "file_name": "nwp_lami-2i_{domain_name}_{datetime_destination}.nc",
+        "file_name": "nwp_lami-2i_{domain_name}_{datetime_destination}_new.nc",
         "compression": true,
         "format": "netcdf_base",
         "variables": {

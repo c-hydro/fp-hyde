@@ -28,7 +28,7 @@ logging.getLogger('cfgrib').setLevel(logging.WARNING)
 logging.getLogger('gribapi').setLevel(logging.WARNING)
 
 # debug
-import matplotlib.pylab as plt
+# import matplotlib.pylab as plt
 
 # default netcdf encoded attributes
 attrs_encoded = ["_FillValue", "dtype", "scale_factor", "add_offset", "grid_mapping"]
@@ -41,7 +41,7 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
                        obj_attrs=None, obj_method=None, obj_settings=None,
                        reference_time=None,
                        var_name_time='time', var_name_geo_x='longitude', var_name_geo_y='latitude',
-                       coord_name_time='time', coord_name_x='longitude', coord_name_y='latitude',
+                       coord_name_time='time', coord_name_x='west_east', coord_name_y='south_north',
                        dim_name_time='time', dim_name_x='longitude', dim_name_y='latitude'):
 
     # organize time information
@@ -89,7 +89,7 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
             data_attrs_tmp = attrs_data
 
         # create variable data array
-        data_dframe_tmp = create_darray(
+        data_da_tmp = create_darray(
             data_values, obj_geo_x, obj_geo_y,
             geo_1d=False, time=data_time,
             coord_name_x=coord_name_x, coord_name_y=coord_name_y, coord_name_time=coord_name_time,
@@ -100,7 +100,7 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
 
             # define mode attributes
             fx_name = method_data['fx']
-            fx_type, fx_period = method_data['type'], method_data['period']
+            fx_type, fx_period, fx_frequency = method_data['type'], method_data['period'], method_data['frequency']
 
             # search fx method in the library
             if hasattr(lib_fx_nwp, fx_name):
@@ -108,22 +108,39 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
                 # define fx method
                 fx_obj = getattr(lib_fx_nwp, fx_name)
                 # define fx arguments
-                fx_args = {'var_dframe': data_dframe_tmp,
+                fx_args = {'var_dframe': data_da_tmp,
                            'var_time_reference': reference_time,
                            'var_attrs': data_attrs_tmp,
+                           'var_period': fx_period, 'var_frequency': fx_frequency,
                            'var_type': fx_type}
                 # apply fx method and arguments
-                data_dframe_def, data_attrs_def = fx_obj(**fx_args)
+                data_da_def, data_attrs_def = fx_obj(**fx_args)
 
             else:
                 alg_logger.error(' ===> Method fx "' + fx_name + '" is not available')
                 raise NotImplementedError('Case not implemented yet')
 
         else:
-            data_dframe_def = data_dframe_tmp
+            data_da_def = data_da_tmp
             data_attrs_def = data_attrs_tmp
 
-        collections_data_dset[data_name] = data_dframe_def
+        # adjust coordinates (in some cases the order of the coordinates is not correct)
+        if list(data_da_def.coords) != [coord_name_time, coord_name_y, coord_name_x]:
+            if set(list(data_da_def.coords)) == {coord_name_time, coord_name_y, coord_name_x}:
+
+                data_values = data_da_def.values
+                data_time = pd.DatetimeIndex(data_da_def[coord_name_time].values)
+                data_geo_x = data_da_def[coord_name_x].values
+                data_geo_y = data_da_def[coord_name_y].values
+
+                data_da_def = create_darray(data_values, data_geo_x, data_geo_y, geo_1d=False, time=data_time)
+
+            else:
+                alg_logger.error(' ===> Dimensions are not correctly declared')
+                raise RuntimeError(' Check your data array and dataset to fix the dimensions issue')
+
+        # store data and attributes in the collections
+        collections_data_dset[data_name] = data_da_def
         collections_data_attrs[data_name] = data_attrs_def
 
     return collections_data_dset, collections_data_attrs

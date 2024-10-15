@@ -26,6 +26,7 @@ from lib_info_args import logger_name
 
 # set logger
 alg_logger = logging.getLogger(logger_name)
+logging.getLogger('repurpose').setLevel(logging.WARNING)
 
 # debug
 import matplotlib.pylab as plt

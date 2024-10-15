@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-HYDE APP - NWP ICON-2I PRODUCT  - HYdrolagical Data Engines
+HYDE APP - NWP ICON-2I PRODUCT  - HYdrological Data Engines
 
 __date__ = '20241001'
 __version__ = '1.0.0'

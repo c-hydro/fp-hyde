@@ -1,0 +1,128 @@
+{
+  "algorithm":{
+    "flag": {
+      "update_static_data_ancillary": false,
+      "update_dynamic_data_ancillary": true,
+      "update_dynamic_data_destination": true,
+      "clean_temporary_data": false
+    },
+    "general": {
+      "title": "GroundNetwork - River stations product",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "2.0.0 [20201210]",
+      "project-info": "HyDE - Hydrological Data Engines",
+      "algorithm": "River stations preprocessing tools"
+    },
+    "info": {
+      "domain": "marche"
+    },
+    "template": {
+      "domain_name": "string_domain",
+      "source_datetime": "%Y%m%d%H%M",
+      "source_sub_path_time": "%Y/%m/%d/",
+      "ancillary_datetime": "%Y%m%d%H%M",
+      "ancillary_sub_path_time": "%Y/%m/%d/",
+      "destination_datetime": "%Y%m%d%H%M",
+      "destination_sub_path_time": "%Y/%m/%d/"
+    }
+  },
+  "data": {
+    "static": {
+      "source" : {
+        "sections": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/shapefile/",
+          "file_name": "fp_sections_marche.shp",
+          "file_fields_columns": [
+            "ID", "HMC_X", "HMC_Y", "LON", "LAT", "BASIN", "SEC_NAME", "SEC_RS", "SEC_TAG",
+            "TYPE", "AREA", "Q_THR1", "Q_THR2", "ADMIN_B_L1", "ADMIN_B_L2", "ADMIN_B_L3"
+          ],
+          "file_fields_types": [
+            "int", "int", "int", "float", "float", "str", "str", "int", "str",
+            "str", "float", "float", "float", "str", "str", "str"],
+          "file_fields_tags": [
+            "id", "hmc_id_x", "hmc_id_y", "longitude", "latitude", "catchment", "name", "code", "tag",
+            "type", "area", "discharge_thr1", "discharge_thr2", "boundary_limit_01", "boundary_limit_02", "boundary_limit_03"]
+        }
+      },
+      "ancillary": {
+        "points" : {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_static/ancillary/river_stations/",
+          "file_name": "rs_points.workspace"
+        }
+      }
+    },
+    "dynamic": {
+      "time": {
+        "time_period": 200,
+        "time_frequency": "H",
+        "time_rounding": "H"
+      },
+      "source": {
+        "discharge": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/source/obs/river_stations/{source_sub_path_time}",
+          "file_name": "discharge_{domain_name}_{source_datetime}.csv",
+          "file_fields": ["longitude", "latitude", "discharge", "time", "units", "catchment", "name", "tag", "type",
+          "code", "hmc_id_x", "hmc_id_y"]
+        }
+      },
+      "ancillary" : {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/ancillary/obs/river_stations/{ancillary_sub_path_time}",
+        "file_name": "rs_{domain_name}_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/data_dynamic/outcome/obs/river_stations/{destination_sub_path_time}",
+        "file_name": "rs.db.{destination_datetime}.txt",
+        "file_fields_columns": ["code", "discharge", "tag"],
+        "file_fields_format": ["%7s", "%10.1f", "%s"],
+        "file_fields_types": ["str", "float", "str"],
+        "file_compression": false
+      }
+    }
+  },
+  "log": {
+      "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hyde-ws/marche/log/river_stations/",
+      "file_name": "hyde_preprocessing_river_stations_log.txt",
+      "file_history": true
+  },
+  "time": {
+    "time_run": "2020-12-03 05:32",
+    "time_period": 0,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  },
+  "variables": {
+    "source": {
+      "discharge": {
+        "var_mode": true,
+        "var_name": "Discharge",
+        "var_method_compute": null,
+        "var_attributes": {
+          "long_name": "discharge",
+          "standard_name": "discharge",
+          "missing_value": -9999.0,
+          "fill_value": -9999.0,
+          "scale_factor": 1,
+          "valid_range": [0, null],
+          "units": "m^3/s"
+        }
+      }
+    },
+    "destination": {
+      "discharge":{
+        "var_mode": true,
+        "var_name": "Discharge",
+        "var_attributes": {
+          "long_name": "discharge",
+          "standard_name": "discharge",
+          "missing_value": -9999.0,
+          "fill_value": -9999.0,
+          "scale_factor": 1,
+          "valid_range": [0, null],
+          "units": "m^3/s",
+          "description": ""
+        }
+      }
+    }
+  }
+}

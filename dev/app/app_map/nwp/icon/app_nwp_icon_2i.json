@@ -1,7 +1,7 @@
 {
   "flags": {
     "reset_datasets_ancillary_raw": false,
-    "reset_datasets_ancillary_def": false,
+    "reset_datasets_ancillary_def": true,
     "reset_datasets_destination": true,
     "reset_logs": true
   },
@@ -124,13 +124,20 @@
   },
   "methods": {
     "organize_data": {
-      "air_temperature": {"fx": "compute_air_temperature", "type": "instantaneous", "period": null},
-      "rain": {"fx": "compute_rain", "type": "accumulated", "period": 72},
-      "relative_humidity": {"fx": "compute_relative_humidity", "type": "instantaneous", "period": 3},
-      "incoming_radiation": {"fx": "compute_incoming_radiation", "type": "average", "period": 1},
-      "wind_u": {"fx": "compute_wind_component", "type": "instantaneous", "period": null},
-      "wind_v": {"fx": "compute_wind_component", "type": "instantaneous", "period": null},
-      "albedo": {"fx": "compute_surface_albedo", "type": "instantaneous", "period": 3}
+      "air_temperature": {"fx": "compute_air_temperature", "type": "instantaneous",
+        "period": [1, 73], "frequency": "1H"},
+      "rain": {"fx": "compute_rain", "type": "accumulated",
+        "period": [0, 72], "frequency": "1H"},
+      "relative_humidity": {"fx": "compute_relative_humidity", "type": "instantaneous",
+        "period": [1, 25], "frequency": "3H"},
+      "incoming_radiation": {"fx": "compute_incoming_radiation", "type": "average",
+        "period": [1, 73], "frequency": "1H"},
+      "wind_u": {"fx": "compute_wind_component", "type": "instantaneous",
+        "period": [1, 73],"frequency": "1H"},
+      "wind_v": {"fx": "compute_wind_component", "type": "instantaneous",
+        "period": [1, 73],"frequency": "1H"},
+      "albedo": {"fx": "compute_surface_albedo", "type": "instantaneous",
+        "period": [1, 25],"frequency": "3H"}
     },
     "compose_data": {
       "air_temperature": {"variables": ["air_temperature"],"fx": null},
@@ -199,7 +206,7 @@
           "file_name": "{datetime_source}-icon-2i.t00z.RH2m",
           "compression": false,
           "variables": {
-            "relative_humidity": "2r",
+            "relative_humidity": "r2",
             "longitude": "longitude",
             "latitude": "latitude"
           }
@@ -209,7 +216,7 @@
           "file_name": "{datetime_source}-icon-2i.t00z.SWH",
           "compression": false,
           "variables": {
-            "incoming_radiation": "asob_s",
+            "incoming_radiation": "msnswrf",
             "longitude": "longitude",
             "latitude": "latitude"
           }

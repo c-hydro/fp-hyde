@@ -85,7 +85,10 @@ def transform_dset_2_data(obj_data_src, obj_attrs_src,
             variable_data = obj_data_src[variable_name]
             obj_data_dst[variable_name] = variable_data.values
 
-            obj_attrs_dst[variable_name] = obj_attrs_src[variable_name]
+            if variable_name in obj_attrs_src:
+                obj_attrs_dst[variable_name] = obj_attrs_src[variable_name]
+            else:
+                obj_attrs_dst[variable_name] = {}
 
     return obj_data_dst, obj_attrs_dst
 # ----------------------------------------------------------------------------------------------------------------------
@@ -94,7 +97,7 @@ def transform_dset_2_data(obj_data_src, obj_attrs_src,
 # ----------------------------------------------------------------------------------------------------------------------
 # method to extract data
 def extract_data(obj_collections_src,
-                var_name_time='time', var_name_geo_x='west_east', var_name_geo_y='south_north'):
+                 var_name_time='time', var_name_geo_x='west_east', var_name_geo_y='south_north'):
 
     # get data and time information
     obj_data_dst = obj_collections_src['data']
@@ -124,6 +127,13 @@ def extract_data(obj_collections_src,
     else:
         alg_logger.error(' ===> Geographical variable "' + var_name_geo_y + '" is not available in the datasets')
         raise RuntimeError('Geographical variable is needed by the method')
+
+    for var_name in obj_data_dst.variables:
+        if var_name in ['longitude', 'latitude']:
+            alg_logger.warning(
+                ' ===> Data "' + var_name + '" will be removed from the datasets. '
+                                            'Procedure will keep only data variables')
+            obj_data_dst = obj_data_dst.drop_vars(var_name)
 
     return obj_data_dst, obj_attrs_dst, time_values_dst, geo_x_values_dst, geo_y_values_dst
 # ----------------------------------------------------------------------------------------------------------------------

@@ -2,26 +2,26 @@
 
 #-----------------------------------------------------------------------------------------
 # Script information
-script_name='HYDE DYNAMICDATA - NWP ECMWF 0100 - EXAMPLE'
-script_version="1.6.0"
-script_date='2020/11/30'
+script_name='APP - NWP ECMWF-0100 - RUNNER'
+script_version="1.7.0"
+script_date='2024/10/15'
 
 virtualenv_folder='/hydro/library/fp_libs_python3/'
 virtualenv_name='virtualenv_python3'
 script_folder='/hydro/library/hyde/'
 
 # Execution example:
-# python3 HYDE_DynamicData_NWP_ECMWF0100.py -settings_file hyde_dynamicdata_nwp_ecmwf0100.json -time "2020-11-02 12:00"
+# python app_nwp_ecmwf_0100_main.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 #-----------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------------------
 # Get script information
-script_file='HYDE_DynamicData_NWP_ECMWF0100.py'
-settings_file='hyde_configuration_nwp_ecmwf0100_example.json'
+script_file='app_nwp_ecmwf_0100.py'
+settings_file='app_nwp_ecmwf_0100.json'
 
 # Get lock information
-file_lock_start='hyde_lock_nwp_ecmwf0100_example_START.txt'
-file_lock_end='hyde_lock_nwp_ecmwf0100_example_END.txt'
+file_lock_start='app_nwp_ecmwf_0100_lock_START.txt'
+file_lock_end='app_nwp_ecmwf_0100_lock_END.txt'
 
 file_lock_init=true
 folder_lock_raw='/lock/nwp/'
@@ -34,7 +34,7 @@ file_list_expected=(
 "%YYYY%MM%DD-ecmwf0100.t00z.VENTO10m"
 )
 
-folder_data_raw='/source/nwp/ecmwf0100/'
+folder_data_raw='/source/nwp/ecmwf_0100/'
 
 # Get time information (-u to get gmt time)
 time_now=$(date -u +"%Y-%m-%d %H:00")

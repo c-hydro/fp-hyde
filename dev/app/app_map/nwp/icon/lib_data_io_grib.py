@@ -41,7 +41,7 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
                        obj_attrs=None, obj_method=None, obj_settings=None,
                        reference_time=None,
                        var_name_time='time', var_name_geo_x='longitude', var_name_geo_y='latitude',
-                       coord_name_time='time', coord_name_x='longitude', coord_name_y='latitude',
+                       coord_name_time='time', coord_name_x='west_east', coord_name_y='south_north',
                        dim_name_time='time', dim_name_x='longitude', dim_name_y='latitude'):
 
     # organize time information
@@ -89,7 +89,7 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
             data_attrs_tmp = attrs_data
 
         # create variable data array
-        data_dframe_tmp = create_darray(
+        data_da_tmp = create_darray(
             data_values, obj_geo_x, obj_geo_y,
             geo_1d=False, time=data_time,
             coord_name_x=coord_name_x, coord_name_y=coord_name_y, coord_name_time=coord_name_time,
@@ -100,7 +100,7 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
 
             # define mode attributes
             fx_name = method_data['fx']
-            fx_type, fx_period = method_data['type'], method_data['period']
+            fx_type, fx_period, fx_frequency = method_data['type'], method_data['period'], method_data['frequency']
 
             # search fx method in the library
             if hasattr(lib_fx_nwp, fx_name):
@@ -108,22 +108,39 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
                 # define fx method
                 fx_obj = getattr(lib_fx_nwp, fx_name)
                 # define fx arguments
-                fx_args = {'var_dframe': data_dframe_tmp,
+                fx_args = {'var_dframe': data_da_tmp,
                            'var_time_reference': reference_time,
-                           'var_attrs': data_attrs_tmp, 'var_period': fx_period,
+                           'var_attrs': data_attrs_tmp,
+                           'var_period': fx_period, 'var_frequency': fx_frequency,
                            'var_type': fx_type}
                 # apply fx method and arguments
-                data_dframe_def, data_attrs_def = fx_obj(**fx_args)
+                data_da_def, data_attrs_def = fx_obj(**fx_args)
 
             else:
                 alg_logger.error(' ===> Method fx "' + fx_name + '" is not available')
                 raise NotImplementedError('Case not implemented yet')
 
         else:
-            data_dframe_def = data_dframe_tmp
+            data_da_def = data_da_tmp
             data_attrs_def = data_attrs_tmp
 
-        collections_data_dset[data_name] = data_dframe_def
+        # adjust coordinates (in some cases the order of the coordinates is not correct)
+        if list(data_da_def.coords) != [coord_name_time, coord_name_y, coord_name_x]:
+            if set(list(data_da_def.coords)) == {coord_name_time, coord_name_y, coord_name_x}:
+
+                data_values = data_da_def.values
+                data_time = pd.DatetimeIndex(data_da_def[coord_name_time].values)
+                data_geo_x = data_da_def[coord_name_x].values
+                data_geo_y = data_da_def[coord_name_y].values
+
+                data_da_def = create_darray(data_values, data_geo_x, data_geo_y, geo_1d=False, time=data_time)
+
+            else:
+                alg_logger.error(' ===> Dimensions are not correctly declared')
+                raise RuntimeError(' Check your data array and dataset to fix the dimensions issue')
+
+        # store data and attributes in a common object
+        collections_data_dset[data_name] = data_da_def
         collections_data_attrs[data_name] = data_attrs_def
 
     return collections_data_dset, collections_data_attrs
@@ -220,48 +237,4 @@ def read_file_grib(file_name, file_variables=None, file_time_reference=None,
 
     return data_obj, attrs_obj, geo_obj, time_obj
 
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# method to write nc file
-def write_file_nc(file_name, dset_data,
-                  dset_mode='w', dset_engine='netcdf4', dset_compression=9, dset_format='NETCDF4',
-                  dim_key_time='time', no_data=-9999.0):
-
-    dset_encoded = dict(zlib=True, complevel=dset_compression)
-
-    dset_encoding = {}
-    for var_name in dset_data.data_vars:
-
-        if isinstance(var_name, bytes):
-            tmp_name = var_name.decode("utf-8")
-            dset_data.rename({var_name: tmp_name})
-            var_name = deepcopy(tmp_name)
-
-        var_data = dset_data[var_name]
-        if len(var_data.dims) > 0:
-            dset_encoding[var_name] = deepcopy(dset_encoded)
-
-        var_attrs = dset_data[var_name].attrs
-        if var_attrs:
-            for attr_key, attr_value in var_attrs.items():
-                if attr_key in attrs_encoded:
-
-                    dset_encoding[var_name][attr_key] = {}
-
-                    if isinstance(attr_value, list):
-                        attr_string = [str(value) for value in attr_value]
-                        attr_value = ','.join(attr_string)
-
-                    dset_encoding[var_name][attr_key] = attr_value
-
-        if '_FillValue' not in list(dset_encoding[var_name].keys()):
-            dset_encoding[var_name]['_FillValue'] = no_data
-
-    if dim_key_time in list(dset_data.coords):
-        dset_encoding[dim_key_time] = {'calendar': 'gregorian'}
-
-    dset_data.to_netcdf(path=file_name, format=dset_format, mode=dset_mode,
-                        engine=dset_engine, encoding=dset_encoding)
 # ----------------------------------------------------------------------------------------------------------------------

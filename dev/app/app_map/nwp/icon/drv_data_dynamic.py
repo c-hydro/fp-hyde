@@ -520,6 +520,8 @@ class DrvData:
                                                  dset_map=self.variables_dst))
 
                     # method to write netcdf dataset (by base library)
+                    folder_name_dst_step, file_name_dst_step = os.path.split(file_path_dst_step)
+                    make_folder(folder_name_dst_step)
                     write_file_nc_library(
                         file_path_dst_step,
                         dset_data=obj_data_anc_def_step, dset_attrs=obj_attrs_anc_def_step,

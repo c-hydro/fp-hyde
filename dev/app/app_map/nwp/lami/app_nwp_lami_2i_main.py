@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-HYDE APP - NWP LAMI-2I PRODUCT  - HYdrolagical Data Engines
+HYDE APP - NWP LAMI-2I PRODUCT  - HYdrological Data Engines
 
 __date__ = '20241001'
 __version__ = '1.5.0'
@@ -10,7 +10,7 @@ __author__ =
 __library__ = 'hyde'
 
 General command line:
-python app_nwp_lami_2i_main.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
+python app_nwp_ecmwf_0100_main.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
 20241001 (1.5.0) --> Refactor and update code for hyde package

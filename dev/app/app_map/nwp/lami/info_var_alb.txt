@@ -1,0 +1,54 @@
+20240930-lami-2i.t00z.ALB
+edition      centre       typeOfLevel  level        dataDate     stepRange    shortName    packingType  gridType     
+1            cnmc         surface      0            20240930     0            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     1            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     2            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     3            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     4            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     5            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     6            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     7            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     8            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     9            alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     10           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     11           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     12           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     13           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     14           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     15           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     16           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     17           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     18           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     19           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     20           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     21           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     22           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     23           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     24           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     25           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     26           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     27           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     28           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     29           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     30           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     31           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     32           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     33           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     34           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     35           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     36           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     37           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     38           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     39           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     40           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     41           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     42           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     43           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     44           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     45           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     46           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     47           alb_rad      grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     48           alb_rad      grid_simple  rotated_ll  
+49 of 49 messages in 20240930-lami-2i.t00z.ALB
+
+49 of 49 total messages in 1 files
