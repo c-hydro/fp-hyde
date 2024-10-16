@@ -2,6 +2,44 @@
 Changelog
 =========
 
+Version 2.0.0 [2024-10-16]
+**************************
+GENERIC_DEV
+    - Refactor of HyDE python package (name, script, structure and deps);
+    - Upgrade previous version package.
+
+APP: **app_nwp_icon_2i_main.py**
+	- Beta release
+APP: **app_nwp_lami_2i_main.py**
+	- update app version 
+APP: **app_nwp_ecmwf_0100_main.py**
+	- update app version 
+APP: **app_obs_ws_main.py**
+	- update app version 
+APP: **app_obs_rs_main.py**
+	- update app version 
+APP: **app_obs_hs_main.py**
+	- update app version 
+APP: **app_obs_mcm_main.py**
+	- update app version 
+APP: **app_point_time_step_src2csv.py**
+	- Beta release 
+
+TOOLS: **tool_processing_datasets_adapter**
+	- update app version
+TOOLS: **tool_processing_datasets_generic**
+	- update app version
+TOOLS: **tool_processing_datasets_manager**
+	- update app version
+TOOLS: **tool_processing_datasets_transfer**
+	- update app version
+TOOLS: **tool_processing_system_cleaner**
+	- update app version	
+TOOLS: **tool_processing_system_organizer**
+	- update app version	
+TOOLS: **tool_processing_system_profiler**
+	- update app version	
+	
 Version 1.9.9 [2022-03-21]
 **************************
 APP: **HYDE_DynamicData_GroundNetwork_RS.py**
@@ -12,16 +50,12 @@ Version 1.9.8 [2021-08-01]
 **************************
 APP: **hyde_data_dynamic_modified_conditional_merging.py**
     - Update of the variogram estimation procedure and performance optimization
-
 BIN: **hyde_downloader_nwp_gefs_nomads.py**
     - Release for Hyde package
-
 BIN: **hyde_downloader_mysql_dams.py**
     - Release for Hyde package
-
 DRV: **drv_model_griso_exec.py**
     - Bug fixes: integrate mathematical variogram fit procedure
-
 FIX: **HYDE_Model_RFarm.py**
 	- Add resampling of outcome datasets according with the time delta settings
     - Fix 3d array vertical direction for the ecmwf0100 nwp
@@ -51,19 +85,14 @@ BIN: **hyde_downloader_nwp_gfs_nomads.py**
 
 BIN: **hyde_downloader_nwp_gfs_historical.py**
     - Release for Hyde package
-
 BIN: **hyde_downloader_nwp_gfs_ftp.py**
 	- Release for Hyde package
-
 BIN: **hyde_downloader_satellite_gsmap_nowcasting.py**
 	- Release for Hyde package
-	
 BIN: **hyde_downloader_satellite_gsmap_obs.py**
 	- Release for Hyde package
-
 DRV: **drv_model_griso_exec.py**
     - Release for Hyde package
-
 FIX: **HYDE_Model_RFarm.py**
     - Add the support to GFS 0.25 products
     - Update WRF reader for supporting 3d files

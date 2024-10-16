@@ -1,0 +1,54 @@
+20240930-lami-2i.t00z.T2m
+edition      centre       typeOfLevel  level        dataDate     stepRange    shortName    packingType  gridType     
+1            cnmc         heightAboveGround  2            20240930     0            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     1            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     2            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     3            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     4            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     5            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     6            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     7            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     8            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     9            2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     10           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     11           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     12           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     13           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     14           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     15           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     16           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     17           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     18           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     19           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     20           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     21           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     22           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     23           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     24           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     25           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     26           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     27           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     28           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     29           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     30           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     31           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     32           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     33           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     34           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     35           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     36           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     37           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     38           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     39           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     40           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     41           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     42           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     43           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     44           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     45           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     46           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     47           2t           grid_simple  rotated_ll  
+1            cnmc         heightAboveGround  2            20240930     48           2t           grid_simple  rotated_ll  
+49 of 49 messages in 20240930-lami-2i.t00z.T2m
+
+49 of 49 total messages in 1 files

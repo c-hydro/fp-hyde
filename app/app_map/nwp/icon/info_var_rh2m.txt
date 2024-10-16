@@ -1,0 +1,30 @@
+20240930-icon-2i.t00z.RH2m
+edition      centre       date         dataType     gridType     stepRange    typeOfLevel  level        shortName    packingType  
+2            ecmf         20240930     af           regular_ll   0            heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   3            heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   6            heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   9            heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   12           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   15           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   18           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   21           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   24           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   27           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   30           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   33           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   36           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   39           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   42           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   45           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   48           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   51           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   54           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   57           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   60           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   63           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   66           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   69           heightAboveGround  2            2r           grid_simple 
+2            ecmf         20240930     af           regular_ll   72           heightAboveGround  2            2r           grid_simple 
+25 of 25 messages in 20240930-icon-2i.t00z.RH2m
+
+25 of 25 total messages in 1 files

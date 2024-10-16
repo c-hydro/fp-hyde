@@ -1,0 +1,54 @@
+20240930-lami-2i.t00z.SWH
+edition      centre       typeOfLevel  level        dataDate     stepRange    shortName    packingType  gridType     
+1            cnmc         surface      0            20240930     0            sobs_rad     grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-1          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-2          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-3          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-4          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-5          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-6          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-7          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-8          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-9          asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-10         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-11         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-12         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-13         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-14         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-15         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-16         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-17         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-18         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-19         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-20         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-21         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-22         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-23         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-24         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-25         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-26         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-27         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-28         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-29         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-30         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-31         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-32         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-33         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-34         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-35         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-36         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-37         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-38         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-39         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-40         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-41         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-42         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-43         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-44         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-45         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-46         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-47         asob_s       grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     0-48         asob_s       grid_simple  rotated_ll  
+49 of 49 messages in 20240930-lami-2i.t00z.SWH
+
+49 of 49 total messages in 1 files

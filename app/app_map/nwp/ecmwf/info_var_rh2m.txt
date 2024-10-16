@@ -1,0 +1,34 @@
+20240930-ecmwf0100.t00z.RH2m
+edition      centre       typeOfLevel  level        dataDate     stepRange    dataType     shortName    packingType  gridType     
+1            ecmf         surface      0            20240930     0            fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     3            fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     6            fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     9            fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     12           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     15           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     18           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     21           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     24           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     27           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     30           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     33           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     36           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     39           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     42           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     45           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     48           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     51           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     54           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     57           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     60           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     63           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     66           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     69           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     72           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     75           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     78           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     81           fc           r            grid_simple  regular_ll  
+1            ecmf         surface      0            20240930     84           fc           r            grid_simple  regular_ll  
+29 of 29 messages in 20240930-ecmwf0100.t00z.RH2m
+
+29 of 29 total messages in 1 files

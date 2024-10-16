@@ -1,0 +1,53 @@
+20240930-lami-2i.t00z.PRECI1
+edition      centre       typeOfLevel  level        dataDate     stepRange    shortName    packingType  gridType     
+1            cnmc         surface      0            20240930     0-1          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     1-2          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     2-3          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     3-4          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     4-5          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     5-6          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     6-7          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     7-8          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     8-9          tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     9-10         tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     10-11        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     11-12        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     12-13        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     13-14        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     14-15        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     15-16        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     16-17        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     17-18        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     18-19        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     19-20        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     20-21        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     21-22        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     22-23        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     23-24        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     24-25        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     25-26        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     26-27        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     27-28        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     28-29        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     29-30        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     30-31        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     31-32        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     32-33        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     33-34        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     34-35        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     35-36        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     36-37        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     37-38        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     38-39        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     39-40        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     40-41        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     41-42        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     42-43        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     43-44        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     44-45        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     45-46        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     46-47        tp           grid_simple  rotated_ll  
+1            cnmc         surface      0            20240930     47-48        tp           grid_simple  rotated_ll  
+48 of 48 messages in 20240930-lami-2i.t00z.PRECI1
+
+48 of 48 total messages in 1 files
