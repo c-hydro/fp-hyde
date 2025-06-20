@@ -78,7 +78,7 @@ def main():
 
             if data_settings['data']['dynamic']['products'][prod]['correction_map_filename'] is not None:
                 logging.info(" --> Load data correction map!")
-                correction_map = xr.open_rasterio(data_settings['data']['dynamic']['products'][prod]['correction_map_filename'])
+                correction_map = rioxarray.open_rasterio(data_settings['data']['dynamic']['products'][prod]['correction_map_filename'])
                 apply_correction = True
             else:
                 logging.info(" --> No correction to data applied!")
@@ -104,9 +104,9 @@ def main():
                 if os.path.isfile(file_in_prev_time_step):
                     logging.info(' ----> All necessary file for the time step are available!')
                     if apply_correction is True:
-                        rain_now_mm_h = (xr.open_rasterio(file_in_time_step) + xr.open_rasterio(file_in_prev_time_step)) * correction_map.reindex_like(xr.open_rasterio(file_in_time_step), method="nearest")
+                        rain_now_mm_h = (rioxarray.open_rasterio(file_in_time_step) + rioxarray.open_rasterio(file_in_prev_time_step)) * correction_map.reindex_like(rioxarray.open_rasterio(file_in_time_step), method="nearest")
                     else:
-                        rain_now_mm_h = (xr.open_rasterio(file_in_time_step) + xr.open_rasterio(file_in_prev_time_step))
+                        rain_now_mm_h = (rioxarray.open_rasterio(file_in_time_step) + rioxarray.open_rasterio(file_in_prev_time_step))
                 else:
                     logging.warning(' ----> WARNING! Previous time step is not available!')
                     continue

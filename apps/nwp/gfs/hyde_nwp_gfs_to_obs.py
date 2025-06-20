@@ -1,8 +1,8 @@
 """
 HyDE Processing Tool - NWP GFS to OBS
 
-__date__ = '20210311'
-__version__ = '1.1.0'
+__date__ = '20250620'
+__version__ = '1.2.0'
 __author__ =
         'Andrea Libertino (andrea.libertino@cimafoundation.org',
         'Fabio Delogu (fabio.delogu@cimafoundation.org'
@@ -12,6 +12,7 @@ General command line:
 python hyde_nwp_gfs_to_obs.py -settings_file configuration.json -time YYYY-MM-DD HH:MM
 
 Version(s):
+20250620 (1.2.0) --> Fixed flipped latitude values under certains conditions
 20210311 (1.1.0) --> Updated input gfs format to be Continuum-compliant
 20210302 (1.0.0) --> Beta release for hyde package
 """
@@ -176,6 +177,7 @@ def main():
 
 # -------------------------------------------------------------------------------------
 # Method to create datasets
+# Method to create datasets
 def create_dset(var_data_dict, geo_data_values, geo_x_values, geo_y_values, time_data_values,
                 var_attrs_dict=None,
                 geo_data_attrs_dict=None, geo_data_name='terrain',
@@ -187,6 +189,15 @@ def create_dset(var_data_dict, geo_data_values, geo_x_values, geo_y_values, time
                 dim_name_x='west_east', dim_name_y='south_north', dim_name_time='time',
                 dims_order_2d=None, dims_order_3d=None,
                 missing_value_default=-9999.0, fill_value_default=-9999.0, meteogrid_dem_available=False, time_data=None):
+
+    # Ensure latitudes are increasing (South to North)
+    lat_descending = geo_y_values[0] > geo_y_values[-1]
+    if lat_descending:
+        geo_y_values = geo_y_values[::-1]
+        for key in var_data_dict:
+            var_data_dict[key] = np.flipud(var_data_dict[key])
+        if isinstance(geo_data_values, np.ndarray) and geo_data_values.ndim == 2:
+            geo_data_values = np.flipud(geo_data_values)
 
     geo_x_values_tmp = geo_x_values
     geo_y_values_tmp = geo_y_values
@@ -207,98 +218,85 @@ def create_dset(var_data_dict, geo_data_values, geo_x_values, geo_y_values, time
         time_data_values = [time_data_values]
 
     if var_attrs_dict is None:
-        var_attrs_dict = {}
-        for var_name_step in var_data_dict.keys():
-            var_attrs_dict[var_name_step] = None
+        var_attrs_dict = {var_name_step: None for var_name_step in var_data_dict.keys()}
 
     var_dset = xr.Dataset(coords={coord_name_time: ([dim_name_time], time_data_values)})
+
     if global_attrs_dict is not None:
-        for global_attrs_name, global_attrs_value in global_attrs_dict.items():
-            var_dset.attrs[global_attrs_name] = global_attrs_value
-        if 'nodata_value' not in list(global_attrs_dict.keys()):
+        for k, v in global_attrs_dict.items():
+            var_dset.attrs[k] = v
+        if 'nodata_value' not in global_attrs_dict:
             global_attrs_dict['nodata_value'] = -9999.0
+
     var_dset.coords[coord_name_time] = var_dset.coords[coord_name_time].astype('datetime64[ns]')
 
-    if meteogrid_dem_available==True:
-        var_da_terrain = xr.DataArray(np.flipud(geo_data_values),  name=geo_data_name,
+    if meteogrid_dem_available:
+        var_da_terrain = xr.DataArray(geo_data_values, name=geo_data_name,
                                       dims=dims_order_2d,
                                       coords={coord_name_x: ([dim_name_y, dim_name_x], geo_x_values_tmp),
                                               coord_name_y: ([dim_name_y, dim_name_x], geo_y_values_tmp)})
         var_dset[geo_data_name] = var_da_terrain
 
-    if geo_data_attrs_dict is not None:
+    if geo_data_attrs_dict:
         geo_attrs_dict_info, geo_attrs_dict_encoded = select_attrs(geo_data_attrs_dict)
-        if geo_attrs_dict_info is not None:
+        if geo_attrs_dict_info:
             var_dset[geo_data_name].attrs = geo_attrs_dict_info
-        if geo_attrs_dict_encoded is not None:
+        if geo_attrs_dict_encoded:
             var_dset[geo_data_name].encoding = geo_attrs_dict_encoded
 
-    if geo_x_name in list(var_dset.coords):
-        if geo_x_attrs_dict is not None:
-            geo_attrs_dict_info, geo_attrs_dict_encoded = select_attrs(geo_x_attrs_dict)
-            if geo_attrs_dict_info is not None:
-                var_dset[geo_x_name].attrs = geo_attrs_dict_info
-            if geo_attrs_dict_encoded is not None:
-                var_dset[geo_x_name].encoding = geo_attrs_dict_encoded
+    if geo_x_name in var_dset.coords and geo_x_attrs_dict:
+        geo_attrs_info, geo_attrs_encoded = select_attrs(geo_x_attrs_dict)
+        if geo_attrs_info:
+            var_dset[geo_x_name].attrs = geo_attrs_info
+        if geo_attrs_encoded:
+            var_dset[geo_x_name].encoding = geo_attrs_encoded
 
-    if geo_y_name in list(var_dset.coords):
-        if geo_y_attrs_dict is not None:
-            geo_attrs_dict_info, geo_attrs_dict_encoded = select_attrs(geo_y_attrs_dict)
-            if geo_attrs_dict_info is not None:
-                var_dset[geo_y_name].attrs = geo_attrs_dict_info
-            if geo_attrs_dict_encoded is not None:
-                var_dset[geo_y_name].encoding = geo_attrs_dict_encoded
+    if geo_y_name in var_dset.coords and geo_y_attrs_dict:
+        geo_attrs_info, geo_attrs_encoded = select_attrs(geo_y_attrs_dict)
+        if geo_attrs_info:
+            var_dset[geo_y_name].attrs = geo_attrs_info
+        if geo_attrs_encoded:
+            var_dset[geo_y_name].encoding = geo_attrs_encoded
 
-    for (var_name_step, var_data_step), var_attrs_step in zip(var_data_dict.items(), var_attrs_dict.values()):
+    for (var_name, var_data), var_attrs in zip(var_data_dict.items(), var_attrs_dict.values()):
 
-        if var_data_step.shape.__len__() == 2:
-            var_da_data = xr.DataArray(np.flipud(var_data_step), name=var_name_step,
-                                       dims=dims_order_2d,
-                                       coords={coord_name_x: ([dim_name_y, dim_name_x], geo_x_values_tmp),
-                                               coord_name_y: ([dim_name_y, dim_name_x], geo_y_values_tmp)})
-        elif var_data_step.shape.__len__() == 3:
-            var_da_data = xr.DataArray(np.flipud(var_data_step), name=var_name_step,
-                                       dims=dims_order_3d,
-                                       coords={coord_name_time: ([dim_name_time], time_data),
-                                               coord_name_x: ([dim_name_y, dim_name_x], geo_x_values_tmp),
-                                               coord_name_y: ([dim_name_y, dim_name_x], np.flipud(geo_y_values_tmp))})
+        if var_data.ndim == 2:
+            var_da = xr.DataArray(var_data, name=var_name,
+                                  dims=dims_order_2d,
+                                  coords={coord_name_x: ([dim_name_y, dim_name_x], geo_x_values_tmp),
+                                          coord_name_y: ([dim_name_y, dim_name_x], geo_y_values_tmp)})
+        elif var_data.ndim == 3:
+            var_da = xr.DataArray(var_data, name=var_name,
+                                  dims=dims_order_3d,
+                                  coords={coord_name_time: ([dim_name_time], time_data),
+                                          coord_name_x: ([dim_name_y, dim_name_x], geo_x_values_tmp),
+                                          coord_name_y: ([dim_name_y, dim_name_x], geo_y_values_tmp)})
         else:
-            raise NotImplemented
+            raise NotImplementedError(f"Data with {var_data.ndim} dimensions not supported.")
 
-        if var_attrs_step is not None:
+        if var_attrs:
+            missing_value = next((var_attrs.get(k) for k in attributes_defined_lut['filtering_attrs']['Missing_value']
+                                  if k in var_attrs), missing_value_default)
 
-            missing_value = None
-            for attrs_name in attributes_defined_lut['filtering_attrs']['Missing_value']:
-                if attrs_name in list(var_attrs_step.keys()):
-                    missing_value = var_attrs_step[attrs_name]
-            if missing_value is None:
-                missing_value = missing_value_default
-            for attrs_name in attributes_defined_lut['filtering_attrs']['Valid_range']:
-                if attrs_name in list(var_attrs_step.keys()):
-                    valid_range = var_attrs_step[attrs_name]
-                    var_da_data = clip_data(var_da_data, valid_range, missing_value=missing_value)
+            valid_range = next((var_attrs.get(k) for k in attributes_defined_lut['filtering_attrs']['Valid_range']
+                                if k in var_attrs), None)
+            if valid_range:
+                var_da = clip_data(var_da, valid_range, missing_value=missing_value)
 
-            fill_value = None
-            for attrs_name in attributes_defined_lut['encoding_attrs']['_FillValue']:
-                if attrs_name in list(var_attrs_step.keys()):
-                    fill_value = var_attrs_step[attrs_name]
-            if fill_value is None:
-                fill_value = fill_value_default
-            if meteogrid_dem_available==True:
-                var_da_data = var_da_data.where(var_da_terrain > global_attrs_dict['nodata_value'], other=fill_value)
+            fill_value = next((var_attrs.get(k) for k in attributes_defined_lut['encoding_attrs']['_FillValue']
+                               if k in var_attrs), fill_value_default)
 
-        var_dset[var_name_step] = var_da_data
+            if meteogrid_dem_available:
+                var_da = var_da.where(var_da_terrain > global_attrs_dict['nodata_value'], other=fill_value)
 
-        if var_attrs_step is not None:
-            var_attrs_step_info, var_attrs_step_encoded = select_attrs(var_attrs_step)
-        else:
-            var_attrs_step_info = None
-            var_attrs_step_encoded = None
+        var_dset[var_name] = var_da
 
-        if var_attrs_step_info is not None:
-            var_dset[var_name_step].attrs = var_attrs_step_info
-        if var_attrs_step_encoded is not None:
-            var_dset[var_name_step].encoding = var_attrs_step_encoded
+        if var_attrs:
+            attr_info, attr_encoded = select_attrs(var_attrs)
+            if attr_info:
+                var_dset[var_name].attrs = attr_info
+            if attr_encoded:
+                var_dset[var_name].encoding = attr_encoded
 
     return var_dset
 # -------------------------------------------------------------------------------------
