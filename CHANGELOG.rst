@@ -7,6 +7,7 @@ Version 2.1.0 [2025-10-22]
 GENERIC_DEV
     - Refactor of HyDE python package (name, script, structure and deps);
     - Repository initialization
+    - Repository sources
 
 Version 2.0.0 [2024-10-16]
 **************************
