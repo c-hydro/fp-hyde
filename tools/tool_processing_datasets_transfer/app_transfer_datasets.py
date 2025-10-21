@@ -3,13 +3,13 @@
 """
 HYDE PROCESSING TOOLS - File Transfer
 
-__date__ = '20221209'
-__version__ = '1.3.0'
+__date__ = '20241031'
+__version__ = '1.4.0'
 __author__ = 'Fabio Delogu (fabio.delogu@cimafoundation.org'
 __library__ = 'HyDE'
 
 General command line:
-python3 hyde_tools_transfer_datasets.py -settings_file configuration.json -time "YYYY-mm-dd HH:MM"
+python3 app_transfer_datasets.py -settings_file configuration.json -time "YYYY-mm-dd HH:MM"
 """
 
 # -------------------------------------------------------------------------------------
@@ -23,6 +23,7 @@ import json
 import glob
 import subprocess
 
+import dateutil.parser as dparser
 import pandas as pd
 
 from datetime import datetime
@@ -46,8 +47,8 @@ time_format_algorithm = '%y-%m-%d %H:%M'
 project_name = 'HyDE'
 alg_name = 'Datasets Transfer'
 alg_type = 'Processing Tool'
-alg_version = '1.3.0'
-alg_release = '2022-12-09'
+alg_version = '1.4.0'
+alg_release = '2024-10-31'
 # -------------------------------------------------------------------------------------
 
 
@@ -89,7 +90,7 @@ def main():
     if 'ancillary' in list(settings_data.keys()):
         ancillary_raw = settings_data['ancillary']
     else:
-        ancillary_raw['ancillary'] = {}
+        ancillary_raw = {'ancillary': {}}
         ancillary_raw['ancillary']['tag_name_list'] = ['datasets']
 
     # Configure template information
@@ -111,7 +112,11 @@ def main():
     time_frequency = settings_data['time']['time_frequency']
     time_rounding = settings_data['time']['time_rounding']
 
-    time_run, time_range = set_time(
+    # update time start and time end (based on time bounds left and right)
+    time_start, time_end = set_time_bounds(
+        time_run_args, time_run_file, time_period, time_frequency=time_frequency, time_rounding=time_rounding)
+    # set time period
+    time_run, time_range = set_time_period(
         time_run_args=time_run_args, time_run_file=time_run_file,
         time_run_file_start=time_start, time_run_file_end=time_end,
         time_period=time_period, time_frequency=time_frequency, time_rounding=time_rounding)
@@ -181,6 +186,7 @@ def main():
                         file_list_src_def = [file_path_src_def]
                     else:
                         file_list_src_def = glob.glob(file_path_src_def)
+                        file_list_src_def = sorted(file_list_src_def)
                 elif '*' not in file_path_src_def:
                     if isinstance(file_path_src_def, str):
                         file_list_src_def = [file_path_src_def]
@@ -231,8 +237,24 @@ def main():
                     elif (file_name_dst_tmp is not None) and ('*' in file_name_dst_tmp):
                         file_path_dst_def = []
                         for file_path_src_tmp in file_list_src_def:
+
                             folder_name_src_tmp, file_name_src_tmp = os.path.split(file_path_src_tmp)
-                            file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
+
+                            try:
+                                time_parsed = dparser.parse(file_name_src_tmp, fuzzy=True)
+                                format_parsed = template_time_raw['dset_datetime_dst']
+                                time_parsed = time_parsed.strftime(format_parsed)
+                            except BaseException as parser_error:
+                                log_stream.warning(' ===> Extract time from string failed. "' + str(parser_error) +
+                                                   '" Check the string format. Set the time to NoneType')
+                                time_parsed = None
+
+                            if time_parsed is None:
+                                file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_src_tmp)
+                            else:
+                                file_name_dst_filled = file_name_dst_tmp.replace('*', time_parsed)
+                                file_path_dst_tmp = os.path.join(folder_name_dst_tmp, file_name_dst_filled)
+
                             file_path_dst_filled = file_path_dst_tmp.format(**template_time_filled)
                             file_path_dst_def.append(file_path_dst_filled)
 
@@ -252,8 +274,8 @@ def main():
                     for file_path_src_step, file_path_dst_step in zip(file_list_src_def, file_list_dst_def):
 
                         # Define folder and file name(s)
-                        folder_name_src_step, file_name_src_step = os.path.split(file_path_src_step)
-                        folder_name_dst_step, file_name_dst_step = os.path.split(file_path_dst_step)
+                        folder_name_src_step, file_name_src_step = os.path.split(file_path_src_step); print(file_path_src_step)
+                        folder_name_dst_step, file_name_dst_step = os.path.split(file_path_dst_step); print(file_path_dst_step)
 
                         # Method settings
                         file_info = {
@@ -564,9 +586,61 @@ def set_log(logger_name='hyde_tools_transfer_datasets', logger_file_name="hyde_t
     logging.getLogger('').addHandler(logger_handle_2)
 # -------------------------------------------------------------------------------------
 
+
+# -------------------------------------------------------------------------------------
+# method to define period based on left and right bounds
+def set_time_bounds(time_run_args, time_run_file, time_period,
+                    time_format='%Y-%m-%d %H:%M', time_rounding='H', time_frequency='H'):
+
+    log_stream.info(' ----> Set time bounds ... ')
+
+    if time_run_args is not None:
+        time_run = time_run_args
+        log_stream.info(' ------> Time ' + time_run + ' set by argument')
+    elif (time_run_args is None) and (time_run_file is not None):
+        time_run = time_run_file
+        log_stream.info(' ------> Time ' + time_run + ' set by user')
+    elif (time_run_args is None) and (time_run_file is None):
+        time_now = datetime.now()
+        time_run = time_now.strftime(time_format)
+        log_stream.info(' ------> Time ' + time_run + ' set by system')
+    else:
+        log_stream.info(' ----> Set time period ... FAILED')
+        log_stream.error(' ===> Argument "time_run" is not correctly set')
+        raise IOError('Time type or format is wrong')
+
+    time_run = pd.Timestamp(time_run)
+    time_run = time_run.floor(time_rounding)
+
+    time_start, time_end = None, None
+    if isinstance(time_period, (int, float)):
+        pass
+    elif isinstance(time_period, dict):
+
+        # get time period bounds
+        time_period_left = time_period['left']
+        time_period_right = time_period['right']
+
+        # set time start
+        time_start = pd.date_range(end=time_run, periods=time_period_left, freq=time_frequency)[0]
+
+        # set time end
+        time_tmp = pd.date_range(start=time_run, periods=2, freq=time_frequency)[-1]
+        time_end = pd.date_range(start=time_tmp, periods=time_period_right, freq=time_frequency)[-1]
+
+    else:
+        log_stream.error(' ===> Argument "time_period" format is not expected')
+        raise NotImplemented('Case not implemented yet')
+
+    log_stream.info(' ----> Set time bounds ... DONE')
+
+    return time_start, time_end
+# -------------------------------------------------------------------------------------
+
+
 # -------------------------------------------------------------------------------------
 # Method to set time run
-def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:%M',
+def set_time_period(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:%M',
              time_run_file_start=None, time_run_file_end=None,
              time_period=1, time_frequency='H', time_rounding='H', time_reverse=True):
 
@@ -577,16 +651,12 @@ def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:%M
 
         if time_run_args is not None:
             time_run = time_run_args
-            log_stream.info(' ------> Time ' + time_run + ' set by argument')
         elif (time_run_args is None) and (time_run_file is not None):
             time_run = time_run_file
-            log_stream.info(' ------> Time ' + time_run + ' set by user')
         elif (time_run_args is None) and (time_run_file is None):
             time_now = datetime.now()
             time_run = time_now.strftime(time_format)
-            log_stream.info(' ------> Time ' + time_run + ' set by system')
         else:
-            log_stream.info(' ----> Set time period ... FAILED')
             log_stream.error(' ===> Argument "time_run" is not correctly set')
             raise IOError('Time type or format is wrong')
 
@@ -610,7 +680,7 @@ def set_time(time_run_args=None, time_run_file=None, time_format='%Y-%m-%d %H:%M
         time_run_file_end = pd.Timestamp(time_run_file_end)
         time_run_file_end = time_run_file_end.floor(time_rounding)
 
-        time_now = date.today()
+        time_now = pd.Timestamp.now()
         time_run = time_now.strftime(time_format)
         time_run = pd.Timestamp(time_run)
         time_run = time_run.floor(time_rounding)

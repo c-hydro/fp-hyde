@@ -2,17 +2,18 @@
 
 #-----------------------------------------------------------------------------------------
 # Script information
-script_name='FP ENVIRONMENT - PYTHON3 LIBRARIES FOR DOOR PACKAGE - CONDA'
-script_version="1.6.3"
-script_date='2022/11/22'
+script_name='HYDE ENVIRONMENT - PYTHON LIBRARIES FOR PACKAGE - RUNNER TYPE - CONDA'
+script_version="1.6.4"
+script_date='2024/10/15'
 
 # Define file reference path according with https link(s) --> https://repo.anaconda.com/miniconda/
-fp_env_file_miniconda='https://repo.continuum.io/miniconda/Miniconda3-py37_4.8.2-Linux-x86_64.sh'
+#fp_env_file_miniconda='https://repo.continuum.io/miniconda/Miniconda3-py37_4.8.2-Linux-x86_64.sh'
+fp_env_file_miniconda='https://repo.continuum.io/miniconda/Miniconda3-py39_23.1.0-1-Linux-x86_64.sh'
 
 # Argument(s) default definition(s)
-fp_env_tag_default='hyde'
+fp_env_tag_default='hyde_runner'
 
-fp_env_folder_root_default='/home/fabio/Desktop/Documents/Work_Area/Code_Development/Workspace/HyDE_Workspace/conda/'
+fp_env_folder_root_default='./conda/'
 fp_env_file_reference_default='%ENV_TAG_settings'
 fp_env_folder_libraries_default='%ENV_TAG_libraries'
 
@@ -175,8 +176,16 @@ else
 	echo " =====> CONDA INSTALLATION ... "
 	
 	echo " ======> CONDA-DEFAULT CHANNEL INSTALLATION ... "
-	conda create --yes --name $fp_env_folder_libraries numpy scipy pandas rasterio netCDF4 cython xarray=0.18.0 bottleneck dask pip python=3.7
+	conda create --yes --name $fp_env_folder_libraries numpy scipy pandas rasterio netCDF4 cython xarray=0.18.0 bottleneck dask pip python=3.9
 	echo " ======> CONDA-DEFAULT CHANNEL INSTALLATION ... DONE"
+	
+	echo " ======> [2/2] PYTHON-PIP INSTALLATION ... "
+	source activate $fp_env_folder_libraries
+	pip install cfgrib
+	pip install pyresample
+	pip install repurpose
+	echo " ======> [2/2] PYTHON-PIP INSTALLATION ... DONE"
+	
 
 
 	echo " =====> CONDA INSTALLATION ... DONE"

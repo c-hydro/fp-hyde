@@ -230,18 +230,44 @@ class DrvData:
                     # merge dataset source
                     if obj_dset_src is not None:
 
+                        alg_logger.info(' -------> Organize common dataframe ... ')
+
                         # store data collections
                         if collections_dset_src is None:
+
+                            time_start_src = obj_dset_src['time'].values[0]
+                            time_end_src = obj_dset_src['time'].values[-1]
+
+                            alg_logger.info(' ::: Use empty dataframe ')
+                            alg_logger.info(
+                                ' ::: DataPeriod - "' + str(time_start_src) + '" "' + str(time_end_src) + '"')
+
                             collections_dset_src = deepcopy(obj_dset_src)
                         else:
+
+                            time_start_src, time_end_src = obj_dset_src['time'].values[0], obj_dset_src['time'].values[-1]
+                            time_start_cl, time_end_cl = collections_dset_src['time'].values[0], collections_dset_src['time'].values[-1]
+
+                            alg_logger.info(' ::: Use available dataframe ')
+                            alg_logger.info(
+                                ' ::: DataPeriod - "' + str(time_start_src) + '" "' + str(time_end_src) + '"')
+                            alg_logger.info(
+                                ' ::: DataCollection - "' + str(time_start_cl) + '" "' + str(time_end_cl) + '"')
+
                             for (c_dim_name, c_dim_value), (s_dim_name, s_dim_value) in zip(
                                     collections_dset_src.dims.items(), obj_dset_src.dims.items()):
+
                                 if c_dim_name != s_dim_name:
                                     raise ValueError('Dimension names are different or order is different')
                                 else:
                                     if c_dim_value != s_dim_value:
                                         raise ValueError('Dimension values are different')
+
                             collections_dset_src = collections_dset_src.merge(obj_dset_src)
+
+                            alg_logger.info(' --------> Use available dataframe ... DONE')
+
+                        alg_logger.info(' -------> Organize common dataframe ... DONE')
 
                         # store attrs collections
                         if collections_attrs_src is None:

@@ -1,0 +1,138 @@
+{
+  "algorithm": {
+    "general": {
+      "title": "Preprocessing tool to convert variable time-step point from source to csv",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.1.0 [20241016]",
+      "project-info": "hyde",
+      "algorithm": "Algorithm developed by CIMA Research Foundation"
+    },
+    "flags": {
+      "reset_source": false,
+      "reset_destination": true
+    },
+    "template": {
+      "datasets": {
+        "point_name": "string_point_name",
+        "variable_name": "string_variable_name"
+      },
+      "time" : {
+        "source_sub_path_time": "%Y/%m/%d/",
+        "source_datetime": "%Y%m%d%H%M",
+        "source_datetime_start": "%Y%m%d%H%M",
+        "source_datetime_end": "%Y%m%d%H%M",
+        "ancillary_sub_path_time": "%Y/%m/%d",
+        "ancillary_datetime": "%Y%m%d%H%M",
+        "destination_sub_path_time": "%Y/%m/%d/%H/",
+        "destination_datetime": "%Y%m%d%H%M"
+      }
+    }
+  },
+  "data": {
+    "source": {
+      "registry": {
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_static/registry/",
+        "file_name": "air_temperature_registry_ws.csv",
+        "format": "csv",
+        "filters": {},
+        "type": null,
+        "fields": {
+          "code": "code",
+          "longitude": "longitude",
+          "latitude": "latitude",
+          "altitude": "altitude",
+          "catchment": "catchment",
+          "name": "name",
+          "units": "units",
+          "depth": "depth",
+          "porosity": "porosity",
+          "valid": "valid",
+          "tag": "tag",
+          "amm_level_1": "amm_level_1",
+          "amm_level_2": "amm_level_2"
+        }
+      },
+      "datasets": {
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/obs/weather_stations/{source_sub_path_time}",
+        "file_name": "air_temperature_marche_{source_datetime}.csv",
+        "format": "csv",
+        "time_start": null,
+        "time_end": null,
+        "time_frequency": "H",
+        "time_rounding": "H",
+        "time_format": "%Y-%m-%d %H:%M:%S",
+        "filters": null,
+        "type": null,
+        "fields": {
+          "time": "time_end",
+          "values": "data",
+          "code": "code",
+          "name": "name"
+        }
+      }
+    },
+    "ancillary": {
+      "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/ancillary/obs/{ancillary_sub_path_time}",
+      "file_name": "air_temperature_{ancillary_datetime}_marche.workspace"
+    },
+    "destination": {
+      "registry" : {
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_static/registry/",
+        "file_name": "air_temperature_ts_registry.csv",
+        "format": "csv",
+        "filters": null,
+        "type": null,
+        "fields": {
+          "code": "code",
+          "longitude": "longitude",
+          "latitude": "latitude",
+          "altitude": "altitude",
+          "catchment": "catchment",
+          "name": "name",
+          "units": "units",
+          "depth": "depth",
+          "porosity": "porosity",
+          "valid": "valid",
+          "tag": "tag",
+          "amm_level_1": "amm_level_1",
+          "amm_level_2": "amm_level_2"
+        },
+        "no_data": -9999.0
+      },
+      "datasets" : {
+        "__comment__": "type: [all_pnt_one_var, one_pnt_all_var]",
+        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/destination/obs/{destination_sub_path_time}",
+        "file_name": "air_temperature_{destination_datetime}_{point_name}.csv",
+        "format": "csv",
+        "time_start": null,
+        "time_end": null,
+        "time_frequency": "H",
+        "time_rounding": "H",
+        "filters": null,
+        "type": "one_pnt_all_var",
+        "fields": {
+          "time": "time",
+          "values": "air_temperature"
+        },
+        "no_data": -9999.0
+      }
+    }
+  },
+  "time" : {
+    "time_reference": null,
+    "time_frequency": "H",
+    "time_rounding": "H",
+    "time_period": 48,
+    "time_start": null,
+    "time_end": null
+  },
+  "tmp": {
+    "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/tmp/",
+    "file_name": null
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/log",
+    "file_name": "air_temperature_time_step_src2csv_marche.txt"
+  }
+}

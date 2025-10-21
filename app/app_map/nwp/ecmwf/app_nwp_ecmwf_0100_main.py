@@ -3,8 +3,8 @@
 """
 HYDE APP - NWP ECMWF-0100 PRODUCT  - HYdrological Data Engines
 
-__date__ = '20241012'
-__version__ = '3.5.0'
+__date__ = '20251022'
+__version__ = '3.6.0'
 __author__ =
     'Fabio Delogu (fabio.delogu@cimafoundation.org)'
 __library__ = 'hyde'
@@ -13,6 +13,7 @@ General command line:
 python app_nwp_ecmwf_0100_main.py -settings_file configuration.json -time "YYYY-MM-DD HH:MM"
 
 Version(s):
+20251022 (3.6.0) --> Extend support to forecast datasets (1h and 3h)
 20241012 (3.5.0) --> Refactor and update code for hyde package
 20200210 (3.0.0) --> Beta release for hyde package
 20170510 (2.5.0) --> Updated version
@@ -45,8 +46,8 @@ alg_logger = logging.getLogger(logger_name)
 project_name = 'hyde'
 alg_name = 'Application for processing nwp ecmwf-0100'
 alg_type = 'Package'
-alg_version = '3.5.0'
-alg_release = '2024-10-12'
+alg_version = '3.6.0'
+alg_release = '2025-10-22'
 # ----------------------------------------------------------------------------------------------------------------------
 
 

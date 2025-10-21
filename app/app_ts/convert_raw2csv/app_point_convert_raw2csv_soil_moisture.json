@@ -1,0 +1,137 @@
+{
+  "algorithm": {
+    "general": {
+      "title": "Preprocessing tool to convert soil moisture time-step point from source to csv",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.0.0 [20240703]",
+      "project-info": "recolour",
+      "algorithm": "Algorithm developed by CIMA Research Foundation"
+    },
+    "flags": {
+      "reset_source": true,
+      "reset_destination": true
+    },
+    "template": {
+      "datasets": {
+        "point_name": "string_point_name",
+        "variable_name": "string_variable_name"
+      },
+      "time" : {
+        "source_sub_path_time": "%Y/%m/%d/",
+        "source_datetime": "%Y%m%d%H%M",
+        "source_datetime_start": "%Y%m%d%H%M",
+        "source_datetime_end": "%Y%m%d%H%M",
+        "ancillary_sub_path_time": "%Y/%m/%d",
+        "ancillary_datetime": "%Y%m%d%H%M",
+        "destination_sub_path_time": "%Y/%m/%d",
+        "destination_datetime": "%Y%m%d%H%M"
+      }
+    }
+  },
+  "data": {
+    "source": {
+      "registry": {
+        "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/weather_stations_obs/source/regione_marche/data_static/point/",
+        "file_name": "sm_ws_registry.csv",
+        "format": "csv",
+        "filters": {"depth": 10},
+        "type": null,
+        "fields": {
+          "code": "code",
+          "longitude": "longitude",
+          "latitude": "latitude",
+          "altitude": "altitude",
+          "catchment": "catchment",
+          "name": "name",
+          "units": "units",
+          "depth": "depth",
+          "porosity": "porosity",
+          "valid": "valid",
+          "tag": "tag",
+          "amm_level_1": "amm_level_1",
+          "amm_level_2": "amm_level_2"
+        }
+      },
+      "datasets": {
+        "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/weather_stations_obs/source/regione_marche/data_dynamic/{source_sub_path_time}",
+        "file_name": "soil_moisture_10cm_marche_{source_datetime}.csv",
+        "format": "csv",
+        "time_start": "2024-04-01 00:00",
+        "time_end": "2024-04-04 00:00",
+        "time_frequency": "H",
+        "time_rounding": "H",
+        "filters": null,
+        "type": null,
+        "fields": {
+          "time": "time_end",
+          "values": "data",
+          "code": "code",
+          "name": "name"
+        }
+      }
+    },
+    "ancillary": {
+      "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/weather_stations_obs/ancillary/regione_marche/{ancillary_sub_path_time}",
+      "file_name": "sm_ts_obs_10cm_{ancillary_datetime}_marche.workspace"
+    },
+    "destination": {
+      "registry" : {
+        "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/weather_stations_obs/destination/regione_marche/data_static/",
+        "file_name": "sm_ts_registry_10cm.csv",
+        "format": "csv",
+        "filters": null,
+        "type": null,
+        "fields": {
+          "code": "code",
+          "longitude": "longitude",
+          "latitude": "latitude",
+          "altitude": "altitude",
+          "catchment": "catchment",
+          "name": "name",
+          "units": "units",
+          "depth": "depth",
+          "porosity": "porosity",
+          "valid": "valid",
+          "tag": "tag",
+          "amm_level_1": "amm_level_1",
+          "amm_level_2": "amm_level_2"
+        },
+        "no_data": -9999.0
+      },
+      "datasets" : {
+        "__comment__": "type: [all_pnt_one_var, one_pnt_all_var]",
+        "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/weather_stations_obs/destination/regione_marche/data_dynamic/{destination_sub_path_time}",
+        "file_name": "sm_ts_obs_{destination_datetime}_{variable_name}_{point_name}_marche.csv",
+        "format": "csv",
+        "time_start": null,
+        "time_end": null,
+        "time_frequency": "H",
+        "time_rounding": "H",
+        "filters": null,
+        "type": "all_pnt_one_var",
+        "fields": {
+          "time": "time",
+          "values": "sm_10cm"
+        },
+        "no_data": -9999.0
+      }
+    }
+  },
+  "time" : {
+    "time_reference": null,
+    "time_frequency": "H",
+    "time_rounding": "H",
+    "time_period": null,
+    "time_start": null,
+    "time_end": null
+  },
+  "tmp": {
+    "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/tmp/",
+    "file_name": null
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/Recolour_Workspace/ws/log/",
+    "file_name": "sm_time_step_src2csv_marche.txt"
+  }
+}

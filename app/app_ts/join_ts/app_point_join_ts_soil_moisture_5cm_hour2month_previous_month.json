@@ -1,0 +1,95 @@
+{
+  "algorithm": {
+    "general": {
+      "title": "Running tool for soil moisture time-series analysis",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.0.0 [20240301]",
+      "project-info": "recolour",
+      "algorithm": "Algorithm developed by CIMA Research Foundation"
+    },
+    "flags": {
+      "reset_dynamic_source": true,
+      "reset_dynamic_destination": true
+    },
+    "template": {
+      "point_name": "string_point_name",
+      "data_name": "string_data_name",
+      "source_sub_path_time": "%Y/%m/%d",
+      "source_datetime": "%Y%m%d%H%M",
+      "source_datetime_start": "%Y%m",
+      "source_datetime_end": "%Y%m",
+      "ancillary_sub_path_time": "%Y/%m/",
+      "ancillary_datetime": "%Y%m",
+      "ancillary_datetime_start": "%Y%m",
+      "ancillary_datetime_end": "%Y%m",
+      "destination_sub_path_time": "%Y/%m/",
+      "destination_datetime": "%Y%m",
+      "destination_datetime_start": "%Y%m",
+      "destination_datetime_end": "%Y%m"
+    }
+  },
+  "data": {
+    "static": {
+      "folder_name": "/hydro/data/data_static/registry_ground_network/",
+      "file_name": "soil_moisture_registry_ws.csv",
+      "format": "csv",
+      "fields": {
+        "code": "code", "longitude": "longitude", "latitude": "latitude",
+        "depth": "depth",
+        "name": "name", "valid": "valid", "units": "units", "tag": "tag"
+      }, 
+      "filters": {"depth": 5}
+    },
+    "dynamic": {
+      "source": {
+        "folder_name": "/hydro/data/data_dynamic/source/obs/weather_stations/{source_sub_path_time}",
+        "file_name": "soil_moisture_5cm_marche_{source_datetime}.csv",
+        "type": "csv_2d",
+        "fields": {
+          "data": "data", "time": "time_end", "name": "name"
+        },
+        "delimiter": ","
+      },
+      "ancillary": {
+        "folder_name": "/hydro/data/data_dynamic/ancillary/obs/time_series/soil_moisture/month/{ancillary_sub_path_time}",
+        "file_name": "soil_moisture_ts_obs5cm_{ancillary_datetime}.workspace"
+      },
+      "destination": {
+        "folder_name": "/hydro/data/data_dynamic/outcome/obs/time_series/soil_moisture/month/{destination_sub_path_time}",
+        "file_name": "soil_moisture_ts_obs5cm_{destination_datetime}_{point_name}_{data_name}.csv",
+        "type": "csv_1d",
+        "fields": {
+          "data": "data"
+        },
+        "no_data": -9999,
+        "delimiter": ";",
+        "date_format": "%Y-%m-%d %H:00",
+        "decimal_precision": 2
+      }
+    }
+  },
+  "tmp": {
+    "folder_name": "/hydro/data/tmp/",
+    "file_name": null
+  },
+  "log": {
+    "folder_name": "/hydro/log/time_series/",
+    "file_name": "ts_soil_moisture_obs5cm_hour2month_realtime_previous_month.txt"
+  },
+  "time": {
+    "algorithm": {
+      "__comment__": "time_period: FROM_TIME_START, PREVIOUS_MONTH, CURRENT_MONTH",
+      "time_reference": null,
+      "time_period": "PREVIOUS_MONTH",
+      "time_frequency": "H",
+      "time_rounding": "M",
+      "time_start": null,
+      "time_end": null
+    },
+    "data": {
+      "time_frequency": "H",
+      "time_rounding": "H"
+    }
+  }
+}
