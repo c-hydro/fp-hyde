@@ -9,6 +9,9 @@ GENERIC_DEV
     - Repository initialization
     - Repository sources
 
+APP: **app_nwp_ecmwf_0100_main.py**
+	- extend methods for managing 1h, 3h datasets
+
 Version 2.0.0 [2024-10-16]
 **************************
 GENERIC_DEV
