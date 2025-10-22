@@ -1,0 +1,31 @@
+# (0) Install deps for python3 in root:
+sudo -i
+pip3 install watchdog
+
+# (1) Create a Systemd Service File:
+sudo nano /etc/systemd/system/file_monitor.service
+
+# (2) Add the Service Configuration:
+
+[Unit]
+Description=File Monitor Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /path/to/your/script.py
+WorkingDirectory=/path/to/your/script_directory
+Restart=always
+User=yourusername
+Group=yourgroup
+
+[Install]
+WantedBy=multi-user.target
+
+# (3) Reload Systemd and Enable the Service
+
+sudo systemctl daemon-reload
+sudo systemctl enable file_monitor.service
+sudo systemctl start file_monitor.service
+
+# (4) Check the Service Status
+sudo systemctl status file_monitor.service

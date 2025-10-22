@@ -1,0 +1,34 @@
+## ---------------------------------------------------
+## installing new service
+## ---------------------------------------------------
+
+## ---------------------------------------------------
+# (1) change to root
+# user: user password: 'TemplateUB!2020'
+sudo -i
+# install (if needed) the watchdog module for python 3
+pip3 install watchdog
+## ---------------------------------------------------
+
+## ---------------------------------------------------
+# (2) create service file in /hydro/fp_tools_service/ 
+## ---------------------------------------------------
+
+## ---------------------------------------------------
+# (3) add service file (for example):
+cp /hydro/fp_tools_service/monitoring_file_arrivals_nwp.service /etc/systemd/system
+## ---------------------------------------------------
+
+## ---------------------------------------------------
+# (4) reload systemd and enable the service
+
+systemctl daemon-reload
+systemctl enable monitoring_file_arrivals_nwp.service
+systemctl start monitoring_file_arrivals_nwp.service
+## ---------------------------------------------------
+
+## ---------------------------------------------------
+# (5) check the service status
+systemctl status monitoring_file_arrivals_nwp.service
+## ---------------------------------------------------
+

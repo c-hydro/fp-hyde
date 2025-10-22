@@ -26,6 +26,7 @@ import lib_fx_nwp_ecmwf_0100 as lib_fx_nwp
 alg_logger = logging.getLogger(logger_name)
 logging.getLogger('cfgrib').setLevel(logging.WARNING)
 logging.getLogger('gribapi').setLevel(logging.WARNING)
+logging.getLogger("findlibs").setLevel(logging.WARNING)
 
 # debug
 # import matplotlib.pylab as plt
@@ -33,7 +34,6 @@ logging.getLogger('gribapi').setLevel(logging.WARNING)
 # default netcdf encoded attributes
 attrs_encoded = ["_FillValue", "dtype", "scale_factor", "add_offset", "grid_mapping"]
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # method to organize grib file
@@ -148,8 +148,50 @@ def organize_file_grib(obj_data, obj_time=None, obj_geo_x=None, obj_geo_y=None,
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# method to filter timestamps by frequency
+def filter_grib_by_freq(times, expected_freq="1h"):
+
+    # convert to lower case (to manage future warnings)
+    expected_freq = expected_freq.lower()
+
+    # Ensure DatetimeIndex
+    idx = pd.DatetimeIndex(times).sort_values()
+    # Compute expected timedelta for one step
+    expected_delta = pd.to_timedelta(pd.Timedelta(expected_freq))
+    # Compute diffs between consecutive timestamps
+    diffs = idx.to_series().diff()
+    # Keep only those where the diff equals the expected delta
+    # (first element always kept)
+    mask = (diffs.isna()) | (diffs == expected_delta)
+    # Also ensure each timestamp is aligned to frequency grid
+    mask &= (idx == idx.floor(expected_freq))
+
+    return idx[mask]
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# method to select grib dataset by time range
+def select_grib_by_time(dset_grib, time_start, time_end, time_var='valid_time'):
+
+    # Extract time values as NumPy datetime64 array
+    time_values = dset_grib[time_var].values
+
+    # Build boolean mask
+    mask = (time_values >= np.datetime64(time_start)) & (time_values <= np.datetime64(time_end))
+
+    # Apply mask to select along the corresponding dimension
+    # Usually 'valid_time' is along 'time' or 'step' — find which dimension matches
+    dim_name = dset_grib[time_var].dims[0]  # e.g. 'step' or 'time'
+
+    dset_filtered = dset_grib.isel({dim_name: mask})
+
+    return dset_filtered
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
 # method to read grib file
-def read_file_grib(file_name, file_variables=None, file_time_reference=None,
+def read_file_grib(file_name, file_variables=None, type_variables='fc', freq_variables='1h',
+                   file_time_reference=None,
                    var_name_geo_x='longitude', var_name_geo_y='latitude'):
 
     # check file availability
@@ -171,9 +213,26 @@ def read_file_grib(file_name, file_variables=None, file_time_reference=None,
         # iterate over filter variables
         file_dset = None
         for filter_var in filter_vars:
-            tmp_dset = xr.open_dataset(
-                file_name, engine='cfgrib',
-                backend_kwargs={'filter_by_keys': {'cfVarName': filter_var}})
+
+            # read file according to variable type and variable filter
+            if type_variables is None:
+
+                tmp_dset = xr.open_dataset(
+                    file_name,
+                    engine="cfgrib",
+                    backend_kwargs={"filter_by_keys": {"cfVarName": filter_var}})
+
+            elif type_variables == 'fc':
+
+                tmp_dset = xr.open_dataset(
+                    file_name,
+                    engine="cfgrib",
+                    backend_kwargs={"filter_by_keys": {"dataType": type_variables, "cfVarName": filter_var}})
+
+            else:
+                # exit for unsupported variable type
+                alg_logger.error(' ===> Variable type "' + str(type_variables) + '" not implemented')
+                raise NotImplementedError('Case not implemented yet')
 
             if file_dset is None:
                 file_dset = tmp_dset
@@ -184,14 +243,24 @@ def read_file_grib(file_name, file_variables=None, file_time_reference=None,
         if len(file_dset.dims) > 0:
 
             # organize time object
-            time_range = file_dset['valid_time'].values
+            time_index_raw = pd.DatetimeIndex(file_dset['valid_time'].values)
             time_steps = file_dset['step'].values
             time_reference = file_dset['time'].values
+
+            # filter according to expected frequency
+            time_index_filtered = filter_grib_by_freq(time_index_raw, expected_freq=freq_variables)
+
+            # update variables
+            time_range = time_index_filtered.values
+            time_steps = time_steps[:len(time_range)]
             time_start, time_end = time_range[0], time_range[-1]
 
             time_obj = {'reference': time_reference,
                         'time': time_range, 'steps': time_steps,
                         'start': time_start, 'end': time_end}
+
+            # method to select dataset by time range (update using the time index filtered)
+            file_dset = select_grib_by_time(file_dset, time_start, time_end, time_var='valid_time')
 
             # organize attrs obj
             file_attrs = file_dset.attrs

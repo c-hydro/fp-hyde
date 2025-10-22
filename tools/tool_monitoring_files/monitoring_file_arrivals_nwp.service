@@ -1,0 +1,12 @@
+[Unit]
+Description=File Monitor Service [NWP Arrival Files]
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /hydro/fp_tools_service/hyde_tools_monitoring_file_arrivals_nwp.py
+WorkingDirectory=/hydro/fp_tools_service/
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

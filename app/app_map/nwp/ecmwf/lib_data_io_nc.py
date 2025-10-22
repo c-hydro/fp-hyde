@@ -252,8 +252,10 @@ def write_file_nc_library(file_name, dset_data, dset_attrs, dset_time,
                           var_type_time='float64', var_type_geo_x='float64', var_type_geo_y='float64'):
 
     # get dimensions
-    dset_dims = dset_data.dims
-    n_cols, n_rows, n_time = dset_dims['longitude'], dset_dims['latitude'], dset_dims['time']
+    # dset_dims = dset_data.dims
+    # n_cols, n_rows, n_time = dset_dims['longitude'], dset_dims['latitude'], dset_dims['time']
+    n_cols, n_rows, n_time = dset_data.sizes['longitude'], dset_data.sizes['latitude'], dset_data.sizes['time']
+
     # get geographical coordinates
     geo_x, geo_y = deepcopy(dset_geo_x), deepcopy(dset_geo_y)
 

@@ -17,7 +17,7 @@ script_folder='/hydro/library/hyde/'
 #-----------------------------------------------------------------------------------------
 # Get script information
 script_file='app_nwp_ecmwf_0100.py'
-settings_file='app_nwp_ecmwf_0100.json'
+settings_file='app_nwp_ecmwf_0100_3h.json'
 
 # Get lock information
 file_lock_start='app_nwp_ecmwf_0100_lock_START.txt'
