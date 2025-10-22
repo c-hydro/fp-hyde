@@ -75,33 +75,17 @@ fp-hyde/
 
 4. Configure environment variables (paths, data directories, etc.) as described in the `docs/` folder.
 
----
+---## ▶️ How to run applications
 
-## 🧩 Usage
+Execution examples are provided as shell wrappers inside the repository (under `app/app_map/...`).  
+Use these scripts as the **source of truth** for invocation, arguments, and environment handling.
 
-HyDE can be run via command line or as a library module.
+For instance:
+- **ECMWF 0.1° NWP**: [app_nwp_ecmwf_0100.sh](https://github.com/c-hydro/fp-hyde/blob/main/app/app_map/nwp/ecmwf/app_nwp_ecmwf_0100.sh)
 
-### Example (Command Line)
-```bash
-python3 app/hyde_data_engine.py --config ./config/hyde_config.json --run daily
-```
-
-### Example (Python API)
-```python
-from hyde.engine import HyDE
-hyde = HyDE(config='config/hyde_config.json')
-hyde.run()
-```
-
-### Modes
-- `--run daily` → process daily observations
-- `--run realtime` → process near-real-time inputs
-- `--run history` → back-process historical datasets
-
----
+Explore adjacent folders for other models and data types (e.g., ICON, LAMI-2i, observations). The scripts document the expected configuration files and runtime options for each application.
 
 ## 🧠 Integration within FloodPROOFS
-
 HyDE is the **data layer** of the FloodPROOFS ecosystem:
 1. **HyDE** – data acquisition, harmonization, and preprocessing  
 2. **HMC** – distributed hydrological model  
