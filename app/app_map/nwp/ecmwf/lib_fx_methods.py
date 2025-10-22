@@ -10,7 +10,12 @@ Version:       '1.0.0'
 # ----------------------------------------------------------------------------------------------------------------------
 # libraries
 import logging
-import inspect
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message=r"Possible more than \d+ neighbours within \d+ m",
+    module=r"repurpose\.resample"
+)
 
 import numpy as np
 import pandas as pd
@@ -128,7 +133,6 @@ def extract_data(obj_collections_src,
 
     return obj_data_dst, obj_attrs_dst, time_values_dst, geo_x_values_dst, geo_y_values_dst
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # method to resample data

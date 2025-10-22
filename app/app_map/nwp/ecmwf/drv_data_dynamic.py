@@ -80,6 +80,7 @@ class DrvData:
 
         self.tag_folder_name, self.tag_file_name = 'folder_name', 'file_name'
         self.tag_variables, self.tag_compression, self.tag_format = 'variables', 'compression', 'format'
+        self.tag_type, self.tag_frequency = 'type', 'frequency'
 
         self.reset_datasets_anc_raw = self.alg_flags['reset_datasets_ancillary_raw']
         self.reset_datasets_anc_def = self.alg_flags['reset_datasets_ancillary_def']
@@ -192,6 +193,14 @@ class DrvData:
                 file_name_src_tmpl = file_data_fields[self.tag_file_name]
                 file_compression_src = file_data_fields[self.tag_compression]
                 file_variables_src = file_data_fields[self.tag_variables]
+                if self.tag_type in list(file_data_fields.keys()):
+                    file_type_src = file_data_fields[self.tag_type]
+                else:
+                    file_type_src = None
+                if self.tag_frequency in list(file_data_fields.keys()):
+                    file_frequency_src = file_data_fields[self.tag_frequency]
+                else:
+                    file_frequency_src = '3H'
 
                 # check file source availability
                 if (folder_name_src_tmpl is not None) and (file_name_src_tmpl is not None):
@@ -217,7 +226,8 @@ class DrvData:
                         # get dataset source
                         obj_data_src, obj_attrs_src, obj_geo_src, obj_time_src = read_file_grib(
                             file_path_src_tmp, file_time_reference=alg_time_now,
-                            file_variables=file_variables_src)
+                            file_variables=file_variables_src,
+                            type_variables=file_type_src, freq_variables=file_frequency_src)
 
                         # organize dataset source
                         if obj_data_src is not None:
@@ -238,12 +248,11 @@ class DrvData:
                                 collections_dset_src = deepcopy(obj_dset_src)
                             else:
                                 for (c_dim_name, c_dim_value), (s_dim_name, s_dim_value) in zip(
-                                        collections_dset_src.dims.items(), obj_dset_src.dims.items()):
+                                        collections_dset_src.sizes.items(), obj_dset_src.sizes.items()):
                                     if c_dim_name != s_dim_name:
                                         raise ValueError('Dimension names are different or order is different')
-                                    else:
-                                        if c_dim_value != s_dim_value:
-                                            raise ValueError('Dimension values are different')
+                                    elif c_dim_value != s_dim_value:
+                                        raise ValueError('Dimension values are different')
                                 collections_dset_src = collections_dset_src.merge(obj_dset_src)
 
                             # store attrs collections

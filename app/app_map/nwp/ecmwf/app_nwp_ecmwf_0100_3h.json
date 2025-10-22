@@ -171,7 +171,7 @@
         "file_name": null
       },
       "grid_destination" : {
-        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_static/gridded/",
+        "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_static/gridded/",
         "file_name": "marche.dem.txt"
       }
     },
@@ -182,47 +182,55 @@
       },
       "source": {
         "air_temperature_collections": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/ecmwf-0100/",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
           "file_name": "{datetime_source}-ecmwf0100.t00z.T2m",
           "compression": false,
           "variables": {
             "air_temperature": "t2m",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": null,
+          "frequency": "3H"
         },
         "rain_collections": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/ecmwf-0100/",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
           "file_name": "{datetime_source}-ecmwf0100.t00z.PRECI3",
           "compression": false,
           "variables": {
             "rain": "tp",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": null,
+          "frequency": "3H"
         },
         "relative_humidity_collections": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/ecmwf-0100/",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
           "file_name": "{datetime_source}-ecmwf0100.t00z.RH2m",
           "compression": false,
           "variables": {
             "relative_humidity": "r",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": null,
+          "frequency": "3H"
         },
         "incoming_radiation_collections": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/ecmwf-0100/",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
           "file_name": null,
           "compression": false,
           "variables": {
             "incoming_radiation": "asob_s",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": null,
+          "frequency": "3H"
         },
         "wind_collections": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/ecmwf-0100/",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
           "file_name": "{datetime_source}-ecmwf0100.t00z.VENTO10m",
           "compression": false,
           "variables": {
@@ -230,33 +238,37 @@
             "wind_v": "v10",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": null,
+          "frequency": "3H"
         },
         "albedo_collections": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/source/nwp/ecmwf-0100/",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
           "file_name": null,
           "compression": false,
           "variables": {
               "albedo": "alb_rad",
               "longitude": "longitude",
               "latitude": "latitude"
-          }
+          },
+          "type": null,
+          "frequency": "3H"
         }
       },
       "ancillary": {
         "raw": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/ancillary/nwp/ecmwf-0100/{sub_path_ancillary}",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/ancillary/nwp/ecmwf-0100/{sub_path_ancillary}",
           "file_name": "nwp_ecmwf-0100_{domain_name}_{datetime_ancillary}.raw.workspace"
         },
         "def": {
-          "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/ancillary/nwp/ecmwf-0100/{sub_path_ancillary}",
+          "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/ancillary/nwp/ecmwf-0100/{sub_path_ancillary}",
           "file_name": "nwp_ecmwf-0100_{domain_name}_{datetime_ancillary}.def.workspace"
         }
       },
       "destination": {
         "__comment__": "format: [netcdf_xarray, netcdf_base]",
-        "folder_name": "/home/fabio/Desktop/Hyde_Package/ws/marche/data_dynamic/destination/nwp/ecmwf-0100/{sub_path_destination}",
-        "file_name": "nwp_ecmwf-0100_{domain_name}_{datetime_destination}_new.nc",
+        "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/destination/nwp/ecmwf-0100/{sub_path_destination}",
+        "file_name": "nwp_ecmwf-0100_{domain_name}_{datetime_destination}.nc",
         "compression": true,
         "format": "netcdf_base",
         "variables": {
@@ -276,11 +288,11 @@
     "time_rounding" : "H"
   },
   "log": {
-    "folder_name" : "/home/fabio/Desktop/Workspace/Hyde_Package/ws/marche/log/",
-    "file_name": "app_nwp_lami_2i_local.txt"
+    "folder_name" : "/home/fabio/Desktop/hyde/dset/marche/log/",
+    "file_name": "app_nwp_ecmwf-0100_3h.txt"
   },
   "tmp": {
-    "folder_name" : "/home/fabio/Desktop/Workspace/Hyde_Package/ws/marche/tmp/",
+    "folder_name" : "/home/fabio/Desktop/hyde/dset/marche/tmp/",
     "file_name": null
   }
 }

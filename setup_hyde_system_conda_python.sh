@@ -1,14 +1,15 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 #-----------------------------------------------------------------------------------------
 # Script information
 script_name='HYDE ENVIRONMENT - PYTHON LIBRARIES FOR PACKAGE - RUNNER TYPE - CONDA'
-script_version="1.6.4"
-script_date='2024/10/15'
+script_version="1.7.2"
+script_date='2025/10/21'
+#-----------------------------------------------------------------------------------------
 
-# Define file reference path according with https link(s) --> https://repo.anaconda.com/miniconda/
-#fp_env_file_miniconda='https://repo.continuum.io/miniconda/Miniconda3-py37_4.8.2-Linux-x86_64.sh'
-fp_env_file_miniconda='https://repo.continuum.io/miniconda/Miniconda3-py39_23.1.0-1-Linux-x86_64.sh'
+# Miniconda installer (kept from your base script)
+fp_env_file_miniconda='https://repo.continuum.io/miniconda/Miniconda3-py310_25.7.0-2-Linux-x86_64.sh'  # python 3.10
 
 # Argument(s) default definition(s)
 fp_env_tag_default='hyde_runner'
@@ -19,208 +20,168 @@ fp_env_folder_libraries_default='%ENV_TAG_libraries'
 
 fp_env_file_requirements_default='requirements_%ENV_TAG.yaml'
 
-# Examples of generic command-line:
-# conda create --yes --name $fp_env_folder_libraries numpy scipy pip python=3
-# conda create --yes --nama $fp_env_folder_libraries -c conda-forge pyresample pygeobase
-# conda install --yes -c conda-forge nbconvert
-# conda env export | grep -v "^prefix: " > requirements_fp_env_python.yaml
-# conda env create --file $fp_env_file_requirements # create virtual env using yaml file
-# conda create -y --name $fp_env_folder_libraries --file $fp_env_file_requirements # create virtual env using ascii file
 #-----------------------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------------------
 # Info script start
 echo " ==================================================================================="
-echo " ==> "$script_name" (Version: "$script_version" Release_Date: "$script_date")"
+echo " ==> $script_name (Version: $script_version Release_Date: $script_date)"
 echo " ==> START ..."
 
-# Get arguments number and values
 script_args_n=$#
-script_args_values=$@
+script_args_values=${*:-}
 
 echo ""
 echo " ==> Script arguments number: $script_args_n"
 echo " ==> Script arguments values: $script_args_values"
 echo ""
 echo " ==> ARGS DEFINED:"
-echo ""
-echo " ==> Script arguments 1 - Tag of virtual environmenf [string: path]-> $1"
-echo " ==> Script arguments 2 - Directory of libraries [string: path]-> $2"
-echo " ==> Script arguments 3 - Filename of system environment [string: filename] -> $3"
-echo " ==> Script arguments 4 - Name of virtual environment [string: name] -> $4"
-echo " ==> Script arguments 5 - Filename of system requirements in yaml format [string: name] -> $5"
+echo " ==> 1 - Tag of virtual environment [string: path] -> ${1:-<default>}"
+echo " ==> 2 - Directory of libraries (conda root) [string: path] -> ${2:-<default>}"
+echo " ==> 3 - Filename of system environment [string: filename] -> ${3:-<default>}"
+echo " ==> 4 - Name of virtual environment [string: name] -> ${4:-<default>}"
+echo " ==> 5 - Requirements YAML [string: name] -> ${5:-<default>}"
 echo ""
 
-# Get folder root path
-if [ $# -eq 0 ]; then
-
-	fp_env_tag=$fp_env_tag_default	
-    fp_env_folder_root=$fp_env_folder_root_default		
-	fp_env_file_reference=$fp_env_file_reference_default
-	fp_env_folder_libraries=$fp_env_folder_libraries_default
-	fp_env_file_requirements=$fp_env_file_requirements_default
+# Parse args
+if   [ $# -eq 0 ]; then
+  fp_env_tag=$fp_env_tag_default
+  fp_env_folder_root=$fp_env_folder_root_default
+  fp_env_file_reference=$fp_env_file_reference_default
+  fp_env_folder_libraries=$fp_env_folder_libraries_default
+  fp_env_file_requirements=$fp_env_file_requirements_default
 elif [ $# -eq 1 ]; then
-	fp_env_tag=$1
-	fp_env_folder_root=$fp_env_folder_root_default
-	fp_env_file_reference=$fp_env_file_reference_default
-	fp_env_folder_libraries=$fp_env_folder_libraries_default
-	fp_env_file_requirements=$fp_env_file_requirements_default
+  fp_env_tag=$1
+  fp_env_folder_root=$fp_env_folder_root_default
+  fp_env_file_reference=$fp_env_file_reference_default
+  fp_env_folder_libraries=$fp_env_folder_libraries_default
+  fp_env_file_requirements=$fp_env_file_requirements_default
 elif [ $# -eq 2 ]; then
-	fp_env_tag=$1
-	fp_env_folder_root=$2
-	fp_env_file_reference=$fp_env_file_reference_default
-	fp_env_folder_libraries=$fp_env_folder_libraries_default
-	fp_env_file_requirements=$fp_env_file_requirements_default
+  fp_env_tag=$1
+  fp_env_folder_root=$2
+  fp_env_file_reference=$fp_env_file_reference_default
+  fp_env_folder_libraries=$fp_env_folder_libraries_default
+  fp_env_file_requirements=$fp_env_file_requirements_default
 elif [ $# -eq 3 ]; then
-	fp_env_tag=$1
-	fp_env_folder_root=$2
-	fp_env_file_reference=$3
-	fp_env_folder_libraries=$fp_env_folder_libraries_default
-	fp_env_file_requirements=$fp_env_file_requirements_default
+  fp_env_tag=$1
+  fp_env_folder_root=$2
+  fp_env_file_reference=$3
+  fp_env_folder_libraries=$fp_env_folder_libraries_default
+  fp_env_file_requirements=$fp_env_file_requirements_default
 elif [ $# -eq 4 ]; then
-	fp_env_tag=$1
-	fp_env_folder_root=$2
-	fp_env_file_reference=$3
-	fp_env_folder_libraries=$4
-	fp_env_file_requirements=$fp_env_file_requirements_default
+  fp_env_tag=$1
+  fp_env_folder_root=$2
+  fp_env_file_reference=$3
+  fp_env_folder_libraries=$4
+  fp_env_file_requirements=$fp_env_file_requirements_default
 elif [ $# -eq 5 ]; then
-	fp_env_tag=$1
-	fp_env_folder_root=$2
-	fp_env_file_reference=$3
-	fp_env_folder_libraries=$4
-	fp_env_file_requirements=$5
+  fp_env_tag=$1
+  fp_env_folder_root=$2
+  fp_env_file_reference=$3
+  fp_env_folder_libraries=$4
+  fp_env_file_requirements=$5
 fi
 
-# Set the 
-fp_env_folder_root=${fp_env_folder_root/'%ENV_TAG'/$fp_env_tag}
-fp_env_file_reference=${fp_env_file_reference/'%ENV_TAG'/$fp_env_tag}
-fp_env_folder_libraries=${fp_env_folder_libraries/'%ENV_TAG'/$fp_env_tag}
-fp_env_file_requirements=${fp_env_file_requirements/'%ENV_TAG'/$fp_env_tag}
+# Expand placeholders
+fp_env_folder_root="${fp_env_folder_root/'%ENV_TAG'/$fp_env_tag}"
+fp_env_file_reference="${fp_env_file_reference/'%ENV_TAG'/$fp_env_tag}"
+fp_env_folder_libraries="${fp_env_folder_libraries/'%ENV_TAG'/$fp_env_tag}"
+fp_env_file_requirements="${fp_env_file_requirements/'%ENV_TAG'/$fp_env_tag}"
 
 echo ""
 echo " ==> ARGS SELECTED:"
+echo " ==> 1 - Tag -> ${fp_env_tag}"
+echo " ==> 2 - Conda root -> ${fp_env_folder_root}"
+echo " ==> 3 - Env file -> ${fp_env_file_reference}"
+echo " ==> 4 - Conda env name -> ${fp_env_folder_libraries}"
+echo " ==> 5 - Requirements YAML -> ${fp_env_file_requirements}"
 echo ""
-echo " ==> Script arguments 1 - Tag of virtual environmenf [string: path]-> ${fp_env_tag}"
-echo " ==> Script arguments 2 - Directory of libraries [string: path]-> ${fp_env_folder_root}"
-echo " ==> Script arguments 3 - Filename of system environment [string: filename] -> ${fp_env_file_reference}"
-echo " ==> Script arguments 4 - Name of virtual environment [string: name] -> ${fp_env_folder_libraries}"
-echo " ==> Script arguments 5 - Filename of system requirements in yaml format [string: name] -> ${fp_env_file_requirements}"
-echo ""
 
-# Create root folder
-if [ ! -d "$fp_env_folder_root" ]; then
-	mkdir -p $fp_env_folder_root
-fi
-
-# Define folder path(s)
-fp_env_folder_root=$fp_env_folder_root
-
-# Define environment filename
-fp_env_path_reference=$fp_env_folder_root/$fp_env_file_reference
-
-# multilines comment: if [ 1 -eq 0 ]; then ... fi
 #-----------------------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------------------
-# Install python environmente using miniconda
+# Check/install Miniconda  (installer creates the folder; we do NOT pre-create or delete it)
 echo " ====> CHECK PYTHON ENVIRONMENT ... "
-if [ -d "$fp_env_folder_root/bin/" ] > /dev/null 2>&1 ; then
-	export PATH="$fp_env_folder_root/bin:$PATH"
-	if source activate $fp_env_folder_root > /dev/null 2>&1 ; then
-		echo " ====> CHECK PYTHON ENVIRONMENT ... FOUND."
-    	fp_env_install=false
-    else
-   	 	echo " ====> CHECK PYTHON ENVIRONMENT ... FOUND ENVIRONMENT BUT LIBRARIES ARE NOT FOUND."
-    	fp_env_install=false
-    fi
+if [ -x "$fp_env_folder_root/bin/conda" ]; then
+  echo " ====> FOUND EXISTING CONDA INSTALLATION."
+  fp_env_install=false
 else
-	echo " ====> CHECK PYTHON ENVIRONMENT ... NOT FOUND."
-	fp_env_install=true
+  echo " ====> NO EXISTING CONDA FOUND. INSTALLING ..."
+  fp_env_install=true
 fi
 
-echo " ====> INSTALL PYTHON ENVIRONMENT ... "
 if $fp_env_install; then
-	# Download library source codes
-	echo " =====> GET LIBRARY FILES ... "
-	wget $fp_env_file_miniconda -O miniconda.sh
-	echo " =====> GET LIBRARY FILES ... DONE!"
-
-	if [ -d "$fp_env_folder_root" ]; then 
-		rm -Rf $fp_env_folder_root; 
-	fi
-
-	bash miniconda.sh -b -p $fp_env_folder_root
-	
-	echo " ====> INSTALL PYTHON ENVIRONMENT ... DONE!"
-	
+  echo " =====> DOWNLOADING MINICONDA INSTALLER ..."
+  rm -f miniconda.sh
+  wget -q "$fp_env_file_miniconda" -O miniconda.sh
+  echo " =====> RUNNING INSTALLER ..."
+  bash miniconda.sh -b -p "$fp_env_folder_root"
+  echo " =====> CONDA INSTALLED SUCCESSFULLY."
 else
-	echo " ====> INSTALL PYTHON ENVIRONMENT ... DONE. PREVIOSLY INSTALLED"
+  echo " =====> SKIPPING INSTALL (ALREADY EXISTS)."
 fi
-# ----------------------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------------------
-# Install python libraries
-echo " ====> INSTALL PYTHON LIBRARIES ... "
+#-----------------------------------------------------------------------------------------
+# Initialize conda for this shell
+# shellcheck disable=SC1091
+source "$fp_env_folder_root/etc/profile.d/conda.sh"
 export PATH="$fp_env_folder_root/bin:$PATH"
 
-if [ -f $fp_env_file_requirements ] ; then
-	echo " =====> USE OF CONDA REQUIREMENTS FILE YAML: $fp_env_file_requirements"
-	# source activate $fp_env_folder_libraries
-    # conda create -y --name $fp_env_folder_libraries --file $fp_env_file_requirements
-    conda env create --file $fp_env_file_requirements
-   
+#-----------------------------------------------------------------------------------------
+# Install python libraries / Create or update the environment
+echo " ====> INSTALL PYTHON LIBRARIES ... "
+
+if [ -n "${fp_env_file_requirements:-}" ] && [ -f "$fp_env_file_requirements" ]; then
+  echo " =====> USING REQUIREMENTS YAML: $fp_env_file_requirements"
+  # Try to create; if env exists, update it
+  conda env create -f "$fp_env_file_requirements" || conda env update -n "$fp_env_folder_libraries" -f "$fp_env_file_requirements"
+  conda activate "$fp_env_folder_libraries"
 else
-
-	echo " =====> USE OF CONDA GENERIC COMMAND-LINE"
-	
-	echo " =====> CONDA INSTALLATION ... "
-	
-	echo " ======> CONDA-DEFAULT CHANNEL INSTALLATION ... "
-	conda create --yes --name $fp_env_folder_libraries numpy scipy pandas rasterio netCDF4 cython xarray=0.18.0 bottleneck dask pip python=3.9
-	echo " ======> CONDA-DEFAULT CHANNEL INSTALLATION ... DONE"
-	
-	echo " ======> [2/2] PYTHON-PIP INSTALLATION ... "
-	source activate $fp_env_folder_libraries
-	pip install cfgrib
-	pip install pyresample
-	pip install repurpose
-	echo " ======> [2/2] PYTHON-PIP INSTALLATION ... DONE"
-	
-
-
-	echo " =====> CONDA INSTALLATION ... DONE"
-	
+  echo " =====> NO YAML FOUND: creating environment manually from conda-forge (strict) ..."
+  conda create -y -n "$fp_env_folder_libraries" -c conda-forge \
+    "python=3.10" "pip" \
+    "numpy" "scipy" "pandas" "xarray" "matplotlib" "bottleneck" "dask" "cython" \
+    "rasterio>=1.3,<1.4" "gdal>=3.9,<3.10" \
+    "proj" "geos" "geotiff" "libnetcdf" "netcdf4" "hdf5" "hdf4" \
+    "kealib" "tiledb" "openjpeg" "zstd" "libcurl" "libzip"
+  conda activate "$fp_env_folder_libraries"
+  # Pure-Python extras via pip (safe wheels)
+  pip install --no-input cfgrib pyresample repurpose
 fi
+
+# Enforce strict conda-forge inside the env for ABI stability (GDAL/NetCDF/Rasterio)
+conda config --env --add channels conda-forge
+conda config --env --set channel_priority strict
+
+# Optional sanity check (non-fatal)
+python - <<'PY' || true
+try:
+    import rasterio, netCDF4
+    print("Rasterio OK, GDAL:", getattr(rasterio, "__gdal_version__", "unknown"))
+    print("netCDF4 OK, libnetcdf:", netCDF4.__netcdf4libversion__)
+except Exception as e:
+    print("Sanity check warning:", e)
+PY
 
 echo " ====> INSTALL PYTHON LIBRARIES ... DONE!"
-# ----------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------------------
-# Create environmental file
+#-----------------------------------------------------------------------------------------
+# Create environmental file (activation helper)
 echo " ====> CREATE ENVIRONMENTAL FILE ... "
+cd "$fp_env_folder_root"
 
-# Delete old version of environmental file
-cd $fp_env_folder_root
+[ -f "$fp_env_file_reference" ] && rm -f "$fp_env_file_reference"
 
-if [ -f $fp_env_file_reference ] ; then
-    rm $fp_env_file_reference
-fi
+{
+  echo "PATH=$fp_env_folder_root/bin:"'$PATH'
+  echo "export PATH"
+  echo "source \"$fp_env_folder_root/etc/profile.d/conda.sh\""
+  echo "conda activate $fp_env_folder_libraries"
+} >> "$fp_env_file_reference"
 
-# Export BINARY PATH(S)
-echo "PATH=$fp_env_folder_root/bin:"'$PATH'"" >> $fp_env_file_reference
-echo "export PATH" >> $fp_env_file_reference
+echo " ====> ENVIRONMENTAL FILE CREATED: $fp_env_file_reference"
+#-----------------------------------------------------------------------------------------
 
-# Export VENV ACTIVATION
-echo "source activate $fp_env_folder_libraries" >> $fp_env_file_reference
-
-echo " ====> CREATE ENVIRONMENTAL FILE ... DONE!"
-# ----------------------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------------------
 # Info script end
-echo " ==> "$script_name" (Version: "$script_version" Release_Date: "$script_date")"
+echo " ==> $script_name (Version: $script_version Release_Date: $script_date)"
 echo " ==> ... END"
 echo " ==> Bye, Bye"
 echo " ==================================================================================="
-# ----------------------------------------------------------------------------------------
 

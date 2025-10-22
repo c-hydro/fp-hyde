@@ -81,8 +81,8 @@ def compute_rain(var_dframe, var_attrs=None,
         alg_logger.error(' ===> Time index must be 0')
         raise NotImplementedError('Case not implemented yet')
     # check frequency
-    if var_frequency != '3H':
-        alg_logger.error(' ===> Rain frequency must be "3H"')
+    if var_frequency not in ['1H', '3H']:
+        alg_logger.error(' ===> Rain frequency must be "1H" or "3H"')
         raise NotImplementedError('Case not implemented yet')
     else:
         # split frequency in time and step
@@ -105,25 +105,34 @@ def compute_rain(var_dframe, var_attrs=None,
         raise NotImplementedError('Case not implemented yet')
 
     # adjust time range
-    time_start = time_range_in[0] - pd.Timedelta('3h')
-    time_end = time_range_in[-1]
-    time_range_out = pd.date_range(start=time_start, end=time_end, freq='1h')
-    time_range_out = time_range_out[1:]
-    time_steps_out = len(time_range_out)
+    if var_frequency == '3H':
+        time_start = time_range_in[0] - pd.Timedelta('3h')
+        time_end = time_range_in[-1]
+        time_range_out = pd.date_range(start=time_start, end=time_end, freq='1h')
+        time_range_out = time_range_out[1:]
+        time_steps_out = len(time_range_out)
 
-    values_src = var_dframe.values / var_frequency_value
-    values_dst = np.zeros(shape=(time_steps_out, values_src.shape[geo_y_idx], values_src.shape[geo_x_idx]))
-    for i in range(0, time_steps_in):
+        values_src = var_dframe.values / var_frequency_value
+        values_dst = np.zeros(shape=(time_steps_out, values_src.shape[geo_y_idx], values_src.shape[geo_x_idx]))
+        for i in range(0, time_steps_in):
 
-        idx_start = i * var_frequency_value
-        idx_end = (i + 1) * var_frequency_value
+            idx_start = i * var_frequency_value
+            idx_end = (i + 1) * var_frequency_value
 
-        values_src_tmp = values_src[i, :, :]
-        values_dst_tmp = np.zeros(shape=(var_frequency_value, values_src_tmp.shape[0], values_src_tmp.shape[1]))
-        for j in range(0, var_frequency_value):
-            values_dst_tmp[j, :, :] = values_src_tmp
+            values_src_tmp = values_src[i, :, :]
+            values_dst_tmp = np.zeros(shape=(var_frequency_value, values_src_tmp.shape[0], values_src_tmp.shape[1]))
+            for j in range(0, var_frequency_value):
+                values_dst_tmp[j, :, :] = values_src_tmp
 
-        values_dst[idx_start:idx_end, :, :] = values_dst_tmp
+            values_dst[idx_start:idx_end, :, :] = values_dst_tmp
+    elif var_frequency == '1H':
+
+        time_range_out = time_range_in
+        values_dst = var_dframe.values
+
+    else:
+        alg_logger.error(' ===> Rain frequency must be "1H" or "3H"')
+        raise NotImplementedError('Case not implemented yet')
 
     var_dframe = create_darray(
         values_dst, geo_x_values, geo_y_values, geo_1d=False, time=time_range_out, name=None,
@@ -173,17 +182,24 @@ def compute_air_temperature(var_dframe, var_attrs=None,
         alg_logger.error(' ===> Time index must be 0')
         raise NotImplementedError('Case not implemented yet')
     # check frequency
-    if var_frequency != '3H':
-        alg_logger.error(' ===> Air Temperature frequency must be "3H"')
+    if var_frequency not in ['1H', '3H']:
+        alg_logger.error(' ===> Air Temperature frequency must be "1H" or "3H"')
         raise NotImplementedError('Case not implemented yet')
 
-    # convert to 3H to 1H frequency
-    var_dframe = var_dframe.resample(time='1h').interpolate('linear')
+    # convert frequency (if needed
+    if var_frequency == '3H':
+        var_dframe = var_dframe.resample(time='1h').interpolate('linear')
+    elif var_frequency == '1H':
+        pass
+    else:
+        alg_logger.error(' ===> Air Temperature frequency must be "1H" or "3H"')
+        raise NotImplementedError('Case not implemented yet')
 
     # select variable period
     if var_period is not None:
         idx_start, idx_end = var_period[0], var_period[1]
-        idx_end = (idx_end - idx_start) * 3 + 1
+        if var_frequency == '3H':
+            idx_end = (idx_end - idx_start) * 3 + 1
         var_dframe = var_dframe[idx_start:idx_end, :, :]
 
     # apply scale factor
@@ -231,7 +247,7 @@ def compute_wind_component(var_dframe, var_attrs=None,
         alg_logger.error(' ===> Time index must be 0')
         raise NotImplementedError('Case not implemented yet')
     # check frequency
-    if var_frequency != '3H':
+    if var_frequency not in ['1H','3H']:
         alg_logger.error(' ===> Rain frequency must be "3H"')
         raise NotImplementedError('Case not implemented yet')
     else:
@@ -241,6 +257,10 @@ def compute_wind_component(var_dframe, var_attrs=None,
     # select variable period
     if var_period is not None:
         idx_start, idx_end = var_period[0], var_period[1]
+
+        if var_frequency == '3H':
+            idx_end = (idx_end - idx_start) * 3 + 1
+
         var_dframe = var_dframe[idx_start:idx_end, :, :]
 
     time_range_in = pd.DatetimeIndex(var_dframe[var_name_time].values)
@@ -263,25 +283,35 @@ def compute_wind_component(var_dframe, var_attrs=None,
         raise NotImplementedError('Case not implemented yet')
 
     # adjust time range
-    time_start = time_range_in[0] - pd.Timedelta('3h')
-    time_end = time_range_in[-1]
-    time_range_out = pd.date_range(start=time_start, end=time_end, freq='1h')
-    time_range_out = time_range_out[1:]
-    time_steps_out = len(time_range_out)
+    if var_frequency == '3H':
+        time_start = time_range_in[0] - pd.Timedelta('3h')
+        time_end = time_range_in[-1]
+        time_range_out = pd.date_range(start=time_start, end=time_end, freq='1h')
+        time_range_out = time_range_out[1:]
+        time_steps_out = len(time_range_out)
 
-    values_src = var_dframe.values / var_frequency_value
-    values_dst = np.zeros(shape=(time_steps_out, values_src.shape[geo_y_idx], values_src.shape[geo_x_idx]))
-    for i in range(0, time_steps_in):
+        values_src = var_dframe.values / var_frequency_value
+        values_dst = np.zeros(shape=(time_steps_out, values_src.shape[geo_y_idx], values_src.shape[geo_x_idx]))
+        for i in range(0, time_steps_in):
 
-        idx_start = i * var_frequency_value
-        idx_end = (i + 1) * var_frequency_value
+            idx_start = i * var_frequency_value
+            idx_end = (i + 1) * var_frequency_value
 
-        values_src_tmp = values_src[i, :, :]
-        values_dst_tmp = np.zeros(shape=(var_frequency_value, values_src_tmp.shape[0], values_src_tmp.shape[1]))
-        for j in range(0, var_frequency_value):
-            values_dst_tmp[j, :, :] = values_src_tmp
+            values_src_tmp = values_src[i, :, :]
+            values_dst_tmp = np.zeros(shape=(var_frequency_value, values_src_tmp.shape[0], values_src_tmp.shape[1]))
+            for j in range(0, var_frequency_value):
+                values_dst_tmp[j, :, :] = values_src_tmp
 
-        values_dst[idx_start:idx_end, :, :] = values_dst_tmp
+            values_dst[idx_start:idx_end, :, :] = values_dst_tmp
+
+    elif var_frequency == '1H':
+
+        time_range_out = time_range_in
+        values_dst = var_dframe.values
+
+    else:
+        alg_logger.error(' ===> Wind component frequency must be "1H" or "3H"')
+        raise NotImplementedError('Case not implemented yet')
 
     var_dframe = create_darray(
         values_dst, geo_x_values, geo_y_values, geo_1d=False, time=time_range_out, name=None,
@@ -331,18 +361,27 @@ def compute_relative_humidity(var_dframe, var_attrs=None,
     if time_idx != 0:
         alg_logger.error(' ===> Time index must be 0')
         raise NotImplementedError('Case not implemented yet')
+
     # check frequency
-    if var_frequency != '3H':
-        alg_logger.error(' ===> Relative Humidity frequency must be "3H"')
+    if var_frequency not in ['1H', '3H']:
+        alg_logger.error(' ===> Relative Humidity frequency must be "1H" or "3H"')
         raise NotImplementedError('Case not implemented yet')
 
-    # convert to 3H to 1H frequency
-    var_dframe = var_dframe.resample(time='1h').interpolate('linear')
+
+    # convert frequency (if needed
+    if var_frequency == '3H':
+        var_dframe = var_dframe.resample(time='1h').interpolate('linear')
+    elif var_frequency == '1H':
+        pass
+    else:
+        alg_logger.error(' ===> Air Temperature frequency must be "1H" or "3H"')
+        raise NotImplementedError('Case not implemented yet')
 
     # select variable period
     if var_period is not None:
         idx_start, idx_end = var_period[0], var_period[1]
-        idx_end = (idx_end - idx_start) * 3 + 1
+        if var_frequency == '3H':
+            idx_end = (idx_end - idx_start) * 3 + 1
         var_dframe = var_dframe[idx_start:idx_end, :, :]
 
     # apply scale factor

@@ -125,19 +125,19 @@
   "methods": {
     "organize_data": {
       "air_temperature": {"fx": "compute_air_temperature", "type": "instantaneous",
-        "period": [1, 29], "frequency": "3H"},
+        "period": [0, 90], "frequency": "1H"},
       "rain": {"fx": "compute_rain", "type": "accumulated",
-        "period": [0, 28], "frequency": "3H"},
+        "period": [0, 90], "frequency": "1H"},
       "relative_humidity": {"fx": "compute_relative_humidity", "type": "instantaneous",
-        "period": [1, 29], "frequency": "3H"},
+        "period": [0, 90], "frequency": "1H"},
       "incoming_radiation": {"fx": "compute_incoming_radiation", "type": "average",
-        "period": [0, 28], "frequency": "3H"},
+        "period": [0, 90], "frequency": "1H"},
       "wind_u": {"fx": "compute_wind_component", "type": "instantaneous",
-        "period": [1, 29], "frequency": "3H"},
+        "period": [0, 90], "frequency": "1H"},
       "wind_v": {"fx": "compute_wind_component", "type": "instantaneous",
-        "period": [1, 29], "frequency": "3H"},
+        "period": [0, 90], "frequency": "1H"},
       "albedo": {"fx": "compute_surface_albedo", "type": "instantaneous",
-        "period": [1, 29], "frequency": "3H"}
+        "period": [0, 90], "frequency": "1H"}
     },
     "compose_data": {
       "air_temperature": {"variables": ["air_temperature"],"fx": null},
@@ -178,7 +178,7 @@
     "dynamic" : {
       "time": {
         "data_hour_reference": 0,
-        "data_steps": 84
+        "data_steps": 90
       },
       "source": {
         "air_temperature_collections": {
@@ -189,18 +189,22 @@
             "air_temperature": "t2m",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": "fc",
+          "frequency": "1H"
         },
         "rain_collections": {
           "__comment__": "total precipitation variable is 'tp' in meters {datetime_source}-ecmwf0100.t00z.PRECI3",
           "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
-          "file_name": null,
+          "file_name": "{datetime_source}-ecmwf0100.t00z.PRECI1",
           "compression": false,
           "variables": {
             "rain": "tp",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": "fc",
+          "frequency": "1H"
         },
         "relative_humidity_collections": {
           "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
@@ -210,7 +214,9 @@
             "relative_humidity": "r",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": "fc",
+          "frequency": "1H"
         },
         "incoming_radiation_collections": {
           "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
@@ -220,7 +226,9 @@
             "incoming_radiation": "asob_s",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": "fc",
+          "frequency": "1H"
         },
         "wind_collections": {
           "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
@@ -231,7 +239,9 @@
             "wind_v": "v10",
             "longitude": "longitude",
             "latitude": "latitude"
-          }
+          },
+          "type": "fc",
+          "frequency": "1H"
         },
         "albedo_collections": {
           "folder_name": "/home/fabio/Desktop/hyde/dset/marche/data_dynamic/source/nwp/ecmwf-0100/",
@@ -241,7 +251,9 @@
               "albedo": "alb_rad",
               "longitude": "longitude",
               "latitude": "latitude"
-          }
+          },
+          "type": "fc",
+          "frequency": "1H"
         }
       },
       "ancillary": {
@@ -277,11 +289,11 @@
     "time_rounding" : "H"
   },
   "log": {
-    "folder_name" : "/home/fabio/Desktop/Workspace/hyde/dset/marche/log/",
-    "file_name": "app_nwp_lami_2i_local.txt"
+    "folder_name" : "/home/fabio/Desktop/hyde/dset/marche/log/",
+    "file_name": "app_nwp_ecmwf-0100_1h.txt"
   },
   "tmp": {
-    "folder_name" : "/home/fabio/Desktop/Workspace/hyde/dset/marche/tmp/",
+    "folder_name" : "/home/fabio/Desktop/hyde/dset/marche/tmp/",
     "file_name": null
   }
 }
